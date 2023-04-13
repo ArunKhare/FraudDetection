@@ -17,6 +17,7 @@ scikit-learn
 flask
 gunicorn
 mlflow
+dill
 -e .
 ## Dev requirements 
 tox
