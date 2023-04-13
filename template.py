@@ -11,14 +11,16 @@ list_of_files = [
     f"src/{package_name}/__init__.py",
     f"src/{package_name}/components/__init__.py",
     f"src/{package_name}/utils/__init__.py",
-    f"src/{package_name}/utils/common.py"
     f"src/{package_name}/config/__init__.py",
     f"src/{package_name}/pipeline/__init__.py",
     f"src/{package_name}/entity/__init__.py",
     f"src/{package_name}/constants/__init__.py",
+    f"src/{package_name}/exception/__init__.py",
+    f"src/{package_name}/logger/__init__.py",
     "tests/__init__.py",
     "test/unit/__init__.py",
     "tests/integration/__init__.py",
+    "configs/__init__.py",
     "configs/config.yaml",
     "dvc.yaml",
     "params.yaml",
@@ -29,7 +31,7 @@ list_of_files = [
     'setup.cfg',
     "pyproject.toml",
     "tox.ini",
-    "research/trials.ipynb",
+    "notebook/trials.ipynb",
     ]
 
 for filepath in list_of_files:
