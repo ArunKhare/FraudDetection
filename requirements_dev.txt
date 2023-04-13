@@ -21,3 +21,4 @@ mlflow
 ## Dev requirements 
 tox
 pytest
+sphinx
