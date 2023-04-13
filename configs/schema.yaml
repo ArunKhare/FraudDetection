@@ -1,0 +1,13 @@
+columns:
+  step: int64
+  type: object
+  amount: float64
+  nameOrig: object
+  oldbalanceOrg: float64
+  newbalanceOrig: float64
+  nameDest: object 
+  oldbalanceDest:  float64
+  newbalanceDest:  float64
+ 
+target_column: 
+  isFraud: int64
