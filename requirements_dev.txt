@@ -1,0 +1,23 @@
+dvc
+pandas
+notebook
+numpy
+matplotlib
+seaborn
+python-box
+pyYAML
+tqdm
+ensure
+joblib
+types-PyYAML
+scipy
+streamlit
+rangehttpserver
+scikit-learn
+flask
+gunicorn
+mlflow
+-e .
+## Dev requirements 
+tox
+pytest
