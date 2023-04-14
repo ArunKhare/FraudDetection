@@ -1,4 +1,4 @@
-import os
+import os ,sys
 import numpy as np
 import pandas as pd
 import dill, yaml, json, joblib
@@ -8,7 +8,7 @@ from typing import Any
 from ensure import ensure_annotations
 
 from box.exceptions import BoxValueError
-from fraudDetection.exception import fraudDetectionException
+from fraudDetection.exception import FraudDetectionException
 from fraudDetection.logger import logging
 from fraudDetection.constants import DATASET_SCHEMA_COUMNS_KEY
 
@@ -25,7 +25,7 @@ def create_directories(path_to_directories:list,verbose=True):
             if verbose:
                 logging.info("created directories at:{path}")
     except Exception as e:
-        raise fraudDetectionException(e,sys) from e
+        raise FraudDetectionException(e,sys) from e
     
 @ ensure_annotations
 def read_yaml(path_to_yaml:Path) ->ConfigBox:
@@ -43,7 +43,7 @@ def read_yaml(path_to_yaml:Path) ->ConfigBox:
             logging.info(f'yaml file:{path_to_yaml} loaded successfully' )
             return ConfigBox(content)
     except BoxValueError as e:
-        raise fraudDetectionException(e,sys) from e
+        raise FraudDetectionException(e,sys) from e
     
 def write_yaml(file_path:str,data:dict=None) ->yaml:
     """create yaml file
@@ -56,7 +56,7 @@ def write_yaml(file_path:str,data:dict=None) ->yaml:
             if data is not None:
                 yaml.dump(data=data,stream=yaml_file)
     except Exception as e:
-        raise fraudDetectionException(e,sys) from e
+        raise FraudDetectionException(e,sys) from e
                         
 @ensure_annotations
 def save_json(path:Path, data:dict):
@@ -70,7 +70,7 @@ def save_json(path:Path, data:dict):
             json.dump(data,f, indent=4)
         logging.info ("f json file saved at: {path}")
     except Exception as e:
-        raise fraudDetectionException(e,sys) from e
+        raise FraudDetectionException(e,sys) from e
 
 @ensure_annotations
 def load_json(path:Path) ->ConfigBox:
@@ -84,7 +84,7 @@ def load_json(path:Path) ->ConfigBox:
         logging.info("json file loaded succesfully from:{path}")
         return ConfigBox(content)
     except Exception as e:
-        raise fraudDetectionException(e,sys) from e
+        raise FraudDetectionException(e,sys) from e
 
 @ensure_annotations
 def get_size(path:Path) ->str:
@@ -109,7 +109,7 @@ def save_numpy_array_data(file_path:Path, array:np.array):
         with open(file=file_path,mode='wb') as f:
             np.save(f,array)
     except Exception as e:
-        raise fraudDetectionException(e,sys) from e
+        raise FraudDetectionException(e,sys) from e
 
 @ensure_annotations
 def load_numpy_array_data(file_path:Path,) -> np.array:
@@ -122,7 +122,7 @@ def load_numpy_array_data(file_path:Path,) -> np.array:
         with open(file=file_path) as f:
             return np.load(f)
     except Exception as e:
-        raise fraudDetectionException(e,sys) from e
+        raise FraudDetectionException(e,sys) from e
     
 @ensure_annotations
 def save_object(file_path:Path,obj):
@@ -136,7 +136,7 @@ def save_object(file_path:Path,obj):
         with open(file=file_path,mode='wb') as file_obj:
             dill.dump(obj,file_obj)
     except Exception as e:
-        raise fraudDetectionException(e,sys) from e
+        raise FraudDetectionException(e,sys) from e
     
 @ensure_annotations
 def compare_schema(schema: dict, csv_path: Path):
