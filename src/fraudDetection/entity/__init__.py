@@ -7,3 +7,7 @@ from fraudDetection.entity.config_entity import (
     ModelTrainerConfig,
     TraningPipelineConfig
 )
+
+from fraudDetection.entity.artifact_entity import(
+    DataIngestionArtifact,
+)

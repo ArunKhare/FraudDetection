@@ -5,11 +5,12 @@ from pathlib import Path
 class DataIngestionConfig:
     source_url: str
     raw_data_dir: Path
-    unzip_dir: Path
+    zip_dir: Path
     ingested_dir: Path
     ingested_train_dir: Path
     ingested_test_dir: Path
-
+    stratify: str = None
+    test_size: float = 0.2
 @dataclass(frozen=True)
 class DataValidationConfig:
     schema_dir: Path

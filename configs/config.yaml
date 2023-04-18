@@ -5,11 +5,12 @@ training_pipeline_config:
 data_ingestion_config:
   source_url: kaggle datasets download -d rupakroy/online-payments-fraud-detection-dataset
   raw_data_dir: raw_data
-  unzip_dir: zip_data
+  zip_dir: zip_data
   ingested_dir: ingested_data
   ingested_train_dir: train
   ingested_test_dir: test
-  train_size: 0.8
+  stratify: isFraud
+  test_size: 0.8
 
 data_validation_config:
   schema_dir: config

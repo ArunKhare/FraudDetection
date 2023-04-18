@@ -127,3 +127,8 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+artifacts
+./artifacts
+./trials.ipynb
+./trial codes

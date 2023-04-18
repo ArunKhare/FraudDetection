@@ -2,7 +2,8 @@
 detecting fraud banking transaction 
 
 execution sequence:
-template.py
-init_setup.sh
+python template.py
+bash init_setup.sh
+conda activate ./env
 
 

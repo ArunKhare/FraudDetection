@@ -18,6 +18,7 @@ flask
 gunicorn
 mlflow
 dill
+kaggle
 -e .
 ## Dev requirements 
 tox

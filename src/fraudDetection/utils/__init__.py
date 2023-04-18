@@ -1,4 +1,4 @@
-import os ,sys
+import os, sys
 import numpy as np
 import pandas as pd
 import dill, yaml, json, joblib
@@ -10,7 +10,7 @@ from ensure import ensure_annotations
 from box.exceptions import BoxValueError
 from fraudDetection.exception import FraudDetectionException
 from fraudDetection.logger import logging
-from fraudDetection.constants import DATASET_SCHEMA_COUMNS_KEY
+
 
 @ensure_annotations 
 def create_directories(path_to_directories:list,verbose=True):
@@ -25,7 +25,7 @@ def create_directories(path_to_directories:list,verbose=True):
             if verbose:
                 logging.info("created directories at:{path}")
     except Exception as e:
-        raise FraudDetectionException(e,sys) from e
+        raise FraudDetectionException(e, sys) from e 
     
 @ ensure_annotations
 def read_yaml(path_to_yaml:Path) ->ConfigBox:
@@ -42,6 +42,9 @@ def read_yaml(path_to_yaml:Path) ->ConfigBox:
             content = yaml.safe_load(yaml_file)
             logging.info(f'yaml file:{path_to_yaml} loaded successfully' )
             return ConfigBox(content)
+        raise FileNotFoundError(f"Config file not found:{path_to_yaml}")
+    except FileNotFoundError as e:
+        raise FraudDetectionException(e,sys) from e
     except BoxValueError as e:
         raise FraudDetectionException(e,sys) from e
     
@@ -59,7 +62,7 @@ def write_yaml(file_path:str,data:dict=None) ->yaml:
         raise FraudDetectionException(e,sys) from e
                         
 @ensure_annotations
-def save_json(path:Path, data:dict):
+def save_json(path:Path, data:dict)  -> None:
     """ save json data
     Args: 
         path(Path): path to json file
@@ -98,7 +101,7 @@ def get_size(path:Path) ->str:
     return f"~ {size_in_kb} KB"
 
 @ensure_annotations
-def save_numpy_array_data(file_path:Path, array:np.array):
+def save_numpy_array_data(file_path:Path, array:np.array) -> None:
     """ Save numpy array data to file 
     Args:
         file path(Path): location of file to save
@@ -125,7 +128,7 @@ def load_numpy_array_data(file_path:Path,) -> np.array:
         raise FraudDetectionException(e,sys) from e
     
 @ensure_annotations
-def save_object(file_path:Path,obj):
+def save_object(file_path:Path,obj) -> None:
     """Save a 
     Args:
         file_path(Path): location to save the object
@@ -139,7 +142,7 @@ def save_object(file_path:Path,obj):
         raise FraudDetectionException(e,sys) from e
     
 @ensure_annotations
-def compare_schema(schema: dict, csv_path: Path):
+def compare_schema(schema: dict, csv_path: Path) -> None:
     """
     Compare the schema in a dictionary format with the schema of a CSV file.
     
@@ -164,3 +167,11 @@ def compare_schema(schema: dict, csv_path: Path):
         if str(df_schema[col]) != str(dtype):
             raise FraudDetectionException(f"Column '{col}' has a different data type in CSV schema.", 
                                            f"Expected data type: {dtype}, Actual data type: {df_schema[col]}")
+
+def save_file(df, file_path: Path, chunk_size:int ) -> None:
+    try:
+        for i, (index,chunk) in enumerate(df.groupby(df.index // chunk_size)):
+            chunk_file_path: Path = file_path / f"file_{i}.csv"
+            chunk.to_csv(chunk_file_path, index=False, header=i == 0)
+    except Exception as e:
+        raise FraudDetectionException(e, sys) from e
