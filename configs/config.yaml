@@ -16,6 +16,7 @@ data_validation_config:
   schema_dir: config
   schema_file_name: schema.yaml
   report_file_name: report.json
+  report_file_dir: driftReport
 
 data_transformation_config:
   transformed_dir: transformed_data

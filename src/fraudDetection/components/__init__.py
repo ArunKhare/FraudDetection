@@ -1,1 +1,3 @@
 from fraudDetection.components.data_ingestion import DataIngestion
+from fraudDetection.components.data_validation import DataValidation
+from fraudDetection.components.data_transformation import DataTransformation

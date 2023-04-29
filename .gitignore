@@ -132,3 +132,5 @@ artifacts
 ./artifacts
 ./trials.ipynb
 ./trial codes
+./cache*
+cache

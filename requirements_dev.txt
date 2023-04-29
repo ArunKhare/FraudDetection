@@ -19,6 +19,7 @@ gunicorn
 mlflow
 dill
 kaggle
+evidently
 -e .
 ## Dev requirements 
 tox

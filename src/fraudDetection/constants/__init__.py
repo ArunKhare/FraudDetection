@@ -10,7 +10,6 @@ ROOT_DIR = os.getcwd()
 CONFIG_DIR = "configs"
 CONFIG_FILE_NAME = "config.yaml"
 CONFIG_FILE_PATH: Path = Path(os.path.join(ROOT_DIR,CONFIG_DIR,CONFIG_FILE_NAME))
-# CONFIG_FILE_PATH: Path = Path("configs/config.yaml")
 
 LOGS_DIR ="logs"
 
@@ -33,14 +32,14 @@ DATA_INGESTION_TEST_DIR_KEY = "ingested_test_dir"
 DATA_INGESTION_TEST_SIZE_KEY = "test_size"
 DATA_INGESTION_STRATIFY_COL_KEY = "stratify"
 
-DATASET_SCHEMA_COUMNS_KEY = "columns"
-
 #Data Validation related variable
 DATA_VALIDATION_CONFIG_KEY = "data_validation_config"
 DATA_VALIDATION_ARTIFACT_DIR_KEY = "data_validation"
-DATA_VALIDATION_SCHEMA_DIR_KEY = "schema_dir"
-DATA_VALIDATION_SCHEMA_FILE_NAME_KEY = "Schema_file_name"
-DATA_VALIDATION_REPORT_FILE_NAME_KEY = "report.json"
+DATA_VALIDATION_SCHEMA_DIR_KEY = CONFIG_DIR
+DATA_VALIDATION_SCHEMA_FILE_NAME_KEY = "schema_file_name"
+DATA_VALIDATION_REPORT_FILE_NAME_KEY = "report_file_name"
+DATA_VALIDATION_SCHEMA_COUMNS_KEY = "columns"
+DATA_VALIDATION_REPORT_FILE_PATH = "report_file_dir"
 
 #Data transformation related variable
 DATA_TRANSFORMATION_CONFIG_KEY = "data_transformation_config"
@@ -49,6 +48,9 @@ DATA_TRANSFORMED_TRAIN_DIR_KEY = "transformed_train_dir"
 DATA_TRANSFORMED_TEST_DIR_KEY = "transformed_test_dir"
 DATA_TRANSFORMATION_PREPROCESSING_DIR_KEY = "preprocessing_dir"
 DATA_PREPROCESSING_OBJECT_FILE_NAME_KEY = "preprocessed.pkl"
+DATA_TRANSFORMATION_CATEGORICAL_COLUMN_KEY = "categorical_columns"
+DATA_TRANSFORMATION_NUMERICAL_COLUMN_KEY = "numerical_columns"
+DATA_TRANSFORMATION_TARGET_COLUMN_KEY = "target_column"
 
 # Model trainer related variable
 MODEL_TRAINER_ARTIFACTS_DIR_KEY = "model_trainer"

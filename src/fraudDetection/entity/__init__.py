@@ -10,4 +10,9 @@ from fraudDetection.entity.config_entity import (
 
 from fraudDetection.entity.artifact_entity import(
     DataIngestionArtifact,
+    DataValidationArtifact,
+    DataTransformationArtifact,
+    ModelTrainerArtifact,
+    ModelEvaluationArtifact,
+    ModelPusherArtifacts
 )

@@ -77,14 +77,17 @@ class ConfigurationManager:
             data_validation_artifacts_dir = Path(os.path.join(self.artifact_dir, DATA_VALIDATION_ARTIFACT_DIR_KEY, self.current_time_stamp))
             data_validation_config:ConfigBox = self.config[DATA_VALIDATION_CONFIG_KEY]
             schema_file_name:str = data_validation_config[DATA_VALIDATION_SCHEMA_FILE_NAME_KEY]
+            schema_file_path = Path(os.path.join(ROOT_DIR, CONFIG_DIR, schema_file_name))
             report_file_name:str = data_validation_config[DATA_VALIDATION_REPORT_FILE_NAME_KEY]
-
-            schema_file_path = Path(os.path.join(CONFIG_FILE_PATH))
+            report_file_path = Path(os.path.join(data_validation_artifacts_dir,report_file_name))
+            
             data_validation_config =  DataValidationConfig(
-                schema_dir=schema_file_path,
                 schema_file_name = schema_file_name,
-                report_file_name = report_file_name
+                schema_file_path = schema_file_path,
+                report_file_name = report_file_name,
+                report_file_path = report_file_path,
                 )
+            
             logging.info(f"logging data validation config: {data_validation_config}")
         except Exception as e:
             raise FraudDetectionException(e,sys) from e
@@ -93,19 +96,20 @@ class ConfigurationManager:
     def get_data_transformation_config(self) -> DataTransformationConfig:
         try:
             # artifact_dir = self.training_pipeline_config.artifacts_root
-            data_transformation_artifacts_dir = Path(os.path.join(self.artifact_dir,DATA_TRANSFORMATION_ARTIFACTS_DIR_KEY,self.current_time_stamp))
+            data_transformation_artifacts_dir = Path(os.path.join(self.artifact_dir,DATA_TRANSFORMATION_ARTIFACTS_DIR_KEY))
 
             data_transformation_config:ConfigBox = self.config[DATA_TRANSFORMATION_CONFIG_KEY]
             
             transformed_train_dir = Path(os.path.join(data_transformation_artifacts_dir,data_transformation_config[DATA_TRANSFORMED_TRAIN_DIR_KEY]))
             transformed_test_dir = Path(os.path.join(data_transformation_artifacts_dir,data_transformation_config[DATA_TRANSFORMED_TEST_DIR_KEY]))
-            preprocessed_object_file_name = Path(os.path.join(data_transformation_artifacts_dir, data_transformation_config[DATA_TRANSFORMATION_PREPROCESSING_DIR_KEY]))
+            preprocessed_object_dir = Path(os.path.join(data_transformation_artifacts_dir, data_transformation_config[DATA_TRANSFORMATION_PREPROCESSING_DIR_KEY]))
+
 
             data_transformation_config = DataTransformationConfig(
-                                                tranformed_dir = data_transformation_artifacts_dir,
-                                                tranformed_train_dir = transformed_train_dir,
+                                                transformed_dir = data_transformation_artifacts_dir,
+                                                transformed_train_dir = transformed_train_dir,
                                                 transformed_test_dir = transformed_test_dir,
-                                                preprocessed_object_file_name = preprocessed_object_file_name
+                                                preprocessing_object_dir =  preprocessed_object_dir
                                                                   )
         except Exception as e:
             raise FraudDetectionException(e,sys) from e
@@ -144,7 +148,6 @@ class ConfigurationManager:
             model_evaluation_file_path = Path(os.path.join(artifact_dir,model_evaluation_config[MODEL_EVALUATION_FILE_NAME_KEY],self.current_time_stamp))
 
             response = ModelEvaluationConfig(model_evaluation_file_name= model_evaluation_file_path, time_stamp=self.current_time_stamp)
-
             logging.info(f"Model Evaluation config: {response}")
             return response
         except Exception as e:
@@ -152,7 +155,6 @@ class ConfigurationManager:
        
     def get_model_pusher_config(self) -> None:
         try:
-
             model_pusher_config:ConfigBox = self.config[MODEL_PUSHER_CONFIG_KEY]
 
             export_dir_path = Path(os.path.join(ROOT_DIR,model_pusher_config[MODEL_PUSHER_EXPORT_DIR_KEY]),self.current_time_stamp.strftime('%Y%m%d%H%M%S'))

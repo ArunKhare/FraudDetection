@@ -13,34 +13,29 @@ class DataIngestionConfig:
     test_size: float = 0.2
 @dataclass(frozen=True)
 class DataValidationConfig:
-    schema_dir: Path
     schema_file_name: str
+    schema_file_path: Path
     report_file_name: str
-
+    report_file_path: Path
 @dataclass(frozen=True)
 class DataTransformationConfig:
-    tranformed_dir:Path
-    tranformed_train_dir: Path
+    transformed_dir:Path
+    transformed_train_dir: Path
     transformed_test_dir: Path
-    preprocessing_dir: Path
-    preprocessed_object_file_name: str
-
+    preprocessing_object_dir: Path
 @dataclass(frozen=True)
 class ModelTrainerConfig:
     trained_model_file_path:Path
     base_accuracy: float
     model_config_file_path: str
-
 @dataclass(frozen=True)
 class ModelEvaluationConfig:
     model_evaluation_file_name: str
     time_stamp: str
     mlflow_uri: str
-    
 @dataclass(frozen=True)
 class ModelPusherConfig:
     model_export_dir: str
-
 @dataclass(frozen=True)
 class TraningPipelineConfig:
     artifacts_root: Path
