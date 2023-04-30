@@ -1,0 +1,53 @@
+grid_search:
+  class: GridSearchCV
+  module: sklearn.model_selection
+  params: 
+    cv: 5
+    verbose: 2
+model_selection:
+  module_0:
+    class: LogisticRegression
+    module: sklearn.linear_model
+    params: 
+      fit_intercept: true
+    search_param_grid:
+      penalty: 
+      - l1
+      - l2
+
+  module_1:
+    class: RandomForestClassifier
+    module: sklearn.ensemble
+    params:
+      min_sample_leaf: 3
+      bootstrap: true
+      n_jobs: -1
+      random_state: 42
+      class_weight: balanced
+    search_param_grid:
+      min_sample_leaf:
+      -6
+      criterion:
+      -gini
+      -entropy
+      
+  module_2:
+    class: LinearSVC
+    module: sklearn.svm
+    params:
+      dual: false
+      class_weight: balanced
+      random_state=42
+    search_param_grid:
+
+  module_3:
+       class: OneClassSVM
+    module: sklearn.svm
+    params:
+      dual: false
+      class_weight: balanced
+      random_state=42
+    search_param_grid:
+      kernel:
+      -linear
+      -rbf

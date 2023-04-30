@@ -6,7 +6,6 @@ from sklearn.model_selection import train_test_split
 from tqdm import tqdm
 from pathlib import Path
 from joblib import Memory
-import cloudpickle as pickle
 
 from fraudDetection.entity import DataIngestionConfig, DataIngestionArtifact
 from fraudDetection.logger import logging
@@ -16,7 +15,6 @@ from fraudDetection.utils import (
     save_dfs_to_csv
 )
 
-memory = Memory('./cache')
 class DataIngestion:
     def __init__(self,data_ingestion_config:DataIngestionConfig) -> None:
         try:
@@ -24,7 +22,7 @@ class DataIngestion:
             self.data_ingestion_config: DataIngestionConfig = data_ingestion_config     
         except Exception as e:
             raise FraudDetectionException(e,sys) from e
-
+            
     def download_transaction_data(self,) -> str:
         try:
             #extraction remote url to download dataset
@@ -174,6 +172,5 @@ class DataIngestion:
             logging.info(message)
         return message
         
-    
     def __del__(self) -> None:
         logging.info(f"{'>>'*20} Data Ingestion log completed.{'<<'*20} \n\n")

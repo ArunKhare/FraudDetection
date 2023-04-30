@@ -70,3 +70,11 @@ MLFLOW_URI_KEY = "mlflow_uri"
 #Model pusher related variable
 MODEL_PUSHER_CONFIG_KEY = "model_pusher_config"
 MODEL_PUSHER_EXPORT_DIR_KEY = "model_export_dir"
+
+# model factory related variable
+FACTORY_GRID_SEARCH_KEY = 'grid_search'
+FACTORY_MODULE_KEY = 'module'
+FACTORY_CLASS_KEY = 'class'
+FACTORY_PARAMS = 'params'
+FACTORY_MODEL_SELECTION_KEY = 'model_selection'
+FACTORY_SEARCH_PARAM_GRID_KEY = 'search_param_grid'

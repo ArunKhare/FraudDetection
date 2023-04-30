@@ -14,7 +14,6 @@ from fraudDetection.entity import DataIngestionArtifact, DataTransformationConfi
 from fraudDetection.utils import save_object, read_yaml, load_data, save_numpy_array_data
 
 
-
 class DataTransformation:
     def __init__(self, data_validation_artifact= DataValidationArtifact,
                  data_ingestion_artifact = DataIngestionArtifact,
@@ -122,31 +121,25 @@ class DataTransformation:
             transformed_train_dir = self.data_transformation_config.transformed_train_dir
             transformed_test_dir = self.data_transformation_config.transformed_test_dir
             
-            train_file_name = Path(os.listdir(train_file_path)[0].replace(".csv",".npy"))
-            test_file_name = Path(os.listdir(test_file_path)[0].replace(".csv",".npy"))
-
-            transformed_trained_file_path = Path(os.path.join(transformed_train_dir,train_file_name))
-            transformed_test_file_path = Path(os.path.join(transformed_test_dir,test_file_name))
+            train_file_name = os.listdir(train_file_path)[0].replace(".csv",".npy")
+            test_file_name = os.listdir(test_file_path)[0].replace(".csv",".npy")
+  
+            transformed_trained_file_path = os.path.join(transformed_train_dir,train_file_name)
+            transformed_test_file_path = os.path.join(transformed_test_dir,test_file_name)
 
             logging.info(f"Saving transformed training and testing array at path \n {transformed_trained_file_path} \n {transformed_test_file_path}")
-            chunk_size=10000
-            # try:
-            #     with open(file=transformed_trained_file_path, mode='ab') as f:
-            #         for i in range(0, len(train_arr), chunk_size):
-            #             np.save(f, train_arr[i:i+chunk_size])
-            #             f.flush()
-            #             os.fsync(f.fileno())
-            # except Exception as e:
-            #     raise FraudDetectionException(e,sys) from e
-            print("Type of train_arr is : ============>" , type( train_arr))
-            print("Transformed trained file path: =======>", transformed_trained_file_path)
-
-            save_numpy_array_data(file_path=transformed_trained_file_path, array=train_arr, chunk_size=10000)
-            save_numpy_array_data(file_path=transformed_test_file_path, array=test_arr, chunk_size=10000)
+       
+            save_numpy_array_data(file_path=transformed_trained_file_path, array=train_arr)
+            save_numpy_array_data(file_path=transformed_test_file_path, array=test_arr)
 
             # saving processing boject (pipe transformer object) to artifact path
-            preprocessing_obj_file_path = self.data_transformation_config.preprocessing_object_dir
-            save_object(preprocessing_obj_file_path,preprocessing_obj)
+            preprocessing_obj_file_path = str(self.data_transformation_config.preprocessing_object_dir)
+
+            logging.info(f"Saving preprocessing obj at {preprocessing_obj_file_path}")
+            # preprocessing_obj_name = preprocessing_obj[:-1]
+
+        
+            # save_object(preprocessing_obj_file_path, preprocessing_obj_name)
 
             data_transformation_artifact = DataTransformationArtifact(
                 is_transformed= True,
@@ -155,6 +148,7 @@ class DataTransformation:
                 transformed_test_file_path=transformed_test_dir,
                 processed_object_file_path=preprocessing_obj_file_path
             )
+
             logging.info(f'Data transformation artifact: {data_transformation_artifact}')
             return data_transformation_artifact
         except Exception as e:

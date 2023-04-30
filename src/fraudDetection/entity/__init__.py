@@ -16,3 +16,10 @@ from fraudDetection.entity.artifact_entity import(
     ModelEvaluationArtifact,
     ModelPusherArtifacts
 )
+
+from fraudDetection.entity.model_entity import(
+    InitializedModelDetails,
+    GridSearchBestModel,
+    BestModel,
+    MetricInfoArtifact,
+)

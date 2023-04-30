@@ -4,7 +4,6 @@ import pandas as pd
 import dill, yaml, json
 from box import ConfigBox
 from pathlib import Path
-from functools import lru_cache
 from ensure import ensure_annotations
 from box.exceptions import BoxValueError
 
@@ -101,25 +100,39 @@ def get_size(path:Path) ->str:
     size_in_kb = round(os.path.getsize(path)/1024)
     return f"~ {size_in_kb} KB"
 
-@ensure_annotations
-def save_numpy_array_data(file_path: Path, array: np.ndarray, chunk_size: int = 1024):
-    """ Save numpy array data to file in chunks
-    Args:
-        file_path : str location of file to save
-        array : numpy array data to save
-        chunk_size : number of elements to write at a time, defaults to 1024
+
+# def save_numpy_array_data(file_path, array, chunk_size= 1024):
+#     """ Save numpy array data to file in chunks
+#     Args:
+#         file_path : str location of file to save
+#         array : numpy array data to save
+#         chunk_size : number of elements to write at a time, defaults to 1024
+#     """
+#     try:
+#         create_directories([file_path])
+#         with open(file=file_path, mode='a') as f:
+#             for i in range(0, len(array), chunk_size):
+#                 np.save(f, array[i:i+chunk_size])
+#                 f.flush()
+#                 os.fsync(f.fileno())
+#             np.save(f,array)
+#     except Exception as e:
+#         raise FraudDetectionException(e,sys) from e
+
+def save_numpy_array_data(file_path: str, array: np.array):
+    """
+    Save numpy array data to file
+    file_path: str location of file to save
+    array: np.array data to save
     """
     try:
-        create_directories([file_path])
-        with open(file=file_path, mode='ab') as f:
-            for i in range(0, len(array), chunk_size):
-                np.save(f, array[i:i+chunk_size])
-                f.flush()
-                os.fsync(f.fileno())
+        dir_path = os.path.dirname(file_path)
+        os.makedirs(dir_path, exist_ok=True)
+        with open(file_path, 'wb') as file_obj:
+            np.save(file_obj, array)
     except Exception as e:
-        raise FraudDetectionException(e,sys) from e
+        raise FraudDetectionException(e, sys) from e
     
-
 @ensure_annotations
 def load_numpy_array_data(file_path:Path,) -> np.array:
     """load numpy array data from file
@@ -133,20 +146,33 @@ def load_numpy_array_data(file_path:Path,) -> np.array:
     except Exception as e:
         raise FraudDetectionException(e,sys) from e
     
-@ensure_annotations
-def save_object(file_path:Path,obj) -> None:
-    """Save a 
-    Args:
-        file_path(Path): location to save the object
-        obj: Any sort of object
+# @ensure_annotations
+# def save_object(file_path:Path,obj) -> None:
+#     """Save a 
+#     Args:
+#         file_path(Path): location to save the object
+#         obj: Any sort of object
+#     """
+#     try:
+#         create_directories([file_path])
+#         with open(file=file_path,mode='wb') as file_obj:
+#             dill.dump(obj,file_obj)
+#     except Exception as e:
+#         raise FraudDetectionException(e,sys) from e
+    
+def save_object(file_path:str,obj):
+    """
+    file_path: str
+    obj: Any sort of object
     """
     try:
-        create_directories([file_path])
-        with open(file=file_path,mode='wb') as file_obj:
-            dill.dump(obj,file_obj)
+        dir_path = os.path.dirname(file_path)
+        os.makedirs(dir_path, exist_ok=True)
+        with open(file_path, "wb") as file_obj:
+            dill.dump(obj, file_obj)
     except Exception as e:
         raise FraudDetectionException(e,sys) from e
-    
+
 @ensure_annotations    
 def load_object(file_path:str):
     """

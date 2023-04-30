@@ -3,7 +3,6 @@ from fraudDetection.exception import FraudDetectionException
 from fraudDetection.config.configuration import ConfigurationManager
 from fraudDetection.components import DataIngestion, DataValidation, DataTransformation
 from fraudDetection.entity import DataIngestionArtifact, DataValidationArtifact, DataTransformationArtifact
-from joblib import Parallel, delayed
 
 from fraudDetection.constants import CONFIG_FILE_PATH
 import os, sys

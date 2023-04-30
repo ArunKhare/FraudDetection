@@ -6,8 +6,6 @@ from pathlib import Path
 from evidently.report import Report
 from evidently.metrics import DataDriftTable
 from evidently.metrics import DatasetDriftMetric
-from joblib import Memory
-import time
 
 from fraudDetection.exception import FraudDetectionException
 from fraudDetection.logger import logging
@@ -15,7 +13,6 @@ from fraudDetection.constants import *
 from fraudDetection.entity import DataValidationConfig, DataValidationArtifact, DataIngestionArtifact
 from fraudDetection.utils import create_directories, read_yaml
 
-memory = Memory('./cache')
 
 class DataValidation:
     def __init__(self,data_ingestion_artifact: DataIngestionArtifact, data_validation_config:DataValidationConfig ) -> None:
