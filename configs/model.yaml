@@ -32,7 +32,27 @@ model_selection:
         - {0:0.5, 1:380}
         - {0:1, 1:300}
         - {0:10, 1:200}
-        
+      bootstrap: 
+        - False
+      max_depth: 
+        - 50
+        - 60
+        - 70
+      max_features: 
+        - 2
+        - 3
+      min_samples_leaf: 
+        - 1
+        - 2
+        - 3
+      min_samples_split: 
+        - 4
+        - 5
+        - 16
+      n_estimators: 
+        - 500
+        - 600
+        - 700
   module_2:
     class: LinearSVC
     module: sklearn.svm
