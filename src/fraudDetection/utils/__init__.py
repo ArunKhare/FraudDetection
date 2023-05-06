@@ -119,7 +119,7 @@ def get_size(path:Path) ->str:
 #     except Exception as e:
 #         raise FraudDetectionException(e,sys) from e
 
-def save_numpy_array_data(file_path: str, array: np.array):
+def save_numpy_array_data(file_path: str, array: np.ndarray):
     """
     Save numpy array data to file
     file_path: str location of file to save
@@ -134,33 +134,19 @@ def save_numpy_array_data(file_path: str, array: np.array):
         raise FraudDetectionException(e, sys) from e
     
 @ensure_annotations
-def load_numpy_array_data(file_path:Path,) -> np.array:
+def load_numpy_array_data(file_path:Path) -> np.ndarray:
     """load numpy array data from file
     Args:
         file_path(Path): location of file to load
         return(np.array): data loaded
     """
     try:
-        with open(file=file_path) as f:
+        with open(file=file_path, mode='rb') as f:
             return np.load(f)
     except Exception as e:
         raise FraudDetectionException(e,sys) from e
     
-# @ensure_annotations
-# def save_object(file_path:Path,obj) -> None:
-#     """Save a 
-#     Args:
-#         file_path(Path): location to save the object
-#         obj: Any sort of object
-#     """
-#     try:
-#         create_directories([file_path])
-#         with open(file=file_path,mode='wb') as file_obj:
-#             dill.dump(obj,file_obj)
-#     except Exception as e:
-#         raise FraudDetectionException(e,sys) from e
-    
-def save_object(file_path:str,obj):
+def save_object(file_path:Path,obj):
     """
     file_path: str
     obj: Any sort of object
@@ -174,7 +160,7 @@ def save_object(file_path:str,obj):
         raise FraudDetectionException(e,sys) from e
 
 @ensure_annotations    
-def load_object(file_path:str):
+def load_object(file_path:Path):
     """
     file_path:str
     """
@@ -276,7 +262,7 @@ def load_data(file_path:Path,schema:dict) ->pd.DataFrame:
             if len(error_message) > 0:
                 raise Exception(error_message)
 
-            return data_df
+            return data_df[schema]
         except Exception as e:
             raise FraudDetectionException(e,sys) from e
 
