@@ -7,7 +7,6 @@
             "request": "launch",
             "program": "DEMO.py",
             "console": "integratedTerminal",
-        
         }
     ]
 }
