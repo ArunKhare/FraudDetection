@@ -2,22 +2,22 @@ from dataclasses import dataclass
 
 @dataclass
 class InitializedModelDetails:
-    model_serial_no : int
+    model_serial_number : str
     model : str
     param_grid_search : str
     model_name : str
 
 @dataclass
-class GridSearchBestModel:
-    model_serial_number : int
+class GridSearchedBestModel:
+    model_serial_number : str
     model : str
     best_model : str
-    best_parameter : str
+    best_parameters : str
     best_score : float
 
 @dataclass
 class BestModel:
-    model_serial_number :int
+    model_serial_number :str
     model : str
     best_model : str
     best_parameters: str
@@ -31,7 +31,8 @@ class MetricInfoArtifact:
     test_f1_score: float
     train_precision_score : float
     train_recall_score : float
-    train_label_rank_avg_precision_curve : float
     model_accuracy: float
+    train_accuracy_score: float
+    test_accuracy_score: float
     model_index :int
     

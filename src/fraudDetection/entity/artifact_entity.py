@@ -12,6 +12,7 @@ class DataIngestionArtifact:
 class DataValidationArtifact:
     report_file_path: Path
     schema_file_path: Path
+    class_proportion_train: float
     is_validated: str
     message: str
 
@@ -28,12 +29,15 @@ class ModelTrainerArtifact:
     is_trained: str
     message: str
     trained_model_file_path: Path
-    precision: float
-    recall: float
-    f1_score: float
     train_accuracy: float
     test_accuracy:float
-    model_accuracy:float
+    train_f1_score: float
+    test_f1_score: float
+    train_precision_score: float
+    train_recall_score: float
+    model_accuracy: float
+    train_accuracy_score: float
+    test_accuracy_score: float
 
 @dataclass
 class ModelEvaluationArtifact:

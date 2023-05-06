@@ -82,8 +82,8 @@ class DataValidation:
             # Getting schema
             schema_file_path: Path = self.data_validation_config.schema_file_path
             schema_keys = read_yaml(schema_file_path)
-            column_schema = schema_keys[DATA_VALIDATION_SCHEMA_COUMNS_KEY]
-                            
+            column_schema = schema_keys[DATA_SCHEMA_COLUMNS_KEY]
+            target_col = schema_keys[DATA_SCHEMA_TARGET_COLUMN_KEY]
             logging.info(f" train_df: {train_df.columns} {train_df.dtypes} \n test_df: {test_df.columns} {test_df.dtypes}")
            
             # Compare df's schema
@@ -92,7 +92,7 @@ class DataValidation:
     
             missing_cols = [col for col in column_schema if col not in train_df.columns]
             mismatch_dtype_cols = [col for col, dtype in column_schema.items() if col in train_df.columns and train_df[col].dtype != dtype]
-
+            
             if missing_cols:
                 raise Exception (f"The following columns are missing from the DataFrame schema: {missing_cols}")
             elif mismatch_dtype_cols:
@@ -101,10 +101,32 @@ class DataValidation:
                 logging.info(f"train test file schema are as per the Schema {column_schema}")
             
             logging.info("Data validated")
-            return True
+            return True, target_col
         except Exception as e:
             raise FraudDetectionException(f"Error comparing schema: {e}",sys) from e
         
+    def check_class_balance(self, strat_train_set,strat_test_set,target_col) -> None:
+                
+        # compute class proportions in the training set
+        train_counts = strat_train_set[target_col].value_counts()
+        train_proportions = train_counts / len(strat_train_set)
+
+        # compute class proportions in the test set
+        test_counts = strat_test_set[target_col].value_counts()
+        test_proportions = test_counts / len(strat_test_set)
+
+        class_proportion_train = abs(train_proportions[0] - train_proportions[1])
+        class_proportion_test = abs(test_proportions[1] - test_proportions[0])
+
+        # check if the class proportions are proportional
+        if class_proportion_train <= 0.10 and class_proportion_test <= 0.10:
+            message: str = f'The class proportions are Balanced [Train : {class_proportion_train}, Test : {class_proportion_test}]' 
+            logging.info(message)
+        else:
+            message:str = f'The class proportions are ImBalanced [Train : {class_proportion_train}, Test : {class_proportion_test}]' 
+            logging.info(message)    
+            
+        return class_proportion_train
     
     def get_and_save_drift_report(self,train_df,test_df):
         """create a data drift report
@@ -118,7 +140,6 @@ class DataValidation:
             logging.info("Creating a datadrift report")
             report_file_path: Path = self.data_validation_config.report_file_path
             create_directories([report_file_path])
-        
             # data_drift_datast_report = Report(metrics=[DatasetDriftMetric(), ])
             
             # # record the start time
@@ -133,7 +154,6 @@ class DataValidation:
             # logging.info(f"saving report to {report_file_path}")
             # with open(report_file_path,"w") as report_file:
             #     json.dump(report,report_file,indent=6)
-
             message = f"Data validated sucessfully and data drift report saved at {report_file_path} \n {[self.data_ingestion_artifact.message]}"
             logging.info (f"message : {message}")
             return message 
@@ -144,23 +164,22 @@ class DataValidation:
         except Exception as e:
             raise FraudDetectionException(e,sys) from e
         
-        
     def is_data_drift_found(self):
         pass
-
 
     def initiate_data_validation(self) -> DataValidationArtifact:
         try:
             train_df, test_df = self.get_train_test_df()
-
-            is_data_schema_validated = self.validate_dataset_scheme(train_df, test_df)
+            is_data_schema_validated , target_col  = self.validate_dataset_scheme(train_df, test_df)
+            class_proportion_train = self.check_class_balance(train_df,test_df,target_col)
             message = self.get_and_save_drift_report(train_df,test_df)
       
             data_validation_artifact = DataValidationArtifact(
-                report_file_path = self.data_validation_config.report_file_path,
-                schema_file_path = self.data_validation_config.schema_file_path,
-                is_validated = is_data_schema_validated,
-                message = message
+                report_file_path=self.data_validation_config.report_file_path,
+                schema_file_path=self.data_validation_config.schema_file_path,
+                class_proportion_train=class_proportion_train,
+                is_validated=is_data_schema_validated,
+                message=message
             )
             logging.info(f"Data validation artifact: {data_validation_artifact}")
       

@@ -1,0 +1,8 @@
+saving a object: 
+    - Object must be of class type. i.e it has to have class_attribute
+    - file path needs to include the file_name.extension
+    - name of the file should be of permissible length
+    -logging each output
+
+approach :
+cost sensitive learning 

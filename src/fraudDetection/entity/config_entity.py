@@ -22,12 +22,13 @@ class DataTransformationConfig:
     transformed_dir:Path
     transformed_train_dir: Path
     transformed_test_dir: Path
-    preprocessing_object_dir: Path
+    preprocessing_object_file_path: Path
 @dataclass(frozen=True)
 class ModelTrainerConfig:
     trained_model_file_path:Path
     base_accuracy: float
     model_config_file_path: str
+    threshold_diff_train_test_acc: float
 @dataclass(frozen=True)
 class ModelEvaluationConfig:
     model_evaluation_file_name: str

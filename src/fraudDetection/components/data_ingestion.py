@@ -118,7 +118,7 @@ class DataIngestion:
                 chunk_size = 100000
                 tqdm(save_dfs_to_csv(strat_test_set, test_file_path, chunk_size),mininterval=5,desc=f"saving test data to csv {test_file_path}")
                 tqdm(save_dfs_to_csv(strat_train_set, train_file_path, chunk_size),mininterval=5,desc= f"saving training dataset to csv{train_file_path}")
-                message = self.check_class_balance(strat_train_set,strat_test_set,self.data_ingestion_config.stratify)
+                message = "Data ingestion completed succesfully"
             else:         
                 train_file_path = Path(os.path.join(self.data_ingestion_config.ingested_train_dir))
                 test_file_path = Path(os.path.join(self.data_ingestion_config.ingested_test_dir))
@@ -148,29 +148,6 @@ class DataIngestion:
             self.unzipfile(zip_file_path)
             return self.split_data_as_train_test()
         except Exception as e:
-            raise FraudDetectionException(e,sys) from e
-        
-    @ staticmethod
-    def check_class_balance(strat_train_set,strat_test_set,target_col) -> None:
-        # compute class proportions in the training set
-        train_counts = strat_train_set[target_col].value_counts()
-        train_proportions = train_counts / len(strat_train_set)
-
-        # compute class proportions in the test set
-        test_counts = strat_test_set[target_col].value_counts()
-        test_proportions = test_counts / len(strat_test_set)
-
-        class_proportion_train = abs(train_proportions[0] - train_proportions[1])
-        class_proportion_test = abs(test_proportions[1] - test_proportions[0])
-
-        # check if the class proportions are proportional
-        if class_proportion_train <= 0.05 and class_proportion_test <= 0.05:
-            message: str = f'The class proportions are Balanced [Train : {class_proportion_train}, Test : {class_proportion_test}]' 
-            logging.info(message)
-        else:
-            message:str = f'The class proportions are Balanced [Train : {class_proportion_train}, Test : {class_proportion_test}]' 
-            logging.info(message)
-        return message
-        
+            raise FraudDetectionException(e,sys) from e       
     def __del__(self) -> None:
         logging.info(f"{'>>'*20} Data Ingestion log completed.{'<<'*20} \n\n")

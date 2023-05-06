@@ -1,8 +1,8 @@
 from fraudDetection.logger import logging
 from fraudDetection.exception import FraudDetectionException
 from fraudDetection.config.configuration import ConfigurationManager
-from fraudDetection.components import DataIngestion, DataValidation, DataTransformation
-from fraudDetection.entity import DataIngestionArtifact, DataValidationArtifact, DataTransformationArtifact
+from fraudDetection.components import DataIngestion, DataValidation, DataTransformation,ModelTrainer
+from fraudDetection.entity import DataIngestionArtifact, DataValidationArtifact, DataTransformationArtifact, ModelTrainerArtifact
 
 from fraudDetection.constants import CONFIG_FILE_PATH
 import os, sys
@@ -19,6 +19,9 @@ def main():
         data_transformation_config =config.get_data_transformation_config()
         data_transformation_artifacts = DataTransformation(data_validation_artifacts,data_ingestion_artifacts,data_transformation_config).initiate_data_transformation()
 
+        model_trainer_config = config.get_model_trainer_config()
+        model_trainer_artifacts = ModelTrainer(model_trainer_config,data_transformation_artifacts).initiate_model_trainer()
+        
     except Exception as e:
         logging.error(e)
         raise FraudDetectionException(e,sys) from e

@@ -10,7 +10,12 @@ ROOT_DIR = os.getcwd()
 CONFIG_DIR = "configs"
 CONFIG_FILE_NAME = "config.yaml"
 CONFIG_FILE_PATH: Path = Path(os.path.join(ROOT_DIR,CONFIG_DIR,CONFIG_FILE_NAME))
-
+DATA_SCHEMA_FILE_NAME_KEY = "schema_file_name"
+DATA_SCHEMA_DIR = Path(os.path.join(ROOT_DIR,CONFIG_DIR))
+DATA_SCHEMA_COLUMNS_KEY = "columns"
+DATA_SCHEMA_CATEGORICAL_COLUMN_KEY = "categorical_columns"
+DATA_SCHEMA_NUMERICAL_COLUMN_KEY = "numerical_columns"
+DATA_SCHEMA_TARGET_COLUMN_KEY = "target_column"
 LOGS_DIR ="logs"
 
 CURRENT_TIME_STAMP = get_current_time_stamp()
@@ -35,10 +40,7 @@ DATA_INGESTION_STRATIFY_COL_KEY = "stratify"
 #Data Validation related variable
 DATA_VALIDATION_CONFIG_KEY = "data_validation_config"
 DATA_VALIDATION_ARTIFACT_DIR_KEY = "data_validation"
-DATA_VALIDATION_SCHEMA_DIR_KEY = CONFIG_DIR
-DATA_VALIDATION_SCHEMA_FILE_NAME_KEY = "schema_file_name"
 DATA_VALIDATION_REPORT_FILE_NAME_KEY = "report_file_name"
-DATA_VALIDATION_SCHEMA_COUMNS_KEY = "columns"
 DATA_VALIDATION_REPORT_FILE_PATH = "report_file_dir"
 
 #Data transformation related variable
@@ -47,19 +49,18 @@ DATA_TRANSFORMATION_ARTIFACTS_DIR_KEY = "transformed_dir"
 DATA_TRANSFORMED_TRAIN_DIR_KEY = "transformed_train_dir"
 DATA_TRANSFORMED_TEST_DIR_KEY = "transformed_test_dir"
 DATA_TRANSFORMATION_PREPROCESSING_DIR_KEY = "preprocessing_dir"
-DATA_PREPROCESSING_OBJECT_FILE_NAME_KEY = "preprocessed.pkl"
-DATA_TRANSFORMATION_CATEGORICAL_COLUMN_KEY = "categorical_columns"
-DATA_TRANSFORMATION_NUMERICAL_COLUMN_KEY = "numerical_columns"
-DATA_TRANSFORMATION_TARGET_COLUMN_KEY = "target_column"
+DATA_TRANSFORMATION_PREPROCESSING_OBJECT_FILE_NAME_KEY = "preprocessed_object_file_name"
+
 
 # Model trainer related variable
 MODEL_TRAINER_ARTIFACTS_DIR_KEY = "model_trainer"
 MODEL_TRAINER_CONFIG_KEY = "model_trainer_config"
 MODEL_TRAINED_DIR_KEY = "trained_model_dir"
 MODEL_TRAINED_FILE_NAME_KEY = "model_file_name"
-MODEL_TRAINER_MODEL_CONFIG_DIR_KEY = "model_config_dir"
+MODEL_TRAINER_CONFIG_DIR = os.path.join(ROOT_DIR,CONFIG_DIR)
 MODEL_TRAINER_MODEL_CONFIG_FILE_NAME_KEY = "model_config_file_name"
 MODEL_TRAINED_BASE_ACCURACY_KEY = "base_accuracy"
+MODEL_TRAINED_DIFF_TRAIN_TEST_ACC_KEY = 'threshold_diff_train_test_acc'
 
 #Model evaluation related variable
 MODEL_EVALUATION_CONFIG_KEY = "model_evaluation_config"
@@ -75,6 +76,6 @@ MODEL_PUSHER_EXPORT_DIR_KEY = "model_export_dir"
 FACTORY_GRID_SEARCH_KEY = 'grid_search'
 FACTORY_MODULE_KEY = 'module'
 FACTORY_CLASS_KEY = 'class'
-FACTORY_PARAMS = 'params'
+FACTORY_PARAMS_KEY = 'params'
 FACTORY_MODEL_SELECTION_KEY = 'model_selection'
 FACTORY_SEARCH_PARAM_GRID_KEY = 'search_param_grid'
