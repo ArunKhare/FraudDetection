@@ -9,6 +9,8 @@ from sklearn.ensemble import ExtraTreesRegressor
 from imblearn.over_sampling import SMOTENC
 from imblearn.under_sampling import RandomUnderSampler
 from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.impute import SimpleImputer
+from sklearn.feature_selection import SelectKBest
 
 from fraudDetection.exception import FraudDetectionException
 from fraudDetection.logger import logging
@@ -114,12 +116,12 @@ class DataTransformation:
             logging.info(f'obtaining training and test file path: {train_file_path} \n {test_file_path}')
 
             schema_file_path: Path = self.data_validation_artifact.schema_file_path
-            schema_file  = read_yaml (schema_file_path)
-            schema=schema_file[DATA_SCHEMA_COLUMNS_KEY]
-            target_feature_name = schema_file[DATA_SCHEMA_TARGET_COLUMN_KEY][0]
+            schema  = read_yaml(schema_file_path)
+            data_schema=schema[DATA_SCHEMA_COLUMNS_KEY]
+            target_feature_name = schema[DATA_SCHEMA_TARGET_COLUMN_KEY][0]
 
-            train_df: pd.DataFrame = load_data(file_path=train_file_path,schema=schema)
-            test_df:  pd.DataFrame = load_data(file_path=test_file_path,schema=schema)
+            train_df: pd.DataFrame = load_data(file_path=train_file_path,schema=data_schema)
+            test_df:  pd.DataFrame = load_data(file_path=test_file_path,schema=data_schema)
             
             logging.info(f'\n loading training and test data: Shape {train_df.shape, test_df.shape}')
 
@@ -195,9 +197,8 @@ class DataTransformation:
             preprocessing_obj_file_path = Path(os.path.join(self.data_transformation_config.preprocessing_object_file_path))
 
             logging.info(f"Saving preprocessing obj at {preprocessing_obj_file_path}")
-            transformer = preprocessing_obj.named_steps['transformer']
-         
-            save_object(preprocessing_obj_file_path, transformer)
+            
+            save_object(preprocessing_obj_file_path, preprocessing_obj)
 
             data_transformation_artifact = DataTransformationArtifact(
                 is_transformed= True,
@@ -258,7 +259,7 @@ class DataTransformation:
               raise FraudDetectionException(e,sys)
                 
     def __del__(self):
-        logging.info(f"{'>>'*30} Data transformation complete {'<<'*30} \n\n")
+        logging.info(f"\n{'='*20} Data Transformation Log Complete {'='*20}\n\n")
         
   # weights = {0: n_samples / (2 * np.bincount(y_train_c)[0]), 1: n_samples / (2 * np.bincount(y_train_c)[1])}
 

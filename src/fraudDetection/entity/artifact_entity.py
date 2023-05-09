@@ -38,6 +38,7 @@ class ModelTrainerArtifact:
     model_accuracy: float
     train_accuracy_score: float
     test_accuracy_score: float
+    threshold : float
 
 @dataclass
 class ModelEvaluationArtifact:

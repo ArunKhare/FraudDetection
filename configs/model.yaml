@@ -2,7 +2,7 @@ grid_search:
   class: GridSearchCV
   module: sklearn.model_selection
   params: 
-    cv: 10
+    cv: 3
     verbose: 2
 model_selection:
   module_0:
@@ -22,37 +22,21 @@ model_selection:
       bootstrap: true
       n_jobs: -1
       random_state: 42
+      max_features: sqrt
       class_weight: balanced_subsample
     search_param_grid:
       min_samples_leaf:
         - 6
       criterion:
         - gini
-      class_weight: 
-        - {0:0.5, 1:380}
-        - {0:1, 1:300}
-        - {0:10, 1:200}
       bootstrap: 
         - False
       max_depth: 
-        - 50
         - 60
-        - 70
-      max_features: 
-        - 2
-        - 3
-      min_samples_leaf: 
-        - 1
-        - 2
-        - 3
       min_samples_split: 
-        - 4
         - 5
-        - 16
       n_estimators: 
-        - 500
         - 600
-        - 700
   module_2:
     class: LinearSVC
     module: sklearn.svm
@@ -63,6 +47,3 @@ model_selection:
     search_param_grid:
       class_weight: 
         - balanced
-        - {0:1, 1:20}
-        - {0:0.5, 1:380}
-        - {0:0.7, 1:300}

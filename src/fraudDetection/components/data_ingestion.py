@@ -150,4 +150,4 @@ class DataIngestion:
         except Exception as e:
             raise FraudDetectionException(e,sys) from e       
     def __del__(self) -> None:
-        logging.info(f"{'>>'*20} Data Ingestion log completed.{'<<'*20} \n\n")
+        logging.info(f"\n{'='*20} Data Ingestion Log Completed.{'='*20}\n\n")

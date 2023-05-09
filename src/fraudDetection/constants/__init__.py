@@ -64,8 +64,8 @@ MODEL_TRAINED_DIFF_TRAIN_TEST_ACC_KEY = 'threshold_diff_train_test_acc'
 
 #Model evaluation related variable
 MODEL_EVALUATION_CONFIG_KEY = "model_evaluation_config"
-MODEL_EVALUATION_ARTIFACTS_DIR_KEY = "model_evaluation"
-MODEL_EVALUATION_FILE_NAME_KEY = "model_evaluation.yaml"
+MODEL_EVALUATION_ARTIFACTS_DIR_KEY = "model_evaluation_dir"
+MODEL_EVALUATION_FILE_NAME_KEY = "model_evaluation_file_name"
 MLFLOW_URI_KEY = "mlflow_uri"
 
 #Model pusher related variable
@@ -79,3 +79,10 @@ FACTORY_CLASS_KEY = 'class'
 FACTORY_PARAMS_KEY = 'params'
 FACTORY_MODEL_SELECTION_KEY = 'model_selection'
 FACTORY_SEARCH_PARAM_GRID_KEY = 'search_param_grid'
+
+BEST_MODEL_KEY = "best_model"
+HISTORY_KEY = "history"
+MODEL_PATH_KEY = "model_path"
+
+EXPERIMENT_DIR_NAME="experiment"
+EXPERIMENT_FILE_NAME="experiment.csv"

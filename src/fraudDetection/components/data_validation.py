@@ -81,24 +81,24 @@ class DataValidation:
         try:
             # Getting schema
             schema_file_path: Path = self.data_validation_config.schema_file_path
-            schema_keys = read_yaml(schema_file_path)
-            column_schema = schema_keys[DATA_SCHEMA_COLUMNS_KEY]
-            target_col = schema_keys[DATA_SCHEMA_TARGET_COLUMN_KEY]
+            schema = read_yaml(schema_file_path)
+            data_schema = schema[DATA_SCHEMA_COLUMNS_KEY]
+            target_col = schema[DATA_SCHEMA_TARGET_COLUMN_KEY]
             logging.info(f" train_df: {train_df.columns} {train_df.dtypes} \n test_df: {test_df.columns} {test_df.dtypes}")
            
             # Compare df's schema
             if not train_df.dtypes.equals(test_df.dtypes):
                 raise Exception("Test and Train file schemas are not equal")
     
-            missing_cols = [col for col in column_schema if col not in train_df.columns]
-            mismatch_dtype_cols = [col for col, dtype in column_schema.items() if col in train_df.columns and train_df[col].dtype != dtype]
+            missing_cols = [col for col in data_schema if col not in train_df.columns]
+            mismatch_dtype_cols = [col for col, dtype in data_schema.items() if col in train_df.columns and train_df[col].dtype != dtype]
             
             if missing_cols:
                 raise Exception (f"The following columns are missing from the DataFrame schema: {missing_cols}")
             elif mismatch_dtype_cols:
                 raise Exception (f"The following columns data types does not match with schema: {mismatch_dtype_cols}")
             else:
-                logging.info(f"train test file schema are as per the Schema {column_schema}")
+                logging.info(f"train test file schema are as per the Schema {data_schema}")
             
             logging.info("Data validated")
             return True, target_col
@@ -188,7 +188,7 @@ class DataValidation:
             raise FraudDetectionException(e,sys) from e
         
     def __del__(self):
-        logging.info(f"{'>*30'} Data validation completed. {'<'*30} \n\n")
+        logging.info(f"\n{'='*20} Data Validation Log Completed. {'='*20} \n\n")
 
 
     

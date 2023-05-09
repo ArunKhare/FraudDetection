@@ -31,7 +31,7 @@ class ModelTrainerConfig:
     threshold_diff_train_test_acc: float
 @dataclass(frozen=True)
 class ModelEvaluationConfig:
-    model_evaluation_file_name: str
+    model_evaluation_file_path: str
     time_stamp: str
     mlflow_uri: str
 @dataclass(frozen=True)

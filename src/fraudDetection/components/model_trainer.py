@@ -17,6 +17,8 @@ class FraudetectionEstimaorModel:
 
     def predict(self,X):
         transformed_feature = self.preprocessing_object.transform(X)
+        print(transformed_feature.shape)
+        print(transformed_feature.size)
         return self.trained_model_object.predict(transformed_feature)
     def __repr__(self) -> str:
         return f"{type(self.trained_model_object).__name__}()"
@@ -70,7 +72,7 @@ class ModelTrainer:
             logging.info(f"Evaluation all trained model on training and testing dataset both")
 
             metric_info:MetricInfoArtifact = evaluate_classification_model(model_list=model_list,X_train=X_train,y_train=y_train,X_test=X_test,y_test=y_test,base_accuracy=base_accuracy,threshold=threshold)
-            print(metric_info)
+        
             logging.info(f"Best model found on both training and testing dataset")
 
             preprocessing_obj = load_object(file_path=Path(self.data_transformation_artifact.processed_object_file_path))
@@ -97,7 +99,8 @@ class ModelTrainer:
                 train_recall_score=metric_info.train_recall_score,
                 model_accuracy=metric_info.model_accuracy,
                 train_accuracy_score=metric_info.train_accuracy_score,
-                test_accuracy_score=metric_info.test_accuracy_score
+                test_accuracy_score=metric_info.test_accuracy_score,
+                threshold=threshold,
             )
             logging.info(f"Model Trainer Artifact: {model_trainer_artifact}")
             return model_trainer_artifact

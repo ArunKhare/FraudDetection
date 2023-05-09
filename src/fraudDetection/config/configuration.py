@@ -142,12 +142,16 @@ class ConfigurationManager:
 
     def get_model_evaluation_config(self) -> ModelEvaluationConfig:
         try:
-            model_evaluation_config_info:ConfigBox = self.config[MODEL_EVALUATION_CONFIG_KEY]
-            artifact_dir:ConfigBox = os.path.join(self.artifact_dir,MODEL_EVALUATION_ARTIFACTS_DIR_KEY)
+            model_evaluation_config_info: ConfigBox = self.config[MODEL_EVALUATION_CONFIG_KEY]
+            artifact_dir:Path = Path(os.path.join(self.artifact_dir,MODEL_EVALUATION_ARTIFACTS_DIR_KEY))
 
-            model_evaluation_file_path = Path(os.path.join(artifact_dir,model_evaluation_config_info[MODEL_EVALUATION_FILE_NAME_KEY],self.current_time_stamp))
-
-            response = ModelEvaluationConfig(model_evaluation_file_name= model_evaluation_file_path, time_stamp=self.current_time_stamp)
+            model_evaluation_file_path = Path(os.path.join(artifact_dir,model_evaluation_config_info[MODEL_EVALUATION_FILE_NAME_KEY]))
+    
+            response = ModelEvaluationConfig(
+                model_evaluation_file_path= model_evaluation_file_path, 
+                time_stamp=self.current_time_stamp,
+                mlflow_uri=None)
+            
             logging.info(f"Model Evaluation config: {response}")
             return response
         except Exception as e:

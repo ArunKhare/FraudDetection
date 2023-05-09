@@ -134,3 +134,4 @@ artifacts
 ./trial codes
 ./cache*
 cache
+test.npy

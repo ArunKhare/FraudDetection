@@ -6,6 +6,7 @@ from box import ConfigBox
 from pathlib import Path
 from ensure import ensure_annotations
 from box.exceptions import BoxValueError
+from glob import glob
 
 from fraudDetection.exception import FraudDetectionException
 from fraudDetection.logger import logging
@@ -20,6 +21,7 @@ def create_directories(path_to_directories:list,verbose=True):
     """
     try:
         for path in path_to_directories:
+            path = os.path.dirname(path)
             os.makedirs(path,exist_ok=True)
             if verbose:
                 logging.info("created directories at:{path}")
@@ -27,21 +29,26 @@ def create_directories(path_to_directories:list,verbose=True):
         raise FraudDetectionException(e, sys) from e 
     
 @ ensure_annotations
-def read_yaml(path_to_yaml:Path) ->ConfigBox:
+def read_yaml(file_path:Path) ->ConfigBox:
     """ read yaml file and returns
     Args : 
-        path_to_yaml (str) :path like input
+        file_path (str) :path like input
     Raises:
         ValuError: if yaml file is empty
         e: empty file
         Returns: ConfigBox: ConfigBox type
         """
     try:
-        with open(path_to_yaml) as yaml_file:
-            content = yaml.safe_load(yaml_file)
-            logging.info(f'yaml file:{path_to_yaml} loaded successfully' )
+        if not file_path.is_file():
+            raise FileNotFoundError(f"{file_path} does not exist.")
+        if os.stat(file_path).st_size == 0:
+            raise ValueError(f"{file_path} is empty.")
+        with open(file_path, 'r') as f:
+            content = yaml.safe_load(f)
+            logging.info(f'yaml file:{file_path} loaded successfully' )
             return ConfigBox(content)
-        raise FileNotFoundError(f"Config file not found:{path_to_yaml}")
+    except ValueError as e:
+        logging.info(e)
     except FileNotFoundError as e:
         raise FraudDetectionException(e,sys) from e
     except BoxValueError as e:
@@ -54,12 +61,15 @@ def write_yaml(file_path:Path,data:dict=None) ->yaml:
         file _path: str
         data:dict """
     try:
-        create_directories(file_path)
+        create_directories([file_path])
+        if data is None:
+            data = {}
         with open(file=file_path,mode='w') as yaml_file:
             if data is not None:
                 yaml.dump(data=data,stream=yaml_file)
     except Exception as e:
-        raise FraudDetectionException(e,sys) from e
+        # raise FraudDetectionException(e,sys) from e
+        pass
                         
 @ensure_annotations
 def save_json(path:Path, data:dict)  -> None:
@@ -224,47 +234,59 @@ def get_dtypes(df) -> ConfigBox:
         raise FraudDetectionException(e,sys) from e
 
 @ensure_annotations
-def load_data(file_path:Path,schema:dict) ->pd.DataFrame:
-        """ validation the schema of data downloaded with the provided schema
-        """
-        try:
-            # logging checking training and test files are available
-            is_file_path_exist = os.path.exists(file_path)
-            
-            if not is_file_path_exist:
-                raise Exception(f"train_file_dir {file_path} does not exist", sys)
-            
-            if not os.listdir(file_path):
-                raise Exception(f"{file_path} no file found", sys)
-            
-            # Get a list of files from train and test data dir
-            dataset_files = os.listdir(file_path)
-            
-            logging.info(f"Is train file with first files as : {dataset_files[0]}")
+def load_data(file_path: Path, schema: dict, *args) ->pd.DataFrame:
+    """Validates the schema of data downloaded with the provided schema.
 
-            # concate all  the files in the train and test directory and convert them to dataframe
-            dataset_files: list[str] = dataset_files[:2]
-            
-            #number of files in each test and train dir
-            num_files = len([f for f in dataset_files if os.path.isfile(Path(os.path.join(file_path, f))) if f.endswith('.csv')])
-            
-            data_df = concat_csv_files(dataset_files,file_path)
-            
-            logging.info(f"df and test_df created. Total train_dir CSV files :{num_files}")
+    Args:
+        file_path: The path to the directory containing CSV files.
+        schema: The YAML file for a DataFrame.
+        start_index: The start index to select the files from a list of files in the directory. Default or 'None' is 0. 
+        end_index: The end index to select the files from a list of files in the directory. Default is 2. If `None`, all files in the directory will be selected.
 
-            error_message = ""
-            for column in list(schema.keys()):
-                if column in data_df.columns:
-                    data_df[column].astype(schema[column])
-                else:
-                    error_message = f'Column: {column} is not in the schema'
+    Returns:
+        A DataFrame containing the concatenated data from the selected CSV files.
+    """
+    
+    try:
+        start_index, end_index = args if len(args) > 0 else (0, 2)
+ 
+        if start_index is None:
+            start_index = 0
+        if end_index is None:
+            end_index = len(dataset_files)
 
-            if len(error_message) > 0:
-                raise Exception(error_message)
+        is_file_path_exist = os.path.exists(file_path)        
+        if not is_file_path_exist:
+            raise Exception(f"train_file_dir {file_path} does not exist", sys)
 
-            return data_df[schema]
-        except Exception as e:
-            raise FraudDetectionException(e,sys) from e
+        # Get a list of files from train and test data dir
+        dataset_files = glob(str(file_path / "*.csv"))
+        if not dataset_files:
+            raise Exception(f"No CSV files found in {file_path}")
+
+        logging.info(f"first train file with first files as : {dataset_files[0]}")
+        
+        # concate all  the files in the train and test directory and convert them to dataframe
+        dataset_files: list[str] = dataset_files[start_index:end_index]
+      
+        num_files = len(dataset_files)
+        
+        data_df = concat_csv_files(dataset_files,file_path)
+        
+        logging.info(f"df and test_df created. Total train_dir CSV files :{num_files}")
+        error_message = []
+        for column in list(schema.keys()):
+            if column in data_df.columns:
+                data_df[column].astype(schema[column])
+            else:
+                error_message.append (f'Column: {column} is not in the schema')
+      
+        if len(error_message) > 0:
+            raise Exception(error_message)
+      
+        return data_df[schema]
+    except Exception as e:
+        raise FraudDetectionException(e,sys) from e
 
 @ensure_annotations  
 def concat_csv_files(files: list, file_dir: Path) -> pd.DataFrame:
