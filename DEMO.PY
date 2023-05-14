@@ -7,6 +7,7 @@ from fraudDetection.entity import DataIngestionArtifact, DataValidationArtifact,
 from fraudDetection.constants import CONFIG_FILE_PATH
 import os, sys
 
+
 def main():
     try:
         config = ConfigurationManager(CONFIG_FILE_PATH)
@@ -23,7 +24,7 @@ def main():
         model_trainer_artifacts = ModelTrainer(model_trainer_config,data_transformation_artifacts).initiate_model_trainer()
 
         model_evaluation_config = config.get_model_evaluation_config()
-        mode_evaluation_artifacts = ModelEvaluation(model_evaluation_config,data_ingestion_artifacts,data_validation_artifacts,model_trainer_artifacts).initiate_model_evaluation()
+        mode_evaluation_artifacts = ModelEvaluation(model_evaluation_config,data_ingestion_artifacts, data_validation_artifacts,model_trainer_artifacts, data_transformation_artifacts).initiate_model_evaluation()
         
     except Exception as e:
         logging.error(e)

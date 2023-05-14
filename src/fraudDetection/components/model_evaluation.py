@@ -5,25 +5,30 @@ from fraudDetection.exception import FraudDetectionException
 from fraudDetection.entity import DataIngestionArtifact, DataTransformationArtifact, ModelEvaluationConfig, ModelTrainerArtifact, DataValidationArtifact, ModelEvaluationArtifact, evaluate_classification_model
 from fraudDetection.utils import read_yaml, write_yaml, load_object, load_data, create_directories
 from fraudDetection.constants import BEST_MODEL_KEY, HISTORY_KEY, MODEL_PATH_KEY, DATA_SCHEMA_TARGET_COLUMN_KEY, DATA_SCHEMA_COLUMNS_KEY
-
+from fraudDetection.components import processing_data
 from box import ConfigBox
 import numpy as np
 import pandas as pd
+from sklearn import set_config
+set_config(display='diagram')
+from IPython.display import display
+
 class ModelEvaluation:
-    def __init__(self, model_evaluation_config: ModelEvaluationConfig, data_ingestion_artifact: DataIngestionArtifact, data_validation_artifact: DataValidationArtifact, model_trainer_artifact: ModelTrainerArtifact) -> None:
+    def __init__(self, model_evaluation_config: ModelEvaluationConfig, data_ingestion_artifact: DataIngestionArtifact, data_validation_artifact: DataValidationArtifact, model_trainer_artifact: ModelTrainerArtifact,data_transformation_artifact: DataTransformationArtifact) -> None:
         try:
-            logging.info(f"{'>>'*30} Model Evaluation Log Started {'<<'*30}")
+            logging.info(f"{'='*20} Model Evaluation Log Started {'='*20}")
             self.model_evaluation_config = model_evaluation_config
             self.data_ingestion_artifact = data_ingestion_artifact
             self.model_trainer_artifact = model_trainer_artifact
             self.data_validation_artifact = data_validation_artifact 
+            self.data_transformation_artifact = data_transformation_artifact
             # self.model_evaluation_artifact = model_evaluation_artifact
         except Exception as e:
             raise FraudDetectionException(e,sys) from e
         
     def get_best_model(self):
         try:
-            model_evaluation = {
+            model_evaluation_dict = {
                 BEST_MODEL_KEY: {
                     MODEL_PATH_KEY: str(self.model_trainer_artifact.trained_model_file_path)
                 },
@@ -31,9 +36,9 @@ class ModelEvaluation:
 
             model = None
             model_evaluation_file_path = Path(self.model_evaluation_config.model_evaluation_file_path)
-            
-            if not os.path.exists(model_evaluation_file_path):
-                write_yaml(file_path=model_evaluation_file_path, data = model_evaluation)
+        
+            if not os.path.exists(model_evaluation_file_path) & isinstance(model_evaluation_dict,dict):
+                write_yaml(file_path=model_evaluation_file_path, data=model_evaluation_dict)
                 return model
 
             model_eval_file_content = None           
@@ -96,11 +101,32 @@ class ModelEvaluation:
             train_df = load_data(train_file_path, data_schema,-3,-1)
             test_df = load_data(test_file_path, data_schema,-5,-3)
 
-            train_target_arr = np.array(train_df[target_column_name])
-            test_target_arr = np.array(test_df[target_column_name])
+            train_target_feature = train_df[target_column_name]
+            test_target_feature = test_df[target_column_name]
 
             train_df.drop(target_column_name, axis=1, inplace=True)
             test_df.drop(target_column_name, axis=1, inplace=True)
+
+            logging.info(f"Original Data evaluation shape : train_df {train_df.shape},{train_target_feature.shape} test_df {test_df.shape} {test_target_feature.shape}")
+
+            processor_file_path = self.data_transformation_artifact.processed_object_file_path
+            imputer_Sampler_file_path = self.data_transformation_artifact.imputer_sampler_object_file_path
+
+            processing_obj = load_object(processor_file_path)
+            imputer_Sampler_obj = load_object(imputer_Sampler_file_path)
+
+            logging.info(f"processing pipline {display(processing_obj)}")
+
+            train_arr_with_y, test_arr_with_y = processing_data(
+                imputer_sampler_obj=imputer_Sampler_obj,
+                preprocessor_obj=processing_obj,
+                train_X=train_df,
+                train_y=train_target_feature,
+                test_X=test_df,
+                test_y=test_target_feature,
+                )
+            
+            train_X , train_y, test_X, test_y = train_arr_with_y[:,:-1], train_arr_with_y[:,-1], test_arr_with_y[:,:-1],test_arr_with_y[:,-1]
 
             model =self.get_best_model()
 
@@ -117,10 +143,10 @@ class ModelEvaluation:
 
             metric_info_artifact = evaluate_classification_model(
                 model_list=model_list,
-                X_train=train_df,
-                y_train= train_target_arr,
-                X_test=test_df,
-                y_test=test_target_arr,
+                X_train=train_X,
+                y_train=train_y,
+                X_test=test_X,
+                y_test=test_y,
                 base_accuracy=self.model_trainer_artifact.model_accuracy,
                 threshold=self.model_trainer_artifact.threshold
             )

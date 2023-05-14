@@ -1,38 +1,36 @@
-import os, sys
-from typing import List
+import sys
 from pathlib import Path
-from fraudDetection.utils import create_directories, load_numpy_array_data, load_data, load_object
+from fraudDetection.utils import load_numpy_array_data
 from fraudDetection.exception import FraudDetectionException
 from fraudDetection.logger import logging
 from fraudDetection.entity import ModelTrainerConfig, ModelTrainerArtifact, DataTransformationArtifact
-from fraudDetection.utils import load_numpy_array_data, load_object, save_object
-from fraudDetection.entity import MetricInfoArtifact, GridSearchedBestModel, ModelFactory
+from fraudDetection.utils import load_numpy_array_data, save_object
+from fraudDetection.entity import MetricInfoArtifact, ModelFactory
 from fraudDetection.entity import evaluate_classification_model
 
 
 class FraudetectionEstimaorModel:
-    def __init__(self, preprocessing_object, trained_model_object) -> None:
-        self.preprocessing_object = preprocessing_object
+    def __init__(self,trained_model_object) -> None:
         self.trained_model_object = trained_model_object
 
     def predict(self,X):
-        transformed_feature = self.preprocessing_object.transform(X)
-        print(transformed_feature.shape)
-        print(transformed_feature.size)
-        return self.trained_model_object.predict(transformed_feature)
+        return self.trained_model_object.predict(X)
+    
     def __repr__(self) -> str:
         return f"{type(self.trained_model_object).__name__}()"
+    
     def __str__(self) -> str:
         return f"{type(self.trained_model_object).__name__}()"
     
 class ModelTrainer:
     def __init__(self, model_trainer_config: ModelTrainerConfig, data_transformation_artifact:DataTransformationArtifact) -> None:
         try:
-            logging.info(f"{'>>'*30} Model training log started {'<<'*30}")
+            logging.info(f"\n{'>>'*20} Model training log started {'<<'*20}")
             self.model_trainer_config: ModelTrainerConfig = model_trainer_config
             self.data_transformation_artifact: DataTransformationArtifact = data_transformation_artifact
         except Exception as e:
             raise FraudDetectionException(e,sys) from e
+        
     def initiate_model_trainer(self) -> ModelTrainerArtifact:
         try:
             logging.info(f"loading transformed training dataset")
@@ -75,9 +73,9 @@ class ModelTrainer:
         
             logging.info(f"Best model found on both training and testing dataset")
 
-            preprocessing_obj = load_object(file_path=Path(self.data_transformation_artifact.processed_object_file_path))
             model_object = metric_info.model_object
-            frauddetection_model = FraudetectionEstimaorModel(preprocessing_object=preprocessing_obj,trained_model_object=model_object)
+        
+            frauddetection_model = FraudetectionEstimaorModel(trained_model_object=model_object)
 
             trained_model_file_path = Path(self.model_trainer_config.trained_model_file_path)
             logging.info(f"saving model at path: {trained_model_file_path}")
@@ -108,4 +106,4 @@ class ModelTrainer:
             raise FraudDetectionException(e,sys) from e
         
     def __del__(self):
-        logging.info(f"{'>>'*30} Model trainer log completed {'<<'*30}")
+        logging.info(f"\n{'>>'*20} Model trainer log completed {'<<'*20} \n\n")

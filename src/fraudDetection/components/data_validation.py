@@ -17,7 +17,7 @@ from fraudDetection.utils import create_directories, read_yaml
 class DataValidation:
     def __init__(self,data_ingestion_artifact: DataIngestionArtifact, data_validation_config:DataValidationConfig ) -> None:
         try:
-            logging.info(f"{'<<'*30}Data validation log started {'<<*30'}")
+            logging.info(f"\n{'='*20}Data validation log started {'='*20}")
             self.data_validation_config: DataValidationConfig = data_validation_config
             self.data_ingestion_artifact: DataIngestionArtifact = data_ingestion_artifact
 

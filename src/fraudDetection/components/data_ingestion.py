@@ -12,13 +12,15 @@ from fraudDetection.logger import logging
 from fraudDetection.exception import FraudDetectionException
 from fraudDetection.utils import (
     create_directories,
-    save_dfs_to_csv
+    save_dfs_to_csv,
+    check_data_dir,
+    is_dir_empty,
 )
 
 class DataIngestion:
     def __init__(self,data_ingestion_config:DataIngestionConfig) -> None:
         try:
-            logging.info("{=*20} Data ingestion start {=*20}")
+            logging.info(f"\n{'='*20} Data ingestion start {'='*20}")
             self.data_ingestion_config: DataIngestionConfig = data_ingestion_config     
         except Exception as e:
             raise FraudDetectionException(e,sys) from e
@@ -46,7 +48,7 @@ class DataIngestion:
                 # Set the path to the kaggle.json file
                 os.environ['KAGGLE_CONFIG_DIR'] = 'kaggle.json'
             
-                dataset_name = Path(download_dataset_link.split()[-1])
+                dataset_name = str(Path(download_dataset_link.split()[-1]))
                 # Download the dataset using the Kaggle API
                 tqdm(kaggle.api.dataset_download_files(dataset_name,zip_download_dir),mininterval=5,desc="downloading kaggle dataset in zip format" )
 
@@ -79,13 +81,21 @@ class DataIngestion:
         
     def split_data_as_train_test(self) -> DataIngestionArtifact:
         try:
-            if not os.path.exists(self.data_ingestion_config.ingested_train_dir):
-                is_ingested =False
-                raw_data_dir: Path = self.data_ingestion_config.raw_data_dir
-                if not os.listdir(raw_data_dir):
-                    raise FraudDetectionException(f"No files found in the raw data directory: {raw_data_dir}", sys)
-                if not os.listdir(raw_data_dir)[0]:
-                    raise ValueError("Raw data directory is empty.")
+            
+            is_ingested =False
+            raw_data_dir: Path = self.data_ingestion_config.raw_data_dir
+
+            train_file_path = Path(os.path.join(self.data_ingestion_config.ingested_train_dir))
+            test_file_path = Path(os.path.join(self.data_ingestion_config.ingested_test_dir))
+            
+            # check_data_dir(raw_data_dir)
+            
+            if is_dir_empty(train_file_path) or is_dir_empty(test_file_path):
+
+                split_dataset_path: list[Path] = [train_file_path,test_file_path]
+                
+                create_directories(split_dataset_path)    
+
                 file_name = Path(os.listdir(raw_data_dir)[0])    
                 file_path = Path(os.path.join(raw_data_dir, file_name))
                 logging.info(f"Reading CSV file: {file_path}")
@@ -93,36 +103,29 @@ class DataIngestion:
 
                 # Check if test_size is within valid range
                 if self.data_ingestion_config.test_size > 1 or self.data_ingestion_config.test_size <= 0:
-                    raise FraudDetectionException(f"Invalid test_size: {self.data_ingestion_config.test_size}. Test size must be between 0 and 1", sys)
-
+                    raise FraudDetectionException(f"Invalid test_size: {self.data_ingestion_config.test_size}. Test size must be between 0 and1", sys)
+                
                 # Check if stratify parameter refers to a valid column
                 if self.data_ingestion_config.stratify not in df.columns:
-                    raise FraudDetectionException(f"Invalid stratify column: {self.data_ingestion_config.stratify}. Column not found in DataFrame", sys)
-
+                    raise FraudDetectionException(f"Invalid stratify column: {self.data_ingestion_config.stratify}. Column not found inDataFrame", sys)
+                
                 # Split the dataset into training and testing sets using stratified sampling
                 logging.info("Split the dataset into training and testing sets using stratified sampling")
-                strat_train_set, strat_test_set = train_test_split(df, test_size=self.data_ingestion_config.test_size, random_state=42, stratify=df[self.data_ingestion_config.stratify])
-
-                # Export the training and testing datasets to files
-                train_file_path = Path(os.path.join(self.data_ingestion_config.ingested_train_dir))
-                test_file_path = Path(os.path.join(self.data_ingestion_config.ingested_test_dir))
-
-                split_dataset_path: list[Path] = [train_file_path,test_file_path]
-
-                if train_file_path is not None and test_file_path is not None:
-                    create_directories(split_dataset_path)
-                
+                strat_train_set, strat_test_set = train_test_split(df, test_size=self.data_ingestion_config.test_size,random_state=42, stratify=df[self.data_ingestion_config.stratify])
+                            
                 logging.info(f"Exporting training and testing dataset to files: [{train_file_path}, {test_file_path}] ")
-
                 # Save each file as multiple chunks
                 chunk_size = 100000
-                tqdm(save_dfs_to_csv(strat_test_set, test_file_path, chunk_size),mininterval=5,desc=f"saving test data to csv {test_file_path}")
-                tqdm(save_dfs_to_csv(strat_train_set, train_file_path, chunk_size),mininterval=5,desc= f"saving training dataset to csv{train_file_path}")
-                message = "Data ingestion completed succesfully"
-            else:         
-                train_file_path = Path(os.path.join(self.data_ingestion_config.ingested_train_dir))
-                test_file_path = Path(os.path.join(self.data_ingestion_config.ingested_test_dir))
-                message = "Data already exist"  
+
+                save_dfs_to_csv(strat_test_set, test_file_path, chunk_size)
+                save_dfs_to_csv(strat_train_set, train_file_path, chunk_size)
+
+                check_data_dir(test_file_path)
+                check_data_dir(train_file_path)
+
+                message = f"Data ingestion completed succesfully train and test data saved at {train_file_path}, {test_file_path}"
+
+            message = f"Train_test_split already exist at path {train_file_path} and {test_file_path}"   
             is_ingested=True
         
             # create the data ingestion artifacts
