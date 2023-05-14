@@ -50,7 +50,7 @@ DATA_TRANSFORMED_TRAIN_DIR_KEY = "transformed_train_dir"
 DATA_TRANSFORMED_TEST_DIR_KEY = "transformed_test_dir"
 DATA_TRANSFORMATION_PREPROCESSING_DIR_KEY = "preprocessing_dir"
 DATA_TRANSFORMATION_PREPROCESSING_OBJECT_FILE_NAME_KEY = "preprocessed_object_file_name"
-
+DATA_TRANSFORMATION_IMPUTER_SAMPLER_OBJECT_FILE_NAME_KEY = "imputer_sampler_object_file_name"
 
 # Model trainer related variable
 MODEL_TRAINER_ARTIFACTS_DIR_KEY = "model_trainer"

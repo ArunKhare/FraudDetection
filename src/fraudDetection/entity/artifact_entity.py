@@ -23,6 +23,7 @@ class DataTransformationArtifact:
     transformed_train_file_path: Path
     transformed_test_file_path: Path
     processed_object_file_path: Path
+    imputer_sampler_object_file_path: Path
 
 @dataclass
 class ModelTrainerArtifact:

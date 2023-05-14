@@ -24,6 +24,7 @@ data_transformation_config:
   transformed_test_dir: test
   preprocessing_dir: preprocessed
   preprocessed_object_file_name: preprocessed.pkl
+  imputer_sampler_object_file_name: imputer_sampler.pkl
 
 model_trainer_config:
   trained_model_dir: trained_model

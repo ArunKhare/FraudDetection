@@ -23,6 +23,7 @@ class DataTransformationConfig:
     transformed_train_dir: Path
     transformed_test_dir: Path
     preprocessing_object_file_path: Path
+    imputer_sampler_object_file_path: Path
 @dataclass(frozen=True)
 class ModelTrainerConfig:
     trained_model_file_path:Path

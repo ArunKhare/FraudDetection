@@ -44,7 +44,6 @@ class ConfigurationManager:
         try:
             data_ingestion_artifact_dir = Path(os.path.join(self.artifact_dir,DATA_INGESTION_ARTIFACT_DIR_KEY))
                                             #    ,self.current_time_stamp))
-           
             data_ingestion_info:ConfigBox = self.config[DATA_INGESTION_CONFIG_KEY]
             dataset_download_url:ConfigBox = data_ingestion_info[DATA_INGESTION_URL_KEY]
             zip_dir = Path(os.path.join(data_ingestion_artifact_dir, data_ingestion_info[DATA_INGESTION_ZIP_DIR_KEY]))
@@ -65,6 +64,7 @@ class ConfigurationManager:
                 stratify=stratify,
                 test_size=test_size,
             )
+
             logging.info(f"Data ingestion config : {data_ingestion_config}")
         except Exception as e:
             raise FraudDetectionException(e,sys) from e 
@@ -96,20 +96,19 @@ class ConfigurationManager:
     def get_data_transformation_config(self) -> DataTransformationConfig:
         try:
             # artifact_dir = self.training_pipeline_config.artifacts_root
-            data_transformation_artifacts_dir = Path(os.path.join(self.artifact_dir,DATA_TRANSFORMATION_ARTIFACTS_DIR_KEY))
-
             data_transformation_config_info:ConfigBox = self.config[DATA_TRANSFORMATION_CONFIG_KEY]
-            
+            data_transformation_artifacts_dir = Path(os.path.join(self.artifact_dir,data_transformation_config_info[ DATA_TRANSFORMATION_ARTIFACTS_DIR_KEY]))
             transformed_train_dir = Path(os.path.join(data_transformation_artifacts_dir,data_transformation_config_info[DATA_TRANSFORMED_TRAIN_DIR_KEY]))
             transformed_test_dir = Path(os.path.join(data_transformation_artifacts_dir,data_transformation_config_info[DATA_TRANSFORMED_TEST_DIR_KEY]))
             preprocessing_object_file_path = Path(os.path.join(data_transformation_artifacts_dir, data_transformation_config_info[DATA_TRANSFORMATION_PREPROCESSING_DIR_KEY],data_transformation_config_info[DATA_TRANSFORMATION_PREPROCESSING_OBJECT_FILE_NAME_KEY]))
-           
+            imputer_sampler_object_file_path =  Path(os.path.join(data_transformation_artifacts_dir, data_transformation_config_info[DATA_TRANSFORMATION_PREPROCESSING_DIR_KEY],data_transformation_config_info[DATA_TRANSFORMATION_IMPUTER_SAMPLER_OBJECT_FILE_NAME_KEY]))
  
             data_transformation_config = DataTransformationConfig(
                                                 transformed_dir = data_transformation_artifacts_dir,
                                                 transformed_train_dir = transformed_train_dir,
                                                 transformed_test_dir = transformed_test_dir,
                                                 preprocessing_object_file_path=preprocessing_object_file_path,
+                                                imputer_sampler_object_file_path= imputer_sampler_object_file_path,
                                                                   )
         except Exception as e:
             raise FraudDetectionException(e,sys) from e
@@ -143,7 +142,7 @@ class ConfigurationManager:
     def get_model_evaluation_config(self) -> ModelEvaluationConfig:
         try:
             model_evaluation_config_info: ConfigBox = self.config[MODEL_EVALUATION_CONFIG_KEY]
-            artifact_dir:Path = Path(os.path.join(self.artifact_dir,MODEL_EVALUATION_ARTIFACTS_DIR_KEY))
+            artifact_dir:Path = Path(os.path.join(self.artifact_dir,model_evaluation_config_info[MODEL_EVALUATION_ARTIFACTS_DIR_KEY]))
 
             model_evaluation_file_path = Path(os.path.join(artifact_dir,model_evaluation_config_info[MODEL_EVALUATION_FILE_NAME_KEY]))
     
