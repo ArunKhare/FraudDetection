@@ -1,5 +1,5 @@
 
-import os, sys
+import sys
 import importlib
 import numpy as np
 import yaml
@@ -21,7 +21,7 @@ def evaluate_classification_model(model_list: list, X_train: np.ndarray, y_train
         metric_info_artifact = None
         for model in model_list:
             model_name = str(model)
-            logging.info(f"{'>>'*30} Starting evaluating model:{type(model).__name__}{'<<'*30} ")
+            logging.info(f"\n{'>>'*20} Starting evaluating model:{type(model).__name__}{'<<'*20} ")
 
             #getting prediction for training and testing dataset
             y_train_pred = model.predict(X_train)
@@ -49,7 +49,7 @@ def evaluate_classification_model(model_list: list, X_train: np.ndarray, y_train
             test_accuracy_score = accuracy_score(y_test,y_test_pred)
 
             #logging all important metric
-            logging.info(f"{'>>'*30}Score {'<<'*30}")
+            logging.info(f"\n{'>>'*20}Score {'<<'*20}")
             logging.info(f"F1 Score: train {train_f1_score}, test {test_f1_score}")
             logging.info(f"Precision Score :  train {train_precision_score} test {test_precision_score}")
             logging.info(f"Recall Score : train {train_recall_score} test {test_recall_score}" )
@@ -79,12 +79,16 @@ def evaluate_classification_model(model_list: list, X_train: np.ndarray, y_train
                     test_accuracy_score=test_accuracy_score,
                     model_index=index_number
                 )
+                
                 logging.info(f'Acceptable model found {metric_info_artifact}')
             index_number +=1
+
         if metric_info_artifact is None:
             logging.info(f"No model with higher accuracy than base accuracy")
             raise Exception(f"No model with higher accuracy than base accuracy {model_accuracy, base_accuracy} and diff_test_train_accuracy {diff_test_train_acc}" )
+        
         return metric_info_artifact
+    
     except Exception as e:
         raise FraudDetectionException(e,sys) from e
    
@@ -153,12 +157,12 @@ class ModelFactory:
                                                 param_grid=initialized_model.param_grid_search)
             grid_search_cv = ModelFactory.update_property_of_class(grid_search_cv, self.grid_search_property_data)
 
-            message =  f'\n{">>"*30} Training {type(initialized_model.model).__name__} Started {"<<"*30}\n'
+            message =  f'\n{">>"*20} Training {type(initialized_model.model).__name__} Started {"<<"*20}\n'
             logging.info(message)
 
             grid_search_cv.fit(input_feature, output_feature)
 
-            message = f'\n{">>"*30} Training {type(initialized_model.model).__name__} comp{"<<"*30}\n '
+            message = f'\n{">>"*20} Training {type(initialized_model.model).__name__} comp{"<<"*20}\n'
 
             grid_search_best_model = GridSearchedBestModel(model_serial_number=initialized_model.model_serial_number,
                                                          model=initialized_model.model,

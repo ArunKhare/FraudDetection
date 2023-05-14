@@ -10,7 +10,7 @@ from glob import glob
 
 from fraudDetection.exception import FraudDetectionException
 from fraudDetection.logger import logging
-
+from tqdm import tqdm
 
 @ensure_annotations 
 def create_directories(path_to_directories:list,verbose=True):
@@ -20,16 +20,19 @@ def create_directories(path_to_directories:list,verbose=True):
         ignore_log (bool,optional): ignore if multiple dirs is to be created. Defaults to False.
     """
     try:
-        for path in path_to_directories:
-            path = os.path.dirname(path)
-            os.makedirs(path,exist_ok=True)
-            if verbose:
-                logging.info("created directories at:{path}")
+         for path in path_to_directories:
+            os.makedirs(path, exist_ok=True)
+            if not os.path.exists(path):
+                open(path, 'w').close()
+                if verbose:
+                    logging.info(f"Created file at: {path}")
+            elif verbose:
+                logging.info(f"File already exists: {path}")
     except Exception as e:
         raise FraudDetectionException(e, sys) from e 
     
 @ ensure_annotations
-def read_yaml(file_path:Path) ->ConfigBox:
+def read_yaml(file_path:Path) -> ConfigBox:
     """ read yaml file and returns
     Args : 
         file_path (str) :path like input
@@ -46,7 +49,7 @@ def read_yaml(file_path:Path) ->ConfigBox:
         with open(file_path, 'r') as f:
             content = yaml.safe_load(f)
             logging.info(f'yaml file:{file_path} loaded successfully' )
-            return ConfigBox(content)
+            return ConfigBox (content)
     except ValueError as e:
         logging.info(e)
     except FileNotFoundError as e:
@@ -55,22 +58,19 @@ def read_yaml(file_path:Path) ->ConfigBox:
         raise FraudDetectionException(e,sys) from e
     
 @ensure_annotations    
-def write_yaml(file_path:Path,data:dict=None) ->yaml:
+def write_yaml(file_path:Path, data:dict) ->yaml:
     """create yaml file
     Args:
         file _path: str
         data:dict """
     try:
-        create_directories([file_path])
-        if data is None:
-            data = {}
-        with open(file=file_path,mode='w') as yaml_file:
-            if data is not None:
-                yaml.dump(data=data,stream=yaml_file)
+        dir_path = os.path.dirname(file_path)
+        os.makedirs(dir_path, exist_ok=True)
+        with open(file=file_path, mode='w') as yaml_file:
+                yaml.dump(data=data, stream=yaml_file, indent=4, width=80)
     except Exception as e:
-        # raise FraudDetectionException(e,sys) from e
-        pass
-                        
+        raise FraudDetectionException(e,sys) from e
+         
 @ensure_annotations
 def save_json(path:Path, data:dict)  -> None:
     """ save json data
@@ -210,10 +210,13 @@ def compare_schema(schema: dict, csv_path: Path) -> None:
 @ensure_annotations
 def save_dfs_to_csv(df, file_path: Path, chunk_size:int ) -> None:
     try:
-        for i, (index,chunk) in enumerate(df.groupby(df.index // chunk_size)):
-            chunk_file_path: Path = file_path / f"file_{i}.csv"
-            # chunk.to_csv(chunk_file_path, index=False, header=i == 0)
-            chunk.to_csv(chunk_file_path,index=False)
+
+        with tqdm(total=len(df), desc=f"Saving test data to CSV {file_path}") as pbar:
+            for i, ( _, chunk ) in enumerate(df.groupby(df.index // chunk_size)):
+                chunk_file_path = file_path / f"file_{i}.csv"
+                chunk.to_csv(chunk_file_path, index=False)
+                pbar.update(len(chunk))
+      
     except Exception as e:
         raise FraudDetectionException(e, sys) from e
     
@@ -283,8 +286,8 @@ def load_data(file_path: Path, schema: dict, *args) ->pd.DataFrame:
       
         if len(error_message) > 0:
             raise Exception(error_message)
-      
-        return data_df[schema]
+        column_list = list(schema.keys())
+        return data_df[column_list]
     except Exception as e:
         raise FraudDetectionException(e,sys) from e
 
@@ -318,3 +321,22 @@ def validate_schema(df:pd.DataFrame,schema:dict):
         return True
     except Exception as e:
         raise FraudDetectionException(f"Error comparing schema: {e}",sys) from e
+    
+@ensure_annotations
+def is_dir_empty(path: Path) -> bool:
+    with os.scandir(path) as entries:
+        for entry in entries:
+            return False
+    return True
+
+@ensure_annotations
+def check_data_dir(raw_data_dir: Path) -> None:
+    raw_data_dir_str =  raw_data_dir.as_posix()
+    if not os.path.exists(raw_data_dir_str):
+        raise ValueError("Raw data directory does not exist.")
+    if not os.path.isdir(raw_data_dir_str):
+        raise ValueError("Raw data directory is not a directory.")
+    if not os.listdir(raw_data_dir_str):
+        raise ValueError(f"No files found in the raw data directory: {raw_data_dir_str}")
+    if not os.listdir(raw_data_dir_str)[0]:
+        raise ValueError("Raw data directory is empty.")
