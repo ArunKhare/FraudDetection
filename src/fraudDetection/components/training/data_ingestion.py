@@ -35,12 +35,24 @@ class DataIngestion:
             zip_filepath:Path = Path(os.path.join(zip_download_dir, base_filename,) +".zip")
      
             create_directories([zip_download_dir])
-          
+
+            choice: str
             # Check if file already exists
             if os.path.exists(zip_filepath):
-                logging.info(f"File {zip_filepath} already exists, skipping download")
+                logging.info(f"File {zip_filepath} already exists")
+                
                 print("====>>>File already exists")
-            else:
+
+                options = ['Yes', 'No']
+                while True:
+                    choice = input(f'Do you want to download data again? Options ({"/".join(options)}): ')
+                    if choice.capitalize() in options:
+                        print(f'You selected: {choice.capitalize()}')
+                        break
+                    else:
+                        print('Invalid choice. Please enter a valid option.')
+
+            if not os.path.exists(zip_filepath) or choice=='Yes':
                 logging.info(f"Downloading file from :[{download_dataset_link}] into :[{zip_download_dir}]")
                 # Set the path to the kaggle.json file
             

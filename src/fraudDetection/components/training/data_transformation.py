@@ -136,7 +136,7 @@ def processing_data(imputer_sampler_obj, preprocessor_obj,train_X,train_y,test_X
     
     #preprocessing train dataset
     resample_train_X, resample_train_y  = imputer_sampler_obj.fit_transform(train_X,train_y)
-    print(f"RESAMPLED {resample_train_X.shape, resample_train_y.shape}")
+ 
     transformed_train_arr= preprocessor_obj.fit_transform(resample_train_X,resample_train_y)
     features_selected =  preprocessor_obj.get_feature_names_out() 
 
@@ -145,7 +145,7 @@ def processing_data(imputer_sampler_obj, preprocessor_obj,train_X,train_y,test_X
     # preprocessing test dataset
     if not test_X.isnull().sum().sum() == 0:
         test_X = imputer_sampler_obj[-2:-1].fit_transform(test_X,test_y)
-    print(f"TEST {test_X.shape,test_y.shape}")
+
     transformed_test_arr = preprocessor_obj[-2:-1].fit_transform(test_X,test_y)
     test_feature_selected = preprocessor_obj[-2:-1].get_feature_names_out() 
   
@@ -203,6 +203,7 @@ class DataTransformation:
             target_feature_test_df = test_df[target_feature_name]
      
             logging.info(f'\n Split train DataFrame Input_feature_train_df {input_feature_train_df.shape} target_feature_train_df{target_feature_train_df.shape}')
+
             logging.info(f'\n Split test DataFrame Input_feature_train_df {input_feature_test_df.shape} target_feature_test_df {target_feature_test_df.shape}')
         
             inputer_sampler_obj, preprocessor_obj= get_data_processing_objects()
