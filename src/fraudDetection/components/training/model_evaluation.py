@@ -33,12 +33,13 @@ class ModelEvaluation:
                     MODEL_PATH_KEY: str(self.model_trainer_artifact.trained_model_file_path)
                 },
             }
+          
 
             model = None
             model_evaluation_file_path = Path(self.model_evaluation_config.model_evaluation_file_path)
         
-            if not os.path.exists(model_evaluation_file_path) & isinstance(model_evaluation_dict,dict):
-                write_yaml(file_path=model_evaluation_file_path, data=model_evaluation_dict)
+            if not os.path.exists(model_evaluation_file_path):
+                model=write_yaml(file_path=model_evaluation_file_path, data=model_evaluation_dict)
                 return model
 
             model_eval_file_content = None           
@@ -98,8 +99,8 @@ class ModelEvaluation:
             data_schema= schema[DATA_SCHEMA_COLUMNS_KEY]
             target_column_name = schema[DATA_SCHEMA_TARGET_COLUMN_KEY]
 
-            train_df = load_data(train_file_path, data_schema,-3,-1)
-            test_df = load_data(test_file_path, data_schema,-5,-3)
+            train_df = load_data(train_file_path, data_schema,(-8,-1))
+            test_df = load_data(test_file_path, data_schema,(-10,-8))
 
             train_target_feature = train_df[target_column_name]
             test_target_feature = test_df[target_column_name]

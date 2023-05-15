@@ -152,20 +152,27 @@ class ConfigurationManager:
                 mlflow_uri=None)
             
             logging.info(f"Model Evaluation config: {response}")
+
             return response
+        
         except Exception as e:
             raise FraudDetectionException(e,sys) from e
        
     def get_model_pusher_config(self) -> None:
+        
         try:
             model_pusher_config_info:ConfigBox = self.config[MODEL_PUSHER_CONFIG_KEY]
-
-            export_dir_path = Path(os.path.join(ROOT_DIR,model_pusher_config_info[MODEL_PUSHER_EXPORT_DIR_KEY]),self.current_time_stamp.strftime('%Y%m%d%H%M%S'))
+    
+            export_dir_path = Path(os.path.join(self.artifact_dir,model_pusher_config_info[MODEL_PUSHER_EXPORT_DIR_KEY]),self.current_time_stamp)
 
             model_pusher_config = ModelPusherConfig(
                 model_export_dir=export_dir_path
             )
+            
             logging.info(f"Logging model pusher: {model_pusher_config}")
+
+            return model_pusher_config
+        
         except Exception as e:
             raise FraudDetectionException(e,sys) from e
         

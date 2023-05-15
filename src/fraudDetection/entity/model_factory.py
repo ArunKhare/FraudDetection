@@ -53,7 +53,7 @@ def evaluate_classification_model(model_list: list, X_train: np.ndarray, y_train
             logging.info(f"F1 Score: train {train_f1_score}, test {test_f1_score}")
             logging.info(f"Precision Score :  train {train_precision_score} test {test_precision_score}")
             logging.info(f"Recall Score : train {train_recall_score} test {test_recall_score}" )
-            logging.info(f"Classification Report : train {train_classification_report} test {test_classification_report}")
+            logging.info(f"Classification Report : train \n {train_classification_report} test \n {test_classification_report}")
             logging.info(f"Precision Recall Curve: train {train_precision_recall_curve}, test {test_precision_recall_curve}")
             logging.info(f'Accuracy Score: train  {train_accuracy_score} test {test_recall_score}')
             
@@ -79,13 +79,13 @@ def evaluate_classification_model(model_list: list, X_train: np.ndarray, y_train
                     test_accuracy_score=test_accuracy_score,
                     model_index=index_number
                 )
-                
+
                 logging.info(f'Acceptable model found {metric_info_artifact}')
             index_number +=1
 
         if metric_info_artifact is None:
-            logging.info(f"No model with higher accuracy than base accuracy")
-            raise Exception(f"No model with higher accuracy than base accuracy {model_accuracy, base_accuracy} and diff_test_train_accuracy {diff_test_train_acc}" )
+            logging.info(f"No model with higher accuracy than base accuracy {model_accuracy, base_accuracy} and diff_test_train_accuracy {diff_test_train_acc}")
+        
         
         return metric_info_artifact
     

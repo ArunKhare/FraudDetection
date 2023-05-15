@@ -1,0 +1,24 @@
+dvc
+pandas
+notebook
+numpy
+matplotlib
+seaborn
+python-box
+pyYAML
+tqdm
+ensure
+joblib
+types-PyYAML
+scipy
+streamlit
+rangehttpserver
+scikit-learn
+flask
+gunicorn
+mlflow
+dill
+kaggle
+evidently
+imblearn
+-e .

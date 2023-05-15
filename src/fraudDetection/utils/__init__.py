@@ -7,7 +7,7 @@ from pathlib import Path
 from ensure import ensure_annotations
 from box.exceptions import BoxValueError
 from glob import glob
-
+from typing import Union
 from fraudDetection.exception import FraudDetectionException
 from fraudDetection.logger import logging
 from tqdm import tqdm
@@ -58,7 +58,7 @@ def read_yaml(file_path:Path) -> ConfigBox:
         raise FraudDetectionException(e,sys) from e
     
 @ensure_annotations    
-def write_yaml(file_path:Path, data:dict) ->yaml:
+def write_yaml(file_path:Path, data: Union[str ,dict]) ->yaml:
     """create yaml file
     Args:
         file _path: str
@@ -67,7 +67,12 @@ def write_yaml(file_path:Path, data:dict) ->yaml:
         dir_path = os.path.dirname(file_path)
         os.makedirs(dir_path, exist_ok=True)
         with open(file=file_path, mode='w') as yaml_file:
-                yaml.dump(data=data, stream=yaml_file, indent=4, width=80)
+            model = yaml.dump(data=data, stream=yaml_file, indent=4, width=80)
+            return model
+    except yaml.YAMLError as e:
+        raise FraudDetectionException(e,sys) from e
+    except yaml.error as e:
+        raise FraudDetectionException(e,sys) from e
     except Exception as e:
         raise FraudDetectionException(e,sys) from e
          
@@ -237,7 +242,7 @@ def get_dtypes(df) -> ConfigBox:
         raise FraudDetectionException(e,sys) from e
 
 @ensure_annotations
-def load_data(file_path: Path, schema: dict, *args) ->pd.DataFrame:
+def load_data(file_path: Path, schema: dict, args : tuple =()) ->pd.DataFrame:
     """Validates the schema of data downloaded with the provided schema.
 
     Args:

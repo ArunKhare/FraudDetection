@@ -1,12 +1,11 @@
 import os,sys
 import kaggle
 from zipfile import ZipFile
-import pandas as pd
+import pandas as pd8
 from sklearn.model_selection import train_test_split
 from tqdm import tqdm
 from pathlib import Path
 from joblib import Memory
-
 from fraudDetection.entity import DataIngestionConfig, DataIngestionArtifact
 from fraudDetection.logger import logging
 from fraudDetection.exception import FraudDetectionException

@@ -2,7 +2,9 @@ saving a object:
     - Object must be of class type. i.e it has to have class_attribute
     - file path needs to include the file_name.extension
     - name of the file should be of permissible length
-    -logging each output
+    - yaml file : create_directories without the file_name extension, while writing file in the directory open the filepath with extension.write the data and close the connection
+    
+logging each output
 
 approach :
 cost sensitive learning 

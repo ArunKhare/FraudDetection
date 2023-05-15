@@ -191,8 +191,8 @@ class DataTransformation:
             categorical_columns = schema[DATA_SCHEMA_CATEGORICAL_COLUMN_KEY]
             numerical_columns = schema[DATA_SCHEMA_NUMERICAL_COLUMN_KEY]
             
-            train_df: pd.DataFrame = load_data(file_path=train_file_path,schema=data_schema)
-            test_df:  pd.DataFrame = load_data(file_path=test_file_path,schema=data_schema)
+            train_df: pd.DataFrame = load_data(file_path=train_file_path, schema=data_schema, args=(0,10))
+            test_df:  pd.DataFrame = load_data(file_path=test_file_path, schema=data_schema, args=(10,11))
             
             logging.info(f'\n loading training and test data: Shape {train_df.shape, test_df.shape}')
      

@@ -32,12 +32,12 @@ class ModelTrainerConfig:
     threshold_diff_train_test_acc: float
 @dataclass(frozen=True)
 class ModelEvaluationConfig:
-    model_evaluation_file_path: str
+    model_evaluation_file_path: Path
     time_stamp: str
     mlflow_uri: str
 @dataclass(frozen=True)
 class ModelPusherConfig:
-    model_export_dir: str
+    model_export_dir: Path
 @dataclass(frozen=True)
 class TraningPipelineConfig:
     artifacts_root: Path

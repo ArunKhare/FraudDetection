@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from pathlib import Path
+from datetime import datetime, time
 
 @dataclass
 class DataIngestionArtifact:
@@ -51,3 +52,17 @@ class ModelPusherArtifacts:
     is_model_pusher: str
     export_model_file_path: Path
 
+@dataclass
+class Experiment:
+    experiment_id: str
+    initialization_timestamp: datetime
+    artifact_timestamp: datetime
+    running_status: str
+    start_time: time
+    stop_time: time
+    execution_time: time
+    message: str
+    experiment_file_path: Path
+    accuracy: float
+    is_model_accepted: str
+    

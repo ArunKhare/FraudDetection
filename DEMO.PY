@@ -1,7 +1,7 @@
 from fraudDetection.logger import logging
 from fraudDetection.exception import FraudDetectionException
 from fraudDetection.config.configuration import ConfigurationManager
-from fraudDetection.components import DataIngestion, DataValidation, DataTransformation,ModelTrainer, ModelEvaluation
+from fraudDetection.components import DataIngestion, DataValidation, DataTransformation,ModelTrainer, ModelEvaluation, ModelPusher
 from fraudDetection.entity import DataIngestionArtifact, DataValidationArtifact, DataTransformationArtifact, ModelTrainerArtifact, ModelEvaluationArtifact
 
 from fraudDetection.constants import CONFIG_FILE_PATH
@@ -25,6 +25,9 @@ def main():
 
         model_evaluation_config = config.get_model_evaluation_config()
         mode_evaluation_artifacts = ModelEvaluation(model_evaluation_config,data_ingestion_artifacts, data_validation_artifacts,model_trainer_artifacts, data_transformation_artifacts).initiate_model_evaluation()
+
+        model_pusher_config = config.get_model_pusher_config()
+        model_pusher_artifacts = ModelPusher(model_pusher_config=model_pusher_config, model_evaluation_artifact=mode_evaluation_artifacts).initiate_model_pusher()
         
     except Exception as e:
         logging.error(e)

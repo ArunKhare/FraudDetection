@@ -14,7 +14,8 @@ from fraudDetection.entity.artifact_entity import(
     DataTransformationArtifact,
     ModelTrainerArtifact,
     ModelEvaluationArtifact,
-    ModelPusherArtifacts
+    ModelPusherArtifacts,
+    Experiment
 )
 
 from fraudDetection.entity.model_entity import(

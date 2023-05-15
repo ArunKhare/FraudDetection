@@ -25,7 +25,7 @@ class FraudetectionEstimaorModel:
 class ModelTrainer:
     def __init__(self, model_trainer_config: ModelTrainerConfig, data_transformation_artifact:DataTransformationArtifact) -> None:
         try:
-            logging.info(f"\n{'>>'*20} Model training log started {'<<'*20}")
+            logging.info(f"\n{'='*20} Model training log started {'='*20}")
             self.model_trainer_config: ModelTrainerConfig = model_trainer_config
             self.data_transformation_artifact: DataTransformationArtifact = data_transformation_artifact
         except Exception as e:
@@ -106,4 +106,4 @@ class ModelTrainer:
             raise FraudDetectionException(e,sys) from e
         
     def __del__(self):
-        logging.info(f"\n{'>>'*20} Model trainer log completed {'<<'*20} \n\n")
+        logging.info(f"\n{'='*20} Model trainer log completed {'='*20} \n\n")
