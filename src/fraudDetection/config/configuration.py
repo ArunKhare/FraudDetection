@@ -121,7 +121,7 @@ class ConfigurationManager:
 
             model_trainer_config_info:ConfigBox = self.config[MODEL_TRAINER_CONFIG_KEY]
             
-            base_accuracy:ConfigBox =  model_trainer_config_info[MODEL_TRAINED_BASE_ACCURACY_KEY]
+            base_accuracy:ConfigBox =  model_trainer_config_info[MODEL_TRAINER_BASE_SCORE_KEY]
             trained_model_file_path = Path(os.path.join(model_trainer_artifacts_dir, model_trainer_config_info[MODEL_TRAINED_DIR_KEY],
             model_trainer_config_info[MODEL_TRAINED_FILE_NAME_KEY]))
             model_config_file_path = Path(os.path.join(MODEL_TRAINER_CONFIG_DIR, model_trainer_config_info[MODEL_TRAINER_MODEL_CONFIG_FILE_NAME_KEY]))
@@ -129,7 +129,7 @@ class ConfigurationManager:
 
             model_trainer_config = ModelTrainerConfig(
                 trained_model_file_path=trained_model_file_path,
-                base_accuracy=base_accuracy,
+                base_score=base_accuracy,
                 model_config_file_path=model_config_file_path,
                 threshold_diff_train_test_acc=threshold_diff_train_test_acc
                 )
@@ -164,7 +164,7 @@ class ConfigurationManager:
             model_pusher_config_info:ConfigBox = self.config[MODEL_PUSHER_CONFIG_KEY]
     
             export_dir_path = Path(os.path.join(self.artifact_dir,model_pusher_config_info[MODEL_PUSHER_EXPORT_DIR_KEY]),self.current_time_stamp)
-
+            
             model_pusher_config = ModelPusherConfig(
                 model_export_dir=export_dir_path
             )

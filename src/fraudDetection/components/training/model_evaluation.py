@@ -3,7 +3,7 @@ from pathlib import Path
 from fraudDetection.logger import logging
 from fraudDetection.exception import FraudDetectionException
 from fraudDetection.entity import DataIngestionArtifact, DataTransformationArtifact, ModelEvaluationConfig, ModelTrainerArtifact, DataValidationArtifact, ModelEvaluationArtifact, evaluate_classification_model
-from fraudDetection.utils import read_yaml, write_yaml, load_object, load_data, create_directories
+from fraudDetection.utils import read_yaml, write_yaml, load_object, load_data
 from fraudDetection.constants import BEST_MODEL_KEY, HISTORY_KEY, MODEL_PATH_KEY, DATA_SCHEMA_TARGET_COLUMN_KEY, DATA_SCHEMA_COLUMNS_KEY
 from fraudDetection.components import processing_data
 from box import ConfigBox
@@ -12,6 +12,7 @@ import pandas as pd
 from sklearn import set_config
 set_config(display='diagram')
 from IPython.display import display
+import yaml
 
 class ModelEvaluation:
     def __init__(self, model_evaluation_config: ModelEvaluationConfig, data_ingestion_artifact: DataIngestionArtifact, data_validation_artifact: DataValidationArtifact, model_trainer_artifact: ModelTrainerArtifact,data_transformation_artifact: DataTransformationArtifact) -> None:
@@ -44,6 +45,9 @@ class ModelEvaluation:
 
             model_eval_file_content = None           
             model_eval_file_content = read_yaml(file_path=model_evaluation_file_path)
+
+            logging.info(f'yaml file:{model_evaluation_file_path} loaded successfully' )
+
             model_eval_file_content = dict() if model_eval_file_content is None else model_eval_file_content
             if BEST_MODEL_KEY not in model_eval_file_content:
                 return model
@@ -148,7 +152,7 @@ class ModelEvaluation:
                 y_train=train_y,
                 X_test=test_X,
                 y_test=test_y,
-                base_accuracy=self.model_trainer_artifact.model_accuracy,
+                base_score=self.model_trainer_artifact.model_accuracy,
                 threshold=self.model_trainer_artifact.threshold
             )
 

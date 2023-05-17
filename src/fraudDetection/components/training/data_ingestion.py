@@ -1,11 +1,13 @@
-import os,sys
+import os, sys
 import kaggle
 from zipfile import ZipFile
-import pandas as pd8
+import pandas as pd
 from sklearn.model_selection import train_test_split
 from tqdm import tqdm
 from pathlib import Path
-from joblib import Memory
+import msvcrt
+import time
+
 from fraudDetection.entity import DataIngestionConfig, DataIngestionArtifact
 from fraudDetection.logger import logging
 from fraudDetection.exception import FraudDetectionException
@@ -44,10 +46,21 @@ class DataIngestion:
                 print("====>>>File already exists")
 
                 options = ['Yes', 'No']
+
                 while True:
-                    choice = input(f'Do you want to download data again? Options ({"/".join(options)}): ')
-                    if choice.capitalize() in options:
-                        print(f'You selected: {choice.capitalize()}')
+                    print(f'Do you want to download data again? Options ({"/".join(options)}): ')
+                    time.sleep(2)  # Add a 2-second delay
+
+                    if msvcrt.kbhit():
+                        key = msvcrt.getch()
+                        choice = 'No'
+                        print('You selected: No')
+                        break
+                    else:
+                        choice = input().capitalize()
+
+                    if choice in options:
+                        print(f'You selected: {choice}')
                         break
                     else:
                         print('Invalid choice. Please enter a valid option.')
@@ -64,7 +77,9 @@ class DataIngestion:
                 tqdm(kaggle.api.dataset_download_files(dataset_name,zip_download_dir),mininterval=5,desc="downloading kaggle dataset in zip format" )
 
                 logging.info(f"File :[{zip_download_dir}] has been downloaded successfully.")
+            
             return zip_download_dir
+
         except Exception as e:
             raise FraudDetectionException(e,sys) from e
         
@@ -98,14 +113,12 @@ class DataIngestion:
 
             train_file_path = Path(os.path.join(self.data_ingestion_config.ingested_train_dir))
             test_file_path = Path(os.path.join(self.data_ingestion_config.ingested_test_dir))
-            
+
+            split_dataset_path: list[Path] = [train_file_path,test_file_path] 
+            create_directories(split_dataset_path)    
             # check_data_dir(raw_data_dir)
             
             if is_dir_empty(train_file_path) or is_dir_empty(test_file_path):
-
-                split_dataset_path: list[Path] = [train_file_path,test_file_path]
-                
-                create_directories(split_dataset_path)    
 
                 file_name = Path(os.listdir(raw_data_dir)[0])    
                 file_path = Path(os.path.join(raw_data_dir, file_name))

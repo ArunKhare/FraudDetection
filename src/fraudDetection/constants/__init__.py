@@ -59,7 +59,7 @@ MODEL_TRAINED_DIR_KEY = "trained_model_dir"
 MODEL_TRAINED_FILE_NAME_KEY = "model_file_name"
 MODEL_TRAINER_CONFIG_DIR = os.path.join(ROOT_DIR,CONFIG_DIR)
 MODEL_TRAINER_MODEL_CONFIG_FILE_NAME_KEY = "model_config_file_name"
-MODEL_TRAINED_BASE_ACCURACY_KEY = "base_accuracy"
+MODEL_TRAINER_BASE_SCORE_KEY = "base_score"
 MODEL_TRAINED_DIFF_TRAIN_TEST_ACC_KEY = 'threshold_diff_train_test_acc'
 
 #Model evaluation related variable

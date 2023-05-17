@@ -5,7 +5,7 @@ import numpy as np
 import yaml
 
 from typing import List
-from sklearn.metrics import f1_score, precision_recall_curve, recall_score, classification_report,precision_score ,accuracy_score, balanced_accuracy_score
+from sklearn.metrics import f1_score, fbeta_score, roc_auc_score, precision_recall_curve, recall_score, classification_report,precision_score ,accuracy_score, balanced_accuracy_score, make_scorer, auc
 from fraudDetection.exception import FraudDetectionException
 from fraudDetection.logger import logging
 
@@ -14,7 +14,7 @@ from fraudDetection.constants import FACTORY_CLASS_KEY, FACTORY_GRID_SEARCH_KEY,
 from fraudDetection.entity import InitializedModelDetails, GridSearchedBestModel, BestModel, MetricInfoArtifact
 
 
-def evaluate_classification_model(model_list: list, X_train: np.ndarray, y_train: np.ndarray, X_test: np.ndarray, y_test: np.ndarray, base_accuracy: float=0.6,threshold:float = 0.05 ) -> MetricInfoArtifact:
+def evaluate_classification_model(model_list: list, X_train: np.ndarray, y_train: np.ndarray, X_test: np.ndarray, y_test: np.ndarray, base_score: float=0.6,threshold:float = 0.05 ) -> MetricInfoArtifact:
 
     try:
         index_number = 0
@@ -30,6 +30,15 @@ def evaluate_classification_model(model_list: list, X_train: np.ndarray, y_train
             #calculating f1 score on training and testing dataset
             train_f1_score = f1_score(y_train,y_train_pred)
             test_f1_score = f1_score(y_test,y_test_pred)
+
+            #calculating fbetascore on training and testing dataset
+            train_fbeta_score = fbeta_score(y_train,y_train_pred,beta=2)
+            test_fbeta_score = fbeta_score(y_test,y_test_pred,beta=2)
+
+            #calculating fbetascore on training and testing dataset
+            train_roc_auc_score = roc_auc_score(y_train,y_train_pred)
+            test_roc_auc_score = roc_auc_score(y_test,y_test_pred)
+
             #calculating precision  score for training and testing dataset
             train_precision_score = precision_score(y_train,y_train_pred)
             test_precision_score = precision_score(y_test, y_test_pred)
@@ -51,6 +60,8 @@ def evaluate_classification_model(model_list: list, X_train: np.ndarray, y_train
             #logging all important metric
             logging.info(f"\n{'>>'*20}Score {'<<'*20}")
             logging.info(f"F1 Score: train {train_f1_score}, test {test_f1_score}")
+            logging.info(f"Fbeta Score: train {train_fbeta_score}, test {test_fbeta_score}")
+            logging.info(f"Roc_Auc Score: train {train_roc_auc_score}, test {test_roc_auc_score}")
             logging.info(f"Precision Score :  train {train_precision_score} test {test_precision_score}")
             logging.info(f"Recall Score : train {train_recall_score} test {test_recall_score}" )
             logging.info(f"Classification Report : train \n {train_classification_report} test \n {test_classification_report}")
@@ -65,13 +76,17 @@ def evaluate_classification_model(model_list: list, X_train: np.ndarray, y_train
             logging.info( f'Model accuracy: {model_accuracy}')
 
             # defining threshold
-            if model_accuracy >=base_accuracy and diff_test_train_acc < threshold:
-                base_accuracy = model_accuracy
+            if train_fbeta_score >=base_score and diff_test_train_acc < threshold:
+                base_score = train_fbeta_score
                 metric_info_artifact = MetricInfoArtifact(
                     model_name=model_name,
                     model_object=model,
                     train_f1_score=train_f1_score,
                     test_f1_score=test_f1_score,
+                    train_fbeta_score=train_fbeta_score,
+                    test_fbeta_score=test_fbeta_score,
+                    train_roc_auc_score=train_roc_auc_score,
+                    test_roc_auc_score=test_roc_auc_score,
                     train_precision_score=train_precision_score,
                     train_recall_score=train_recall_score,
                     model_accuracy=model_accuracy,
@@ -84,7 +99,7 @@ def evaluate_classification_model(model_list: list, X_train: np.ndarray, y_train
             index_number +=1
 
         if metric_info_artifact is None:
-            logging.info(f"No model with higher accuracy than base accuracy {model_accuracy, base_accuracy} and diff_test_train_accuracy {diff_test_train_acc}")
+            logging.info(f"No model with higher accuracy than base accuracy {model_accuracy, base_score} and fbeta {train_fbeta_score, test_fbeta_score} and diff_test_train_accuracy {diff_test_train_acc}")
         
         
         return metric_info_artifact
@@ -152,10 +167,24 @@ class ModelFactory:
         try: 
             # instantiating GridSearch CV
             grid_search_cv_ref = ModelFactory.class_for_name(module_name=self.grid_search_cv_module,
-                                                            class_name= self.grid_search_class_name)   
+                                                            class_name= self.grid_search_class_name)
             grid_search_cv = grid_search_cv_ref(estimator=initialized_model.model,
                                                 param_grid=initialized_model.param_grid_search)
+            
+            scoring = {
+                'f1': make_scorer(f1_score),
+                'precision': make_scorer(precision_score),
+                'recall': make_scorer(recall_score)
+                }
+            
+            self.grid_search_property_data.update({"scoring": scoring,
+                                                   'refit': 'f1'} )
+
             grid_search_cv = ModelFactory.update_property_of_class(grid_search_cv, self.grid_search_property_data)
+
+            print( "grid_search_cv_ref : ", grid_search_cv_ref)
+            print("grid_search_cv: ", grid_search_cv)
+            print("grid_search_property data:", self.grid_search_property_data)
 
             message =  f'\n{">>"*20} Training {type(initialized_model.model).__name__} Started {"<<"*20}\n'
             logging.info(message)
@@ -235,32 +264,32 @@ class ModelFactory:
               
     @staticmethod    
     def get_best_model_from_grid_searched_best_model_list(grid_searched_best_model_list:List[GridSearchedBestModel],
-                                                        base_accuracy = 0.6) -> BestModel:
+                                                        base_score = 0.6) -> BestModel:
         """
         function Accepts the models with score greater than base accuracy threshold. 
         raise exception if no model accuracy greater than base accuracy found.
         args: 
             grid_searched_best_model_list: list of Gridsearched best models
-            base_accuracy: accuracy threhold set 
+            base_score: accuracy threhold set 
         returns:
             best models with accuracy
         """
         try:
             best_model = None
             for grid_searched_best_model in  grid_searched_best_model_list:
-                if base_accuracy < grid_searched_best_model.best_score:
+                if base_score < grid_searched_best_model.best_score:
                     logging.info(f"Acceptable model found: {grid_searched_best_model}")     
-                    base_accuracy = grid_searched_best_model.best_score
+                    base_score = grid_searched_best_model.best_score
                     best_model = grid_searched_best_model
                 
                 if not best_model:
-                    raise Exception(f"None of Model has base Accuracy: {base_accuracy}")
+                    raise Exception(f"None of Model has base Accuracy: {base_score}")
                 logging.info(f'Best model: {best_model}')
                 return best_model
         except Exception as e:
             raise FraudDetectionException(e,sys) from e
 
-    def get_best_model(self, X ,y, base_accuracy) -> BestModel:
+    def get_best_model(self, X ,y, base_score) -> BestModel:
         try:
             
             logging.info("Started Initializing model from config file")
@@ -273,6 +302,6 @@ class ModelFactory:
                 output_feature=y,
             )
             return ModelFactory.get_best_model_from_grid_searched_best_model_list(grid_searched_best_model_list=grid_searched_best_model_list,
-                                                                                 base_accuracy=base_accuracy)
+                                                                                 base_score=base_score)
         except Exception as e: 
             raise FraudDetectionException(e, sys) from e

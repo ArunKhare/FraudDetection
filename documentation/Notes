@@ -8,3 +8,39 @@ logging each output
 
 approach :
 cost sensitive learning 
+Cost-sensitive learning is a machine learning paradigm that takes into account the costs associated with misclassification errors in the training and evaluation of a predictive model. The costs can be in the form of monetary, social, or any other measurable impact.
+
+In traditional machine learning, the goal is to minimize the overall error rate, without differentiating between types of errors. However, in some applications, the cost of a certain type of error can be much higher than the cost of another type of error. For example, in medical diagnosis, a false negative (failing to identify a disease) can be more costly than a false positive (incorrectly identifying a healthy person as having the disease).
+
+Cost-sensitive learning tries to address this by incorporating the costs of different types of errors into the learning process. This can be done by assigning different weights to different types of misclassifications or by modifying the decision boundary of the model based on the costs.
+
+Some common approaches to cost-sensitive learning include:
+
+Adjusting the class weights in the loss function of the model to reflect the different costs of errors
+Using cost-sensitive sampling methods to oversample or undersample the minority class to balance the costs of errors
+Modifying the decision threshold of the model to optimize the expected cost of the predictions
+Using different evaluation metrics that take into account the costs of different types of errors, such as cost curves or cost-benefit analysis.
+Cost-sensitive learning can be particularly useful in applications where the costs of errors are imbalanced or where the cost of certain types of errors is high. By taking into account the real-world costs of errors, cost-sensitive learning can help improve the performance and usefulness of predictive models.
+
+
+
+distribution: normal, gausian
+evaluate : f1score 
+pytest
+
+streamlit, Bokeh, panel, dash ,voila for jupyter notebook
+
+DVC, Neptune 
+mlflow 
+frontend
+
+CICD pipeline
+
+graphana
+prothemus
+MongoDB
+circleCI
+Docker
+terraform
+airflow
+cloud

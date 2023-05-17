@@ -27,7 +27,7 @@ class DataTransformationConfig:
 @dataclass(frozen=True)
 class ModelTrainerConfig:
     trained_model_file_path:Path
-    base_accuracy: float
+    base_score: float
     model_config_file_path: str
     threshold_diff_train_test_acc: float
 @dataclass(frozen=True)

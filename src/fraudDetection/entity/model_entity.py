@@ -29,6 +29,10 @@ class MetricInfoArtifact:
     model_object : str
     train_f1_score : float
     test_f1_score: float
+    train_fbeta_score: float
+    test_fbeta_score: float
+    train_roc_auc_score: float
+    test_roc_auc_score: float
     train_precision_score : float
     train_recall_score : float
     model_accuracy: float

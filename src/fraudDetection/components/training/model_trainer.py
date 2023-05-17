@@ -52,13 +52,13 @@ class ModelTrainer:
             logging.info(f"Initializing model factory class using above model config  file :{model_config_file_path}")
 
             model_factory = ModelFactory(model_config_path=model_config_file_path)
-            base_accuracy = self.model_trainer_config.base_accuracy
+            base_score = self.model_trainer_config.base_score
             threshold = self.model_trainer_config.threshold_diff_train_test_acc
 
-            logging.info(f"Expected  accuracy: {base_accuracy}, threshold {threshold}")
+            logging.info(f"Expected  accuracy: {base_score}, threshold {threshold}")
             
             logging.info(f"Initiating operation model selection")
-            best_model = model_factory.get_best_model(X=X_train,y=y_train,base_accuracy=base_accuracy)
+            best_model = model_factory.get_best_model(X=X_train,y=y_train,base_score=base_score)
 
             logging.info(f'Best Model found on training dataset: {best_model}')
 
@@ -69,7 +69,7 @@ class ModelTrainer:
             
             logging.info(f"Evaluation all trained model on training and testing dataset both")
 
-            metric_info:MetricInfoArtifact = evaluate_classification_model(model_list=model_list,X_train=X_train,y_train=y_train,X_test=X_test,y_test=y_test,base_accuracy=base_accuracy,threshold=threshold)
+            metric_info:MetricInfoArtifact = evaluate_classification_model(model_list=model_list,X_train=X_train,y_train=y_train,X_test=X_test,y_test=y_test,base_score=base_score,threshold=threshold)
         
             logging.info(f"Best model found on both training and testing dataset")
 
@@ -93,6 +93,10 @@ class ModelTrainer:
                 test_accuracy=metric_info.test_accuracy_score,
                 train_f1_score=metric_info.train_f1_score,
                 test_f1_score=metric_info.test_f1_score,
+                train_fbeta_score=metric_info.train_fbeta_score,
+                test_fbeta_score=metric_info.test_fbeta_score,
+                train_roc_auc_score=metric_info.train_roc_auc_score,
+                test_roc_auc_score=metric_info.test_roc_auc_score,
                 train_precision_score=metric_info.train_precision_score,
                 train_recall_score=metric_info.train_recall_score,
                 model_accuracy=metric_info.model_accuracy,
@@ -100,8 +104,11 @@ class ModelTrainer:
                 test_accuracy_score=metric_info.test_accuracy_score,
                 threshold=threshold,
             )
+
             logging.info(f"Model Trainer Artifact: {model_trainer_artifact}")
+            
             return model_trainer_artifact
+        
         except Exception as e:
             raise FraudDetectionException(e,sys) from e
         
