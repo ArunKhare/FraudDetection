@@ -1,16 +1,20 @@
 import os, sys
+from dataclasses import dataclass
 import numpy as np
 import pandas as pd
 import dill, yaml, json
 from box import ConfigBox
-from pathlib import Path
+from pathlib import Path ,WindowsPath
 from ensure import ensure_annotations
 from box.exceptions import BoxValueError
 from glob import glob
-from typing import Union
+import yaml
 from fraudDetection.exception import FraudDetectionException
 from fraudDetection.logger import logging
 from tqdm import tqdm
+import ruamel.yaml
+
+# Your code using ruamel.yaml
 
 @ensure_annotations 
 def create_directories(path_to_directories:list,verbose=True):
@@ -30,35 +34,47 @@ def create_directories(path_to_directories:list,verbose=True):
                 logging.info(f"File already exists: {path}")
     except Exception as e:
         raise FraudDetectionException(e, sys) from e 
-    
-@ ensure_annotations
-def read_yaml(file_path:Path) -> ConfigBox:
+
+@dataclass
+class ConfigBox:
+    data: str
+
+def construct_Configbox(loader, node):
+    data = ConfigBox(loader.construct_mapping(node))
+    # Create an instance of the ConfigBox object
+    config_box = ConfigBox(data)
+    return config_box
+
+# @ ensure_annotations
+def read_yaml(file_path:Path) -> dict:
     """ read yaml file and returns
     Args : 
         file_path (str) :path like input
     Raises:
         ValuError: if yaml file is empty
         e: empty file
-        Returns: ConfigBox: ConfigBox type
+        Returns: dict
         """
     try:
+        yaml = ruamel.yaml.YAML()
         if not file_path.is_file():
             raise FileNotFoundError(f"{file_path} does not exist.")
         if os.stat(file_path).st_size == 0:
             raise ValueError(f"{file_path} is empty.")
+        file_path = str(file_path)
+  
         with open(file_path, 'r') as f:
-            content = yaml.safe_load(f)
+            content = yaml.load(f)
             logging.info(f'yaml file:{file_path} loaded successfully' )
-            return ConfigBox (content)
+            return content
+        
     except ValueError as e:
         logging.info(e)
     except FileNotFoundError as e:
         raise FraudDetectionException(e,sys) from e
-    except BoxValueError as e:
-        raise FraudDetectionException(e,sys) from e
     
-@ensure_annotations    
-def write_yaml(file_path:Path, data: Union[str ,dict]) ->yaml:
+# @ensure_annotations    
+def write_yaml(file_path:Path, data: dict) ->yaml:
     """create yaml file
     Args:
         file _path: str
@@ -76,7 +92,7 @@ def write_yaml(file_path:Path, data: Union[str ,dict]) ->yaml:
     except Exception as e:
         raise FraudDetectionException(e,sys) from e
          
-@ensure_annotations
+# @ensure_annotations
 def save_json(path:Path, data:dict)  -> None:
     """ save json data
     Args: 
@@ -212,16 +228,20 @@ def compare_schema(schema: dict, csv_path: Path) -> None:
             raise FraudDetectionException(f"Column '{col}' has a different data type in CSV schema.", 
                                            f"Expected data type: {dtype}, Actual data type: {df_schema[col]}")
 
-@ensure_annotations
+# @ensure_annotations
 def save_dfs_to_csv(df, file_path: Path, chunk_size:int ) -> None:
-    try:
 
+    try:
+       
         with tqdm(total=len(df), desc=f"Saving test data to CSV {file_path}") as pbar:
+           
             for i, ( _, chunk ) in enumerate(df.groupby(df.index // chunk_size)):
-                chunk_file_path = file_path / f"file_{i}.csv"
+                chunk_file_path = Path(file_path / f"file_{i}.csv")
+                print(f'chunk_file_path: {chunk_file_path}')
                 chunk.to_csv(chunk_file_path, index=False)
-                pbar.update(len(chunk))
       
+                pbar.update(len(chunk))
+                
     except Exception as e:
         raise FraudDetectionException(e, sys) from e
     

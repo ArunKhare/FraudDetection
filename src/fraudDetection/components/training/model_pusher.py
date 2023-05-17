@@ -28,13 +28,7 @@ class ModelPusher:
 
             logging.info(f'evaluated_model_file_path : {evaluated_model_file_path}')
 
-               
-            logging.info(f'Export_dir: {export_dir}')
-
             model_file_name = os.path.basename(evaluated_model_file_path)
-
-            logging.info(f'Base File name : {model_file_name}')
-
             export_model_file_path = os.path.join(export_dir,model_file_name)
             
             logging.info(f"Exporting model file: {export_model_file_path}")
