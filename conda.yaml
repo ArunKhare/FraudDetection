@@ -1,0 +1,30 @@
+name: env
+dependencies:
+  - dvc
+  - pandas~=2.0.1
+  - notebook
+  - numpy~=1.24.3
+  - matplotlib
+  - seaborn
+  - python-box
+  - pyYAML~=6.0
+  - tqdm~=4.65.0
+  - ensure~=1.0.3
+  - joblib
+  - types-PyYAML
+  - scipy
+  - streamlit
+  - rangehttpserver
+  - scikit-learn~=1.2.2
+  - flask
+  - gunicorn
+  - mlflow
+  - dill~=0.3.6
+  - kaggle~=1.5.13
+  - evidently~=0.3.1
+  - imblearn~=0.0
+  - ruamel.yaml
+  - ipython~=8.13.2
+  - setuptools~=66.0.0
+  - -e .
+#  - fraudDetection~=0.0.0

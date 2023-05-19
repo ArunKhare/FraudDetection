@@ -135,3 +135,6 @@ artifacts
 ./cache*
 cache
 test.npy
+mlruns
+./mlruns
+.idea
