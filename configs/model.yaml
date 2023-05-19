@@ -4,6 +4,8 @@ grid_search:
   params: 
     cv: 10
     verbose: 2
+    n_jobs: -1
+
 model_selection:
   module_0:
     class: LogisticRegression
@@ -15,28 +17,23 @@ model_selection:
     search_param_grid:
       penalty: 
         - l2
+
   module_1:
     class: RandomForestClassifier
     module: sklearn.ensemble
     params:
       min_samples_leaf: 3
       bootstrap: true
-      oob_score: true
-      n_jobs: -1
-      random_state: 42
-      max_features: sqrt
-      class_weight: balanced_subsample
     search_param_grid:
-      min_samples_leaf:
+      class_weight:
+        - balanced_subsample
+      oob_score:
+        - true
+      random_state:
+        - 42
+      max_lead_nodes:
         - 6
-      criterion:
-        - gini
-      max_depth: 
-        - 60
-      min_samples_split: 
-        - 5
-      n_estimators: 
-        - 600
+
   module_2:
     class: LinearSVC
     module: sklearn.svm
@@ -47,3 +44,4 @@ model_selection:
     search_param_grid:
       class_weight: 
         - balanced
+        
