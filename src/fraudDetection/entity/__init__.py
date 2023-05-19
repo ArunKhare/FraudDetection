@@ -5,10 +5,10 @@ from fraudDetection.entity.config_entity import (
     ModelEvaluationConfig,
     ModelPusherConfig,
     ModelTrainerConfig,
-    TraningPipelineConfig
+    TrainingPipelineConfig
 )
 
-from fraudDetection.entity.artifact_entity import(
+from fraudDetection.entity.artifact_entity import (
     DataIngestionArtifact,
     DataValidationArtifact,
     DataTransformationArtifact,
@@ -18,12 +18,11 @@ from fraudDetection.entity.artifact_entity import(
     Experiment
 )
 
-from fraudDetection.entity.model_entity import(
+from fraudDetection.entity.model_entity import (
     InitializedModelDetails,
     GridSearchedBestModel,
     BestModel,
     MetricInfoArtifact,
 )
 
-from fraudDetection.entity.model_factory import ModelFactory, evaluate_classification_model 
- 
+from fraudDetection.entity.model_factory import ModelFactory, evaluate_classification_model

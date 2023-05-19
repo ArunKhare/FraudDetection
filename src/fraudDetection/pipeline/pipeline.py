@@ -1,27 +1,11 @@
-from collections.abc import Callable, Iterable, Mapping
-from datetime import datetime 
-from time import time
-import os, sys
-from typing import Any
+import os
+import sys
 import uuid
-from dataclasses import dataclass
-import pandas as pd
-from pathlib import Path
-from multiprocessing import Process
+from datetime import datetime
 from threading import Thread
 
-from fraudDetection.logger import logging
-from fraudDetection.exception import FraudDetectionException
-from fraudDetection.config.configuration import ConfigurationManager
-from fraudDetection.entity import (
-    ModelPusherArtifacts, 
-    DataIngestionArtifact, 
-    ModelEvaluationArtifact, 
-    DataTransformationArtifact,
-    ModelTrainerArtifact, 
-    DataValidationArtifact,
-    Experiment
-    )
+import pandas as pd
+
 from fraudDetection.components import (
     DataIngestion,
     DataValidation,
@@ -30,71 +14,81 @@ from fraudDetection.components import (
     ModelEvaluation,
     ModelPusher
 )
+from fraudDetection.config.configuration import ConfigurationManager
 from fraudDetection.constants import EXPERIMENT_FILE_NAME, EXPERIMENT_DIR_NAME
+from fraudDetection.entity import (
+    DataIngestionArtifact,
+    ModelEvaluationArtifact,
+    DataTransformationArtifact,
+    ModelTrainerArtifact,
+    DataValidationArtifact
+)
 from fraudDetection.entity import Experiment
+from fraudDetection.exception import FraudDetectionException
+from fraudDetection.logger import logging
 from fraudDetection.utils import create_directories
 
 
 class Pipeline(Thread):
-
     # initialization of Experiment class passing None to all the parameters
-    experiment  = Experiment(*([None]*11))
+    experiment = Experiment(*([None] * 11))
     experiment_file_path = None
 
-    def __init__(self, config:ConfigurationManager):
+    def __init__(self, config: ConfigurationManager):
 
         try:
-            artifact_dir  = config.training_pipeline_config.artifacts_root
-            create_directories([artifact_dir]) 
-            Pipeline.experiment_file_path = os.path.join(artifact_dir,EXPERIMENT_DIR_NAME,EXPERIMENT_FILE_NAME)
+            artifact_dir = config.training_pipeline_config.artifacts_root
+            create_directories([artifact_dir])
+            Pipeline.experiment_file_path = os.path.join(artifact_dir, EXPERIMENT_DIR_NAME, EXPERIMENT_FILE_NAME)
 
             self.config = config
 
-            super().__init__(name="pipeline",daemon=False)
+            super().__init__(name="pipeline", daemon=False)
         except Exception as e:
-            raise FraudDetectionException(e,sys) from e
-        
+            raise FraudDetectionException(e, sys) from e
+
     def start_data_ingestion(self) -> None:
 
         try:
             data_ingestion = DataIngestion(
                 data_ingestion_config=self.config.get_data_ingestion_config()
-                )
+            )
 
             return data_ingestion.initiate_data_ingestion()
-        
+
         except Exception as e:
-            raise FraudDetectionException(e,sys) from e
-        
-    def start_data_validation(self,data_ingestion_artifact=DataIngestionArtifact) -> None:
+            raise FraudDetectionException(e, sys) from e
+
+    def start_data_validation(self, data_ingestion_artifact=DataIngestionArtifact) -> None:
 
         try:
 
             data_validation = DataValidation(
-                data_validation_config = self.config.get_data_validation_config(),
+                data_validation_config=self.config.get_data_validation_config(),
                 data_ingestion_artifact=data_ingestion_artifact
-                )
-            
-            return data_validation.initiate_data_validation()
-        
-        except Exception as e:
-            raise FraudDetectionException(e,sys) from e
+            )
 
-    def start_data_transformation(self,data_ingestion_artifact:DataIngestionArtifact, data_validation_artifact: DataValidationArtifact):
+            return data_validation.initiate_data_validation()
+
+        except Exception as e:
+            raise FraudDetectionException(e, sys) from e
+
+    def start_data_transformation(self, data_ingestion_artifact: DataIngestionArtifact,
+                                  data_validation_artifact: DataValidationArtifact):
 
         try:
 
             data_transformation = DataTransformation(
-                data_transformation_config= self.config.get_data_transformation_config(),
+                data_transformation_config=self.config.get_data_transformation_config(),
                 data_ingestion_artifact=data_ingestion_artifact,
                 data_validation_artifact=data_validation_artifact,
-                )
-            
+            )
+
             return data_transformation.initiate_data_transformation()
-        
+
         except Exception as e:
-            raise FraudDetectionException(e,sys) from e
-    
+            raise FraudDetectionException(e, sys) from e
+
     def start_model_trainer(self, data_transformation_artifact: DataTransformationArtifact):
 
         try:
@@ -104,8 +98,8 @@ class Pipeline(Thread):
                 data_transformation_artifact=data_transformation_artifact)
             return model_trainer.initiate_model_trainer()
         except Exception as e:
-            raise FraudDetectionException(e,sys) from e
-        
+            raise FraudDetectionException(e, sys) from e
+
     def start_model_evaluation(self, data_ingestion_artifact: DataIngestionArtifact,
                                data_validation_artifact: DataValidationArtifact,
                                data_transformation_artifact: DataTransformationArtifact,
@@ -113,30 +107,32 @@ class Pipeline(Thread):
         try:
 
             model_evaluation = ModelEvaluation(
-                model_evaluation_config=self.config.get_model_evaluation_config(),data_ingestion_artifact=data_ingestion_artifact,data_validation_artifact=data_validation_artifact,model_trainer_artifact=model_trainer_artifact,data_transformation_artifact=data_transformation_artifact
-                )
-            
+                model_evaluation_config=self.config.get_model_evaluation_config(),
+                data_ingestion_artifact=data_ingestion_artifact, data_validation_artifact=data_validation_artifact,
+                model_trainer_artifact=model_trainer_artifact, data_transformation_artifact=data_transformation_artifact
+            )
+
             return model_evaluation.initiate_model_evaluation()
-        
+
         except Exception as e:
-            raise FraudDetectionException(e,sys) from e
-    
-    def start_model_pusher(self, model_eval_artifact:ModelEvaluationArtifact):
-        
+            raise FraudDetectionException(e, sys) from e
+
+    def start_model_pusher(self, model_eval_artifact: ModelEvaluationArtifact):
+
         try:
 
             model_pusher = ModelPusher(
                 model_pusher_config=self.config.get_model_evaluation_config(),
                 model_evaluation_artifact=model_eval_artifact
-                )
-            
+            )
+
             return model_pusher.initiate_model_pusher()
-        
+
         except Exception as e:
-            raise FraudDetectionException(e,sys) from e
-    
+            raise FraudDetectionException(e, sys) from e
+
     def run_pipeline(self):
-        
+
         try:
             if Pipeline.experiment.running_status:
                 logging.info(f'Pipeline is already running')
@@ -167,34 +163,34 @@ class Pipeline(Thread):
 
             data_validation_artifact = self.start_data_validation(
                 data_ingestion_artifact=data_ingestion_artifact
-                )
-            
+            )
+
             data_transformation_artifact = self.start_data_transformation(
                 data_ingestion_artifact=data_ingestion_artifact,
                 data_validation_artifact=data_validation_artifact
-                )
-            
+            )
+
             model_trainer_artifact = self.start_model_trainer(
                 data_transformation_artifact=data_transformation_artifact
-                )
-            
+            )
+
             model_evaluator_artifact = self.start_model_evaluation(
                 data_ingestion_artifact=data_ingestion_artifact,
                 data_validation_artifact=data_validation_artifact,
                 data_transformation_artifact=data_transformation_artifact,
                 model_trainer_artifact=model_trainer_artifact
-                )
-            
+            )
+
             # if model_evaluator_artifact.is_model_accepted:
             model_pusher_artifact = self.start_model_pusher(model_eval_artifact=model_evaluator_artifact)
             logging.info(f"Model pusher artifact: {model_pusher_artifact}")
             # else:
             #     logging.info("Trained model rejected")
-            
+
             logging.info("Pipline completed")
-            
+
             stop_time = datetime.now()
-            
+
             Pipeline.experiment = Experiment(
                 experiment_id=Pipeline.experiment.experiment_id,
                 initialization_timestamp=self.config.current_time_stamp,
@@ -202,33 +198,34 @@ class Pipeline(Thread):
                 running_status=False,
                 start_time=Pipeline.experiment.start_time,
                 stop_time=stop_time,
-                execution_time=stop_time-Pipeline.experiment.start_time,
+                execution_time=stop_time - Pipeline.experiment.start_time,
                 message="Pipeline has been completed",
                 experiment_file_path=Pipeline.experiment_file_path,
                 is_model_accepted=model_evaluator_artifact.is_model_accepted,
                 accuracy=model_trainer_artifact.model_accuracy
-                )
-            
+            )
+
             logging.info(f"Pipeline experiment:{Pipeline.experiment}")
 
         except Exception as e:
-            raise FraudDetectionException(e,sys) from e
-    
+            raise FraudDetectionException(e, sys) from e
+
     def run(self):
-        
+
         try:
 
             self.run_pipeline()
 
         except Exception as e:
-            raise FraudDetectionException(e,sys) from e
-        
-    def save_experiment(self):
+            raise FraudDetectionException(e, sys) from e
+
+    @staticmethod
+    def save_experiment():
         try:
             if Pipeline.experiment.experiment_id is not None:
                 experiment = Pipeline.experiment
                 experiment_dict = experiment.__dict__
-                experiment_dict = {key: [value] for key ,value in experiment_dict.items()}
+                experiment_dict = {key: [value] for key, value in experiment_dict.items()}
 
                 experiment_dict.update({
                     "create_time_stamp": [datetime.now()],
@@ -240,17 +237,17 @@ class Pipeline(Thread):
                 create_directories([os.path.dirname(Pipeline.experiment_file_path)])
 
                 if os.path.exists(Pipeline.experiment_file_path):
-                    experiment_report.to_csv(Pipeline.experiment_file_path,index=False, header=False, mode='a')
+                    experiment_report.to_csv(Pipeline.experiment_file_path, index=False, header=False, mode='a')
                 else:
                     os.path.exists(Pipeline.experiment_file_path)
-                    experiment_report.to_csv(Pipeline.experiment_file_path,index=False, header=True, mode='w')
+                    experiment_report.to_csv(Pipeline.experiment_file_path, index=False, header=True, mode='w')
 
             else:
                 print("First start experiment")
 
         except Exception as e:
-            raise FraudDetectionException(e,sys) from e
-    
+            raise FraudDetectionException(e, sys) from e
+
     @classmethod
     def get_experiment_status(cls, limit: int = 5) -> pd.DataFrame:
 
@@ -260,9 +257,9 @@ class Pipeline(Thread):
                 df = pd.read_csv(Pipeline.experiment_file_path)
                 limit = -1 * int(limit)
 
-                return df[limit:].drop(columns=["experiment_file_path","initialization_timestamp"], axis=1)
+                return df[limit:].drop(columns=["experiment_file_path", "initialization_timestamp"], axis=1)
             else:
                 return pd.DataFrame()
-            
+
         except Exception as e:
-            raise FraudDetectionException(e,sys) from e
+            raise FraudDetectionException(e, sys) from e
