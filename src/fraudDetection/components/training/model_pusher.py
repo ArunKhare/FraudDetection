@@ -24,6 +24,7 @@ class ModelPusher:
             raise FraudDetectionException(e, sys) from e
 
     def export_model(self):
+
         try:
 
             evaluated_model_file_path = self.model_evaluation_artifact.evaluated_model_path

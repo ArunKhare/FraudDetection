@@ -87,7 +87,7 @@ def evaluate_classification_model(model_list: list, X_train: np.ndarray, y_train
             mlflow.sklearn.log_model(sk_model=model,
                                      artifact_path="model_training",
                                      conda_env='conda.yaml',
-                                     registered_model_name=model_name,
+                                     registered_model_name=model_name.__class__.__name__,
                                      input_example=X_train[:1, :],
                                      metadata=dict(stage="training",
                                                    index_number=index_number))

@@ -31,7 +31,7 @@ model_selection:
         - true
       random_state:
         - 42
-      max_lead_nodes:
+      max_leaf_nodes:
         - 6
 
   module_2:

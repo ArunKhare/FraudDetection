@@ -12,6 +12,7 @@ from fraudDetection.components import processing_data
 from sklearn import set_config
 import mlflow
 from IPython.display import display
+from mlflow.models.signature import infer_signature
 
 set_config(display='diagram')
 
@@ -127,6 +128,8 @@ class ModelEvaluation:
 
             logging.info(
                 f"Original evaluation data shape: train_df {train_df.shape, train_target_feature.shape} test_df {test_df.shape, test_target_feature.shape}")
+            
+            signature1 = infer_signature(train_df, train_target_feature)
 
             processor_file_path = self.data_transformation_artifact.processed_object_file_path
             imputed_sampler_file_path = self.data_transformation_artifact.impute_sampler_object_file_path
@@ -147,6 +150,7 @@ class ModelEvaluation:
 
             train_x, train_y, test_x, test_y = train_arr_with_y[:, :-1], train_arr_with_y[:, -1], test_arr_with_y[:, :-1], test_arr_with_y[
                                                                                                         :, -1]
+            signature = infer_signature(train_x, train_y)
 
             model = self.get_best_model()
 
@@ -185,7 +189,11 @@ class ModelEvaluation:
                 mlflow.end_run()
 
             with mlflow.start_run() as run:
+                
+                mlflow.set_tags({"version": "v1", "stage": "staging"})
 
+                mlflow.set_registry_uri(self.model_evaluation_config.mlflow_uri)
+                
                 if metric_info_artifact is None:
                     response = ModelEvaluationArtifact(is_model_accepted=is_model_accepted,
                                                        evaluated_model_path=trained_model_file_path)
@@ -206,15 +214,28 @@ class ModelEvaluation:
                         sk_model=metric_info_artifact.model_object,
                         artifact_path="evaluation",
                         registered_model_name=metric_info_artifact.model_name,
+                        signature=signature,
+                        input_example=(train_x[:2,:],train_y[:2]),
                         conda_env="conda.yaml",
-                        metadata=dict(stage="evaluation",
+                        pyfunc_predict_fn="predict",
+                        metadata=dict(stage="staging",
                                       is_model_accpeted=is_model_accepted,
                                       model_index=metric_info_artifact.model_index
                                       )
-                    )
+                        )
                     
                     mlflow.sklearn.log_model(
                         sk_model=imputed_sampler_obj,
+                        signature=signature1,
+                        artifact_path="evaluation",
+                        input_example= (train_df[:2,:],train_target_feature[:2]),
+                        conda_env="conda.yaml"
+                    )
+
+                    mlflow.sklearn.log_model(
+                        sk_model=processing_obj,
+                        signature=signature1,
+                        input_example= (train_df[:2,:],train_target_feature[:2]),
                         artifact_path="evaluation",
                         conda_env="conda.yaml"
                     )
@@ -239,7 +260,13 @@ class ModelEvaluation:
                     mlflow.log_metric("test_accuracy_score", metric_info_artifact.test_accuracy_score)
                     mlflow.log_metric("model_index", metric_info_artifact.model_index)
 
-                    # mlflow.register_model("runs:/<run_id>/model", "MyModel")
+                    mlflow.register_model("mlruns\\models\\RandomForestClassifier(class_weight='balanced_subsample', min_samples_leaf=3)\\version-2","sk-learn-random-forest-clf")
+
+                    mlflow.log_dict(schema, 'input_schema')
+                    mlflow.log_artifact(load_data, 'load_data.py')
+                    mlflow.log_artifact(processing_data,'process_data.py')
+
+                    
 
                     if run:
                         logging.info(f"Mlfow run is active {run.info}")
