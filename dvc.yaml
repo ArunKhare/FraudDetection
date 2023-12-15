@@ -1,40 +1,44 @@
 stages:
   data_ingestion:
-    cmd: python src/fraudDetection/components/data_ingestion.py
+    cmd: python src/fraudDetection/components/training/data_ingestion.py
     deps:
-      - src/fraudDetection/components/data_ingestion.py
+      - src/fraudDetection/components/training/data_ingestion.py
       - configs/config.yaml 
-
+      - src/fraudDetection/config/configuration.py
+  
   data_validation:
-    cmd: python src/fraudDetection/components/data_validation.py
+    cmd: python src/fraudDetection/components/training/data_validation.py
     deps: 
-      - src/fraudDetection/components/data_validation.py
+      - src/fraudDetection/components/training/data_validation.py
       - configs/config.yaml
       - configs/schema.yaml
-    outs:
-      - artifacts/data_validation
 
   data_transformation:
-    cmd: python src/fraudDectection/components/data_transformation.py
+    cmd: python src/fraudDetection/components/training/data_transformation.py
     deps:
-      - src/fraudDectection/components/data_transformation.py
+      -  src/fraudDetection/components/training/data_transformation.py
       - configs/config.yaml
-    outs:
-      - artifacts/transformed_dir/preprocessed/preprocessed.pkl
-      - artifacts/transformed_dir/preprocessed/imputer_sampler.pkl
 
   model_trainer: 
-    cmd: python src/fraudDetection/components/model_trainer.py
+    cmd: python src/fraudDetection/components/training/model_trainer.py
     deps:
-      - src/fraudDetection/components/model_trainer.py
+      - src/fraudDetection/components/training/model_trainer.py
+      - src/fraudDetection/entity/model_factory.py
       - configs/config.yaml
       - configs/schema.yaml
       - configs/model.yaml
-    params:
-      # - threshold # track specific param (from params.yaml)
-      - model.yaml: # track all parameters in this file
-      - configs/config.yaml:
-          - base_accuracy
-          - threshold_diff_train_test_acc
-    outs:
-      - artifacts/model_trainer
+ 
+  model_evaluation: 
+    cmd: python src/fraudDetection/components/training/model_evaluation.py
+    deps: 
+      - src/fraudDetection/components/training/model_evaluation.py
+
+  model_pusher: 
+    cmd: python src/fraudDetection/components/training/model_pusher.py
+    deps:
+      - src/fraudDetection/components/training/model_pusher.py
+  
+  pipeline:
+    cmd: python src/fraudDetection/pipeline/pipeline.py
+    deps:
+      - src/fraudDetection/pipeline/pipeline.py

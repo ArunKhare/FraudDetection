@@ -13,8 +13,7 @@ from tqdm import tqdm
 import yaml
 from fraudDetection.exception import FraudDetectionException
 from fraudDetection.logger import logging
-
-
+import pickle
 
 
 @ensure_annotations
@@ -86,12 +85,29 @@ def write_yaml(file_path: Path, data: dict) -> yaml:
         dir_path = os.path.dirname(file_path)
         os.makedirs(dir_path, exist_ok=True)
         with open(file=file_path, mode='w') as yaml_file:
-            model = yaml.dump(data=data, stream=yaml_file)
-            return model
+            yaml.dump(data=data, stream=yaml_file)
     except Exception as e:
         raise FraudDetectionException(e, sys) from e
 
+def write_pickle(file_path: Path, obj: object) -> pickle:
+    """seriralize object and save file
+    Args:
+        file _path: str
+        obj:obj
+    Parameters
+    ----------
+    obj
+    file_path"""
+    try:
+        dir_path = os.path.dirname(file_path)
+        os.makedirs(dir_path, exist_ok=True)
+        ser_obj = pickle.dumps(obj=obj)
+        with open(file=file_path, mode="wb") as file:
+            file.write(ser_obj)
 
+    except Exception as e:
+        raise FraudDetectionException(e, sys) from e
+    
 # @ensure_annotations
 def save_json(path: Path, data: dict) -> None:
     """ save json data

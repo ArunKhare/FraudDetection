@@ -37,13 +37,11 @@ class ModelTrainer:
     def initiate_model_trainer(self) -> ModelTrainerArtifact:
 
         try:
-            mlflow.start_run()
-            # run = mlflow.active_run()
-            # if not run.info.experiment_id:
-            #     experiment_id = mlflow.create_experiment("experiment1")
-                # mlflow.set_experiment(experiment_id=experiment_id)
-
+            mlflow.set_experiment("Experiment_1")
+            mlflow.start_run(run_name="Training", nested=True)
+       
             mlflow.set_tags({"version": "v1", "stage": "training"})
+            mlflow.log_param("Phase", "train")
 
             is_trained = False
 
@@ -129,18 +127,20 @@ class ModelTrainer:
             )
 
             logging.info(f"Model Trainer Artifact: {model_trainer_artifact}")
-            mlflow_artifact_path = "trained_model"
-            if  mlflow_artifact_path == mlflow.get_artifact_uri():
-                mlflow.sklearn.save_model(sk_model=fraud_detection_model,
-                                      path=mlflow_artifact_path,
-                                      conda_env='conda.yaml',
-                                      pyfunc_predict_fn="predict")
 
-                mlflow.sklearn.log_model(sk_model=metric_info.model_object,
+            # mlflow_artifact_path = "trained_model"
+            # if  mlflow_artifact_path == mlflow.get_artifact_uri():
+            #     mlflow.sklearn.save_model(sk_model=fraud_detection_model,
+            #                         path=mlflow_artifact_path,
+            #                         conda_env='conda.yaml',
+            #                         pyfunc_predict_fn="predict")
+                
+            mlflow.sklearn.log_model(sk_model=metric_info.model_object,
                                      artifact_path="trained_model",
-                                     registered_model_name=metric_info.model_name,
+                                     registered_model_name=str(metric_info.model_object.__class__.__name__),
                                      input_example=X_train[:1, :], metadata=dict(stage="trained",
                                                                                  index_number=metric_info.model_index))
+            
             mlflow.log_params({"base_score": base_score, "threshold": threshold})
             mlflow.log_metric("train_f1_score", metric_info.train_f1_score)
             mlflow.log_metric("test_f1_score", metric_info.test_f1_score)

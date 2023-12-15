@@ -82,9 +82,9 @@ class DataIngestion:
                 logging.info(f"File :[{zip_download_dir}] has been downloaded successfully.")
 
             return zip_download_dir
-
+        
         except Exception as e:
-            raise FraudDetectionException(e, sys) from e
+            print(e)
 
     def unzipfile(self, zip_file_path) -> None:
         try:

@@ -84,42 +84,6 @@ def evaluate_classification_model(model_list: list, X_train: np.ndarray, y_train
             logging.info(f'Diff. test train accuracy: {diff_test_train_acc}')
             logging.info(f'Model accuracy: {model_accuracy}')
 
-            mlflow.sklearn.log_model(sk_model=model,
-                                     artifact_path="model_training",
-                                     conda_env='conda.yaml',
-                                     registered_model_name=model_name.__class__.__name__,
-                                     input_example=X_train[:1, :],
-                                     metadata=dict(stage="training",
-                                                   index_number=index_number))
-            
-            if initial_base_score == 0:
-                initial_base_score = base_score
-
-            query = f"params.base_score ='{initial_base_score}'"
-            all_experiments = [exp.experiment_id for exp in mlflow.search_experiments()]
-            runs = mlflow.search_runs(
-            experiment_ids=all_experiments,
-            filter_string=query,
-            run_view_type=ViewType.ACTIVE_ONLY,
-            )
-
-            if runs.empty:
-                mlflow.log_params({"base_score": base_score, "threshold": threshold})
-
-            mlflow.log_metric("train_f1_score", train_f1_score)
-            mlflow.log_metric("test_f1_score", test_f1_score)
-            mlflow.log_metric("train_f-beta_score", train_fbeta_score)
-            mlflow.log_metric("test_f-beta_score", test_fbeta_score)
-            mlflow.log_metric("train_roc_auc_score", train_roc_auc_score)
-            mlflow.log_metric("test_roc_auc_score", test_roc_auc_score)
-            mlflow.log_metric("train_precision_score", train_precision_score)
-            mlflow.log_metric("test_precision_score", test_precision_score)
-            mlflow.log_metric("train_recall_score", train_recall_score)
-            mlflow.log_metric("test_recall_score", test_recall_score)
-            mlflow.log_metric("model_accuracy", model_accuracy)
-            mlflow.log_metric("train_accuracy_score", train_accuracy_score)
-            mlflow.log_metric("test_accuracy_score", test_accuracy_score)
-
             # defining threshold
             if train_fbeta_score >= base_score and diff_test_train_acc < threshold:
                 base_score = train_fbeta_score
@@ -144,6 +108,46 @@ def evaluate_classification_model(model_list: list, X_train: np.ndarray, y_train
 
                 logging.info(f'Acceptable model found {metric_info_artifact}')
             index_number += 1
+
+            # with mlflow.start_run(run_name=f"best_model_{index_number}", nested=True) as best_run:
+                
+            #     mlflow.log_param("Phase", "select_best_models")
+            #     mlflow.sklearn.log_model(sk_model=model,
+            #                             artifact_path=f"best_models/{index_number}",
+            #                             conda_env='conda.yaml',
+            #                             registered_model_name=str(model.__class__.__name__),
+            #                             input_example=X_train[:1, :],
+            #                             metadata=dict(stage="training",
+            #                                         index_number=index_number))
+                
+            #     if initial_base_score == 0:
+            #         initial_base_score = base_score
+
+            #     query = f"params.base_score ='{initial_base_score}'"
+            #     all_experiments = [exp.experiment_id for exp in mlflow.search_experiments()]
+            #     runs = mlflow.search_runs(
+            #     experiment_ids=all_experiments,
+            #     filter_string=query,
+            #     run_view_type=ViewType.ACTIVE_ONLY,
+            #     )
+
+            #     if runs.empty:
+            #         mlflow.log_params({"base_score": base_score, "threshold": threshold})
+
+            #     mlflow.log_metric("train_f1_score", train_f1_score)
+            #     mlflow.log_metric("test_f1_score", test_f1_score)
+            #     mlflow.log_metric("train_f-beta_score", train_fbeta_score)
+            #     mlflow.log_metric("test_f-beta_score", test_fbeta_score)
+            #     mlflow.log_metric("train_roc_auc_score", train_roc_auc_score)
+            #     mlflow.log_metric("test_roc_auc_score", test_roc_auc_score)
+            #     mlflow.log_metric("train_precision_score", train_precision_score)
+            #     mlflow.log_metric("test_precision_score", test_precision_score)
+            #     mlflow.log_metric("train_recall_score", train_recall_score)
+            #     mlflow.log_metric("test_recall_score", test_recall_score)
+            #     mlflow.log_metric("model_accuracy", model_accuracy)
+            #     mlflow.log_metric("train_accuracy_score", train_accuracy_score)
+            #     mlflow.log_metric("test_accuracy_score", test_accuracy_score)
+
 
         if metric_info_artifact is None:
             logging.info(

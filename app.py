@@ -4,7 +4,7 @@ from fraudDetection.config.configuration import ConfigurationManager, ROOT_DIR, 
 import os
 
 config = ConfigurationManager(config=CONFIG_FILE_PATH)
-training_pipeline_config = config.get_training_pipeline_config()
+training_pipeline_config = config.get_training_pipeline_config
 model_pusher_config = config.get_model_pusher_config()
 model_trainer_config = config.get_model_trainer_config()
 

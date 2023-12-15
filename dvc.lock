@@ -1,0 +1,71 @@
+schema: '2.0'
+stages:
+  data_ingestion:
+    cmd: python src/fraudDetection/components/training/data_ingestion.py
+    deps:
+    - path: configs/config.yaml
+      md5: f1e5b20b7373e45cf8981c433dc3b489
+      size: 1244
+    - path: src/fraudDetection/components/training/data_ingestion.py
+      md5: cc6e19469942c2c6547e193220974703
+      size: 8231
+    - path: src/fraudDetection/config/configuration.py
+      md5: bdd3a2856012fb9a0c1676df43550b5f
+      size: 10684
+  data_transformation:
+    cmd: python src/fraudDetection/components/training/data_transformation.py
+    deps:
+    - path: configs/config.yaml
+      md5: f1e5b20b7373e45cf8981c433dc3b489
+      size: 1244
+    - path: src/fraudDetection/components/training/data_transformation.py
+      md5: f040b7d109d29f9e1e1676fd1bd7dc41
+      size: 12075
+  data_validation:
+    cmd: python src/fraudDetection/components/training/data_validation.py
+    deps:
+    - path: configs/config.yaml
+      md5: f1e5b20b7373e45cf8981c433dc3b489
+      size: 1244
+    - path: configs/schema.yaml
+      md5: 564952bdc1ee66c0ab0f0d2b8d4c07eb
+      size: 373
+    - path: src/fraudDetection/components/training/data_validation.py
+      md5: 74a61d7f0e4fbf73b5ad0456aa934c1e
+      size: 9465
+  model_pusher:
+    cmd: python src/fraudDetection/components/training/model_pusher.py
+    deps:
+    - path: src/fraudDetection/components/training/model_pusher.py
+      md5: 4719107350a79c1361fd27c22bde8fac
+      size: 2716
+  model_trainer:
+    cmd: python src/fraudDetection/components/training/model_trainer.py
+    deps:
+    - path: configs/config.yaml
+      md5: f1e5b20b7373e45cf8981c433dc3b489
+      size: 1244
+    - path: configs/model.yaml
+      md5: a60b4e92806246b89b62411685973929
+      size: 924
+    - path: configs/schema.yaml
+      md5: 564952bdc1ee66c0ab0f0d2b8d4c07eb
+      size: 373
+    - path: src/fraudDetection/components/training/model_trainer.py
+      md5: 7b12d8dae88f7762f5777451c633d1f5
+      size: 8961
+    - path: src/fraudDetection/entity/model_factory.py
+      md5: f92c25afdef72772c75bceaeed30d2b2
+      size: 18704
+  pipeline:
+    cmd: python src/fraudDetection/pipeline/pipeline.py
+    deps:
+    - path: src/fraudDetection/pipeline/pipeline.py
+      md5: 5be75ca983283b4cbcecb64ccbb03617
+      size: 10059
+  model_evaluation:
+    cmd: python src/fraudDetection/components/training/model_evaluation.py
+    deps:
+    - path: src/fraudDetection/components/training/model_evaluation.py
+      md5: 27afb5267c8fa8345b4232d66670ca0d
+      size: 13946

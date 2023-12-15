@@ -122,7 +122,7 @@ class Pipeline(Thread):
         try:
 
             model_pusher = ModelPusher(
-                model_pusher_config=self.config.get_model_evaluation_config(),
+                model_pusher_config=self.config.get_model_pusher_config(),
                 model_evaluation_artifact=model_eval_artifact
             )
 

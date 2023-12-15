@@ -196,8 +196,8 @@ class DataTransformation:
             data_schema = schema[DATA_SCHEMA_COLUMNS_KEY]
             target_feature_name = schema[DATA_SCHEMA_TARGET_COLUMN_KEY][0]
 
-            train_df: pd.DataFrame = load_data(file_path=train_file_path, schema=data_schema, args=(12, 16))
-            test_df: pd.DataFrame = load_data(file_path=test_file_path, schema=data_schema, args=(17, 19))
+            train_df: pd.DataFrame = load_data(file_path=train_file_path, schema=data_schema, args=(None, None))
+            test_df: pd.DataFrame = load_data(file_path=test_file_path, schema=data_schema, args=(None,50))
 
             logging.info(f'\n loading training and test data: Shape {train_df.shape, test_df.shape}')
 
