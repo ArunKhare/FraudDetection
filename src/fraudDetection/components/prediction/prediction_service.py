@@ -1,14 +1,13 @@
 import os
 import numpy as np
+import pandas as pd
 from pathlib import Path
 import yaml
 import joblib
-import pandas as pd
 import json
-from pathlib import Path
 import re
 import streamlit as st
-import pandas as pd
+
 
 tags = {'Version':'v1'}
 
@@ -177,6 +176,6 @@ class FraudDetectionApp:
                             prediction_multiple = model.predict(multiple_record_df)
                             st.write("Prediction for Multiple Records: isFraud :blue[1=yes 0=Not a fraud transaction]")
                             st.write(prediction_multiple)                            
-                
+
 if __name__ == "__main__":
     FraudDetectionApp.run()
