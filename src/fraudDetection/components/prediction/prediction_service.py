@@ -8,20 +8,25 @@ import json
 import re
 import streamlit as st
 
-
 tags = {'Version':'v1'}
+INPUT_SCHEMA_JSON_FILE_NAME = "input_schema.json"
+MODEL_EVALUATION_YAML = "model_evaluation.yaml"
+SAVED_MODELS_DIR = Path("artifacts\saved_models")
+MODEL_NAME = "model.pkl"
+PREPROCESSER_OBJ_PATH = Path(r"artifacts\transformed_data\preprocessed\preprocessed.pkl")
+EVALUATED_MODELS_PATH = Path(r"artifacts\model_evaluation")
 
 # schema_file_path = Path(r"C:\Users\arunk\FraudDetection\configs\schema.yaml")
 class FraudDetectionModel():
     def __init__(self) -> None:
-        self.model_name = "model.pkl"
-        self.evaluated_models_path = Path(r"artifacts\model_evaluation")
-        self.preprocessd_obj_path = Path(r"artifacts\transformed_data\preprocessed\preprocessed.pkl")
+        self.model_name = MODEL_NAME
+        self.evaluated_models_path = EVALUATED_MODELS_PATH 
+        self.preprocessd_obj_path = PREPROCESSER_OBJ_PATH
 
-    def load_model(self):
+    def get_latest_model(self):
         try:
             """Load best model from the saved models and the input schema"""
-            self.evaluated_models_file_path = Path(os.path.join(self.evaluated_models_path,"model_evaluation.yaml"))
+            self.evaluated_models_file_path = Path(os.path.join(self.evaluated_models_path,MODEL_EVALUATION_YAML))
 
             with open(self.evaluated_models_file_path, 'r') as f:
                 model_registry_paths = yaml.load(f,Loader=yaml.Loader)
@@ -39,8 +44,7 @@ class FraudDetectionModel():
             if match:
                 best_model_name_dir = match.group()
 
-            saved_models_dir = Path("artifacts\saved_models")
-            matching_dirs = saved_models_dir.glob(best_model_name_dir)
+            matching_dirs = SAVED_MODELS_DIR.glob(best_model_name_dir)
             # Check if any matching directories were found
             if matching_dirs:
             # matching directory
@@ -53,15 +57,19 @@ class FraudDetectionModel():
             print(e)
     
         return model
-
+    
+    def get_frauddetection_input_schema(self):
+        self.input_schema_path = Path(os.path.join(self.evaluated_models_path, INPUT_SCHEMA_JSON_FILE_NAME))
+        with open(self.input_schema_path, 'r') as json_file:
+            schema = json.load(json_file)
+        return schema
+    
     def transform_input(self,df) -> np.array:
         try:
             """Load the pipeline object"""
             preprocessing_pipe_obj = joblib.load(self.preprocessd_obj_path)
-            self.input_schema_path = Path(os.path.join(self.evaluated_models_path, "input_schema.json"))
-            with open(self.input_schema_path, 'r') as json_file:
-                schema = json.load(json_file)
-                df_input = df[schema["columns"]]
+            schema = self.get_frauddetection_input_schema()
+            df_input = df[schema["columns"]]
             transformed_test_arr = preprocessing_pipe_obj.transform(df_input)
             return transformed_test_arr
         except (ValueError, TypeError) as e:
@@ -71,7 +79,7 @@ class FraudDetectionModel():
 
     def predict(self, df) -> pd.DataFrame:
         try:
-            model = self.load_model()
+            model = self.get_latest_model()
             transformed_input = self.transform_input(df)
             prediction = model.predict(transformed_input)
             drop_features = ['isFlaggedFraud','isFraud']
@@ -88,7 +96,7 @@ class FraudDetectionModel():
             print(e)
         
 
-class FraudDetectionApp:
+class FraudDetectionPredictorApp:
     @staticmethod
     def run():
         st.set_page_config(
@@ -125,41 +133,37 @@ class FraudDetectionApp:
            
 
         elif page == "Prediction":
-
             input_option = st.radio(":blue[Pick data option]:lightning:", ["Single Record", "Upload File"])
-
             if input_option == "Single Record":         
                 # Section for entering a single record
-                
                 st.subheader(":blue[Enter a record to predict]")
-                transacted_type = st.selectbox('Transacted type', ('CASH_OUT', 'PAYMENT', 'CASH_IN', 'TRANSFER', 'DEBIT'))
-                step_number = st.number_input('Step number')
-                amount = st.number_input('Amount')
-                old_balance_origin = st.number_input('OldBalance Origin')
-                new_balance_origin = st.number_input('NewBalance Origin')
-                old_balance_dest = st.number_input('Oldbalance Destination')
-                new_balance_dest = st.number_input('NewBalance Destination')
-                                
-                single_record = {
-                    'type': [transacted_type],
-                    'step': [step_number],
-                    'amount':[amount],
-                    'oldbalanceOrg': [old_balance_origin],
-                    'newbalanceOrig': [new_balance_origin],
-                    'oldbalanceDest': [old_balance_dest],
-                    'newbalanceDest': [new_balance_dest]
+                column_list = model.get_frauddetection_input_schema()['columns']            
+                single_record = {    
+                column_list[0]: st.selectbox('Transacted type', ('CASH_OUT', 'PAYMENT', 'CASH_IN', 'TRANSFER', 'DEBIT')),
+                column_list[1]: st.number_input('Step number'),
+                column_list[2]: st.number_input('Amount'),
+                column_list[3]: st.number_input('OldBalance Origin'),
+                column_list[4]: st.number_input('NewBalance Origin'),
+                column_list[5]: st.number_input('Oldbalance Destination'),
+                column_list[6]: st.number_input('NewBalance Destination')
                 }
-                
-                single_record_df = pd.DataFrame(single_record)
+     
+                single_record_df = pd.DataFrame([single_record])
                 st.write(":blue[User Input (Single Record)]:")
                 st.dataframe(single_record_df)
 
                 if st.button("Predict :eyes:", key="predict-button1",type="primary",help="Click to make predictions"):
                     if not single_record_df.empty:
-                        prediction_single = model.predict(single_record_df)
-                        st.write("Prediction for Single Record Records: isFraud :blue[1=yes 0=Not a fraud transaction]")
-                        st.write(prediction_single) 
-            
+                        with st.spinner('Wait for it...'):
+                            prediction_single = model.predict(single_record_df)
+                        if not prediction_single.empty or prediction_single is not None:
+                            st.success('This is a success', icon="✅")
+                            st.snow()
+                            st.write("Prediction for Single Record Records: isFraud :blue[1=yes 0=Not a fraud transaction]")
+                            st.write(prediction_single) 
+                        else:
+                            st.warning('This is a warning', icon="⚠️")
+
             if input_option == "Upload File":
                     # Section for uploading a file
                 with st.container():
@@ -173,9 +177,15 @@ class FraudDetectionApp:
                     #Perform prediction using the model
                     if st.button("Predict :eyes:", key="predict-button",type="primary",help="Click to make predictions"):
                         if not multiple_record_df.empty:
-                            prediction_multiple = model.predict(multiple_record_df)
-                            st.write("Prediction for Multiple Records: isFraud :blue[1=yes 0=Not a fraud transaction]")
-                            st.write(prediction_multiple)                            
+                            with st.spinner('Wait for it...'):
+                                prediction_multiple = model.predict(multiple_record_df)
+                            if not prediction_multiple.empty or prediction_multiple is not None:
+                                st.success('This is a success', icon="✅")
+                                st.balloons()
+                                st.write("Prediction for Multiple Records: isFraud :blue[1=yes 0=Not a fraud transaction]")
+                                st.write(prediction_multiple)
+                            else: 
+                                st.warning('This is a warning', icon="⚠️")
 
 if __name__ == "__main__":
-    FraudDetectionApp.run()
+    FraudDetectionPredictorApp.run()
