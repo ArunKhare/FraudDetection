@@ -4,3 +4,4 @@ from fraudDetection.components.training.data_transformation import DataTransform
 from fraudDetection.components.training.model_trainer import ModelTrainer
 from fraudDetection.components.training.model_evaluation import ModelEvaluation
 from fraudDetection.components.training.model_pusher import ModelPusher
+from fraudDetection.components.prediction.prediction_service import FraudDetectionModel, FraudDetectionPredictorApp

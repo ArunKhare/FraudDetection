@@ -21,7 +21,7 @@ from fraudDetection.exception import FraudDetectionException
 from fraudDetection.logger import logging
 from fraudDetection.utils import save_object, read_yaml, load_data, save_numpy_array_data
 
-set_config(display='diagram')
+# set_config(display='diagram')
 
 
 class SMOTENCWrapper(BaseEstimator, TransformerMixin):

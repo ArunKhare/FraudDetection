@@ -15,7 +15,7 @@ from IPython.display import display
 from mlflow.models.signature import infer_signature
 import pickle
 import shutil
-
+from dotenv import load_dotenv
 
 set_config(display='diagram')
 
@@ -102,12 +102,22 @@ class ModelEvaluation:
     def initiate_model_evaluation(self):
         try:
             is_model_accepted = False
-
+          
             run =mlflow.active_run()
             if run:
                 logging.info(f"Mlfow run is active {run.info}")
-                mlflow.end_run()
+                mlflow.end_run()    
 
+            load_dotenv()
+            tracking_uri = os.getenv("MLFLOW_TRACKING_URI")
+
+            if tracking_uri is not None:
+                mlflow.set_tracking_uri(tracking_uri)
+            else:
+                logging.info("Tracking_URI not set")
+                return
+            
+            
             mlflow.start_run(run_name="Evaluation")
                 
             # mlflow.set_registry_uri(self.model_evaluation_config.mlflow_uri)
@@ -257,7 +267,7 @@ class ModelEvaluation:
                 }
                 mlflow.log_dict(input_schema, 'input_schema.json')
                 
-                eval_file_path = self.model_evaluation_config.model_evaluation_file_path
+                eval_file_path = self.model_evaluation_config.model_evaluation_file_path.parent
                 input_schema_file_name = Path("output.json")
                 input_schema_file_path = os.path.join(eval_file_path,input_schema_file_name)
 

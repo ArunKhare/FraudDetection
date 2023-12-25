@@ -1,4 +1,4 @@
-import sys
+import os, sys
 from pathlib import Path
 from fraudDetection.exception import FraudDetectionException
 from fraudDetection.logger import logging
@@ -6,7 +6,7 @@ from fraudDetection.entity import ModelTrainerConfig, ModelTrainerArtifact, Data
 from fraudDetection.utils import load_numpy_array_data, save_object
 from fraudDetection.entity import MetricInfoArtifact, ModelFactory
 from fraudDetection.entity import evaluate_classification_model
-
+from dotenv import load_dotenv
 import mlflow
 
 
@@ -37,6 +37,16 @@ class ModelTrainer:
     def initiate_model_trainer(self) -> ModelTrainerArtifact:
 
         try:
+
+            load_dotenv()
+            tracking_uri = os.getenv("MLFLOW_TRACKING_URI")
+
+            if tracking_uri is not None:
+                mlflow.set_tracking_uri(tracking_uri)
+            else:
+                logging.info("Tracking_URI not set")
+                return
+            
             mlflow.set_experiment("Experiment_1")
             mlflow.start_run(run_name="Training", nested=True)
        

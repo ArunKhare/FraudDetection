@@ -86,7 +86,7 @@ def evaluate_classification_model(model_list: list, X_train: np.ndarray, y_train
 
             # defining threshold
             if train_fbeta_score >= base_score and diff_test_train_acc < threshold:
-                base_score = train_fbeta_score
+                # base_score = train_fbeta_score
                 metric_info_artifact = MetricInfoArtifact(
                     model_name=model_name,
                     model_object=model,

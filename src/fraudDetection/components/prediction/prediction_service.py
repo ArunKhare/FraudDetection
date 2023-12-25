@@ -99,40 +99,49 @@ class FraudDetectionModel():
 class FraudDetectionPredictorApp:
     @staticmethod
     def run():
-        st.set_page_config(
-            page_title="Fraud Detection System",
-            page_icon="🧊",
-            layout="wide",
-            initial_sidebar_state="expanded",
-            menu_items={'About': "# This is a Fraud Detection System! by Arun khare"}
-            )
-        st.caption(tags)
+        # st.set_page_config(
+        #     page_title="Fraud Detection System",
+        #     page_icon="🧊",
+        #     layout="wide",
+        #     initial_sidebar_state="expanded",
+        #     menu_items={'About': "# This is a Fraud Detection System! by Arun khare"}
+        #     )
+        
         model = FraudDetectionModel()
-
-        page = st.sidebar.selectbox(
-            """ Hello there! I’ll guide you! Please select Service""", 
+        
+        page = st.sidebar.radio(
+            """ Hello there! I’ll guide you! Prediction Service""", 
             ["Main Page",
              "Prediction",
-             "Training"
-             ])
+            ],
+            key = "current_page")
+       
         
         if page == "Main Page":
-            st.title("Hello, welcome to Fraud Detector")
+            
+            st.title("🏦 :rainbow[Hello, welcome to Fraud Detector]")
             st.caption('This detects :blue[_Fraud Transaction_] :sunglasses: in banking transaction')
             st.markdown("""### Transactions drivers used in prediction:
-                      - step: represents a unit of time where 1 step equals 1 hour
-                      - type: type of online transaction
-                      - amount: the amount of the transaction
-                      - nameOrig: customer starting the transaction
-                      - oldbalanceOrg: balance before the transaction
-                      - newbalanceOrig: balance after the transaction
-                      - nameDest: recipient of the transaction
-                      - oldbalanceDest: initial balance of recipient before the transaction
-                      - newbalanceDest: the new balance of recipient after the transaction"""
+                    - step: represents a unit of time where 1 step equals 1 hour
+                    - type: type of online transaction
+                    - amount: the amount of the transaction
+                    - nameOrig: customer starting the transaction
+                    - oldbalanceOrg: balance before the transaction
+                    - newbalanceOrig: balance after the transaction
+                    - nameDest: recipient of the transaction
+                    - oldbalanceDest: initial balance of recipient before the transaction
+                    - newbalanceDest: the new balance of recipient after the transaction"""
             )
-           
+            
+            # next = st.button("__Prediction__ ➡️")
+            # if next:
+            #     if st.session_state["current_page"] == "Main Page":
+            #         st.session_state["current_page"] ="Prediction"
 
+        
         elif page == "Prediction":
+            
+            st.title(':sunflower: :orange[Prediction]', anchor="Prediction")
             input_option = st.radio(":blue[Pick data option]:lightning:", ["Single Record", "Upload File"])
             if input_option == "Single Record":         
                 # Section for entering a single record
@@ -159,7 +168,7 @@ class FraudDetectionPredictorApp:
                         if not prediction_single.empty or prediction_single is not None:
                             st.success('This is a success', icon="✅")
                             st.snow()
-                            st.write("Prediction for Single Record Records: isFraud :blue[1=yes 0=Not a fraud transaction]")
+                            st.write(" 🉑 :red[Prediction for _Single Record_]: isFraud :blue[1=yes 0=Not fraud transaction]")
                             st.write(prediction_single) 
                         else:
                             st.warning('This is a warning', icon="⚠️")
@@ -182,10 +191,14 @@ class FraudDetectionPredictorApp:
                             if not prediction_multiple.empty or prediction_multiple is not None:
                                 st.success('This is a success', icon="✅")
                                 st.balloons()
-                                st.write("Prediction for Multiple Records: isFraud :blue[1=yes 0=Not a fraud transaction]")
+                                st.write("🉑 :red[Prediction for _Multiple Records_]: isFraud :blue[1 = yes 0 = Not fraud transaction]")
                                 st.write(prediction_multiple)
                             else: 
                                 st.warning('This is a warning', icon="⚠️")
+                                
+            # if st.button("__Main Page__ ⬅️"):
+            #     st.session_state.current_page = "Main Page"
 
+        st.markdown("""<footer>  <p>Version: v1.0.0</p></footer>""", unsafe_allow_html=True)
 if __name__ == "__main__":
     FraudDetectionPredictorApp.run()
