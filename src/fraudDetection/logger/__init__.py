@@ -23,11 +23,17 @@ logging.basicConfig(
 
 def get_log_dataframe(file_path):
     data = []
+
     with open(file_path) as log_file:
         for line in log_file.readlines():
             data.append(line.split("^;"))
-    log_df = pd.DataFrame(data)
+
+    df = pd.DataFrame(data)
+    log_df = df.dropna()
+
     columns = ["Time Stamp", "Log Level", "line number", "file name", "function name", "message"]
     log_df.columns = columns
-    log_df["log_message"] = log_df['Time Stamp'].astype(str) + ":$" + log_df["message"]
+
+    log_df["log_message"] = log_df['Time Stamp'].astype(str, copy=False) + ":$" + log_df["message"]
+
     return log_df[["log_message"]]

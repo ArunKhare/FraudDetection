@@ -68,7 +68,7 @@ MODEL_TRAINED_DIFF_TRAIN_TEST_ACC_KEY = 'threshold_diff_train_test_acc'
 MODEL_EVALUATION_CONFIG_KEY = "model_evaluation_config"
 MODEL_EVALUATION_ARTIFACTS_DIR_KEY = "model_evaluation_dir"
 MODEL_EVALUATION_FILE_NAME_KEY = "model_evaluation_file_name"
-MLFLOW_URI_KEY = "mlflow_uri"
+
 
 # Model pusher related variable
 MODEL_PUSHER_CONFIG_KEY = "model_pusher_config"

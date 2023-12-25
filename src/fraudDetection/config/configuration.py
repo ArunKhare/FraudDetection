@@ -18,10 +18,10 @@ from fraudDetection.exception import FraudDetectionException
 
 
 class ConfigurationManager:
-    def __init__(self, config: Path = CONFIG_FILE_PATH) -> None:
+    def __init__(self, config: Path = CONFIG_FILE_PATH, current_time_stamp = CURRENT_TIME_STAMP) -> None:
         try:
             self.config: ConfigBox = read_yaml(config)
-            self.current_time_stamp: str = CURRENT_TIME_STAMP
+            self.current_time_stamp: str = current_time_stamp
             self.training_pipeline_config: TrainingPipelineConfig = self.get_training_pipeline_config
             self.artifact_dir: Path = self.training_pipeline_config.artifacts_root
         except Exception as e:
@@ -37,7 +37,7 @@ class ConfigurationManager:
 
             training_pipeline_config = TrainingPipelineConfig(
                 artifacts_root=artifact_dir,
-                training_pipeline_name=training_pipeline_name
+                training_pipeline_name=training_pipeline_name,
             )
 
         except Exception as e:
@@ -171,8 +171,8 @@ class ConfigurationManager:
 
             response = ModelEvaluationConfig(
                 model_evaluation_file_path=model_evaluation_file_path,
-                time_stamp=self.current_time_stamp,
-                mlflow_uri=None)
+                time_stamp=self.current_time_stamp
+                )
 
             logging.info(f"Model Evaluation config: {response}")
 
