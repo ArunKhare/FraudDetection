@@ -1,9 +1,10 @@
 from fraudDetection.pipeline.pipeline import Pipeline
 from fraudDetection.config.configuration import ConfigurationManager, ROOT_DIR, CONFIG_FILE_PATH
-
+from fraudDetection.constants import get_current_time_stamp
+import mlflow
 import os
 
-config = ConfigurationManager(config=CONFIG_FILE_PATH)
+config = ConfigurationManager(config=CONFIG_FILE_PATH,current_time_stamp=get_current_time_stamp)
 training_pipeline_config = config.get_training_pipeline_config
 model_pusher_config = config.get_model_pusher_config()
 model_trainer_config = config.get_model_trainer_config()
