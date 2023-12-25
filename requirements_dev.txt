@@ -11,7 +11,7 @@ tqdm~=4.65.0
 ensure~=1.0.3
 joblib
 scipy
-streamlit
+streamlit~=1.29.0
 rangehttpserver
 scikit-learn~=1.2.2
 flask
@@ -24,11 +24,13 @@ imblearn~=0.0
 ruamel.yaml
 box
 -e .
-## Dev requirements 
+fraudDetection~=0.0.0
+ipython~=8.13.2
+setuptools~=66.0.0
 tox
 pytest
 sphinx
 
-fraudDetection~=0.0.0
-ipython~=8.13.2
-setuptools~=66.0.0
+## Dev requirements 
+
+python-dotenv-1.0.0

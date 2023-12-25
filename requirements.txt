@@ -11,7 +11,7 @@ ensure~=1.0.3
 joblib
 types-PyYAML
 scipy
-streamlit
+streamlit~=1.29.0
 rangehttpserver
 scikit-learn~=1.2.2
 flask
