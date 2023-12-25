@@ -137,4 +137,9 @@ cache
 test.npy
 mlruns
 ./mlruns
+mlruns.db
+mlflow_tracking_uri
 .idea
+test_code.py
+.vscode
+.vscode/launch.json
