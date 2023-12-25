@@ -43,7 +43,6 @@ class ModelTrainerConfig:
 class ModelEvaluationConfig:
     model_evaluation_file_path: Path
     time_stamp: str
-    mlflow_uri: str
 
 
 @dataclass(frozen=True)
