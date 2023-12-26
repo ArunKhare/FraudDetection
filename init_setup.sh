@@ -1,5 +1,5 @@
 echo ["$(date)"] : "START"
-echo ["$(date)"] : "Creating env with python 3.7 python"
+echo ["$(date)"] : "Creating env with python 3.10 python"
 conda create --prefix ./env python=3.10 -y
 echo ["$(date)"] : "activating the environment"
 source activate ./env
