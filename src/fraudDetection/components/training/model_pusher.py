@@ -1,8 +1,13 @@
+""" This module the Push the Trained model to production"""
 import os
 import shutil
 import sys
 
-from fraudDetection.entity import ModelPusherConfig, ModelPusherArtifacts, ModelEvaluationArtifact
+from fraudDetection.entity import (
+    ModelPusherConfig,
+    ModelPusherArtifacts,
+    ModelEvaluationArtifact,
+)
 from fraudDetection.exception import FraudDetectionException
 from fraudDetection.logger import logging
 from fraudDetection.utils import create_directories
@@ -10,12 +15,20 @@ from pathlib import Path
 
 
 class ModelPusher:
+    """Description: Push the best trained model to production"""
 
-    def __init__(self, model_pusher_config: ModelPusherConfig,
-                 model_evaluation_artifact: ModelEvaluationArtifact) -> None:
+    def __init__(
+        self,
+        model_pusher_config: ModelPusherConfig,
+        model_evaluation_artifact: ModelEvaluationArtifact,
+    ) -> None:
+        """initialize the arficats
+        Args:
+            model_pusher_config(obj:'ModelPusherConfig'): configuration with saved file path
+            model_evaluation_artifact(obj:'ModelEvaluationArtifact') Evaluation file paths
+        """
 
         try:
-
             logging.info(f"\n{'=' * 20} Model pusher log started {'=' * 20}")
             self.model_pusher_config = model_pusher_config
             self.model_evaluation_artifact = model_evaluation_artifact
@@ -24,20 +37,23 @@ class ModelPusher:
             raise FraudDetectionException(e, sys) from e
 
     def export_model(self):
-
+        """Push the model to production
+        Returns:
+            model_pusher_artifacts(obj:'ModelPusherArtifacts'): paths to saved model
+        """
         try:
-
-            evaluated_model_file_path = self.model_evaluation_artifact.evaluated_model_path
+            evaluated_model_file_path = (
+                self.model_evaluation_artifact.evaluated_model_path
+            )
             is_model_accepted = self.model_evaluation_artifact.is_model_accepted
 
             export_dir = self.model_pusher_config.model_export_dir
 
-            logging.info(f'evaluated_model_file_path : {evaluated_model_file_path}')
+            logging.info(f"evaluated_model_file_path : {evaluated_model_file_path}")
 
             if not is_model_accepted:
                 response = ModelPusherArtifacts(
-                    export_model_file_path=export_dir,
-                    is_model_pusher=is_model_accepted
+                    export_model_file_path=export_dir, is_model_pusher=is_model_accepted
                 )
 
                 logging.info(response)
@@ -52,12 +68,14 @@ class ModelPusher:
             shutil.copy(src=evaluated_model_file_path, dst=export_model_file_path)
 
             # we can call a function to save model to Azure blob storage/ google cloud storage / s3 bucket
-            logging.info(f"Trained model: {evaluated_model_file_path} is copied in export dir: {export_dir}")
+            logging.info(
+                f"Trained model: {evaluated_model_file_path} is copied in export dir: {export_dir}"
+            )
 
             model_pusher_artifact = ModelPusherArtifacts(
                 export_model_file_path=export_model_file_path,
-                is_model_pusher=is_model_accepted
-                )
+                is_model_pusher=is_model_accepted,
+            )
 
             logging.info(f"Model pusher artifact : {model_pusher_artifact}")
 
@@ -67,6 +85,7 @@ class ModelPusher:
             raise FraudDetectionException(e, sys) from e
 
     def initiate_model_pusher(self):
+        "implement the model saver process"
         try:
             return self.export_model()
         except Exception as e:

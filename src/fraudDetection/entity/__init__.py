@@ -5,7 +5,7 @@ from fraudDetection.entity.config_entity import (
     ModelEvaluationConfig,
     ModelPusherConfig,
     ModelTrainerConfig,
-    TrainingPipelineConfig
+    TrainingPipelineConfig,
 )
 
 from fraudDetection.entity.artifact_entity import (
@@ -15,7 +15,7 @@ from fraudDetection.entity.artifact_entity import (
     ModelTrainerArtifact,
     ModelEvaluationArtifact,
     ModelPusherArtifacts,
-    Experiment
+    Experiment,
 )
 
 from fraudDetection.entity.model_entity import (
@@ -25,4 +25,7 @@ from fraudDetection.entity.model_entity import (
     MetricInfoArtifact,
 )
 
-from fraudDetection.entity.model_factory import ModelFactory, evaluate_classification_model
+from fraudDetection.entity.model_factory import (
+    ModelFactory,
+    evaluate_classification_model,
+)

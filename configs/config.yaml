@@ -3,14 +3,14 @@ training_pipeline_config:
   artifacts_root: artifacts
   
 data_ingestion_config:
-  source_url: kaggle datasets download -d rupakroy/online-payments-fraud-detection-dataset
+  source_url: rupakroy/online-payments-fraud-detection-dataset
+  kaggle_config_file: kaggle/kaggle.json
   raw_data_dir: raw_data
-  zip_dir: zip_data
   ingested_dir: ingested_data
   ingested_train_dir: train
   ingested_test_dir: test
   stratify: isFraud
-  test_size: 0.8
+  test_size: 0.2
   
 data_validation_config:
   schema_dir: configs

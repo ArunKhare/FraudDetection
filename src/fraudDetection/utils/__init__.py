@@ -1,3 +1,30 @@
+"""
+Module: fraudDetection.utils
+
+This module provides utility functions for handling data, such as reading and writing files, saving and loading objects,
+and validating data schema.
+
+Functions:
+    create_directories(path_to_directories: list, verbose=True)
+    read_yaml(file_path: Path) -> dict
+    write_yaml(file_path: Path, data: dict) -> yaml
+    write_pickle(file_path: Path, obj: object) -> pickle
+    save_json(path: Path, data: dict) -> None
+    load_json(path: Path) -> ConfigBox
+    get_size(path: Path) -> str
+    save_numpy_array_data(file_path: str, array: np.ndarray) -> None
+    load_numpy_array_data(file_path: Path) -> np.ndarray
+    save_object(file_path: Path, obj) -> None
+    load_object(file_path: Path) -> object
+    compare_schema(schema: dict, csv_path: Path) -> None
+    save_dfs_to_csv(df, file_path: Path, chunk_size: int) -> None
+    get_dtypes(df) -> ConfigBox
+    load_data(file_path: Path, schema: dict, args: tuple = ()) -> pd.DataFrame
+    concat_csv_files(files: list, file_dir: Path) -> pd.DataFrame
+    validate_schema(df: pd.DataFrame, schema: dict) -> bool
+    is_dir_empty(path: Path) -> bool
+    check_data_dir(directory: Path) -> None
+"""
 import os
 import sys
 from glob import glob
@@ -9,6 +36,8 @@ import pandas as pd
 from box import ConfigBox
 from ensure import ensure_annotations
 from tqdm import tqdm
+import pandas as pd
+
 # import ruamel.yaml
 import yaml
 from fraudDetection.exception import FraudDetectionException
@@ -18,20 +47,17 @@ import pickle
 
 @ensure_annotations
 def create_directories(path_to_directories: list, verbose=True):
-    """ create list of directories
-    Args: 
-        path_to_directories(list): list of path of directories
-
-    Parameters
-    ----------
-    path_to_directories
-    verbose
+    """
+    Create a list of directories.
+    Args:
+        path_to_directories (List): List of paths of directories.
+        verbose (bool): Whether to print messages about file creation. Default is True.
     """
     try:
         for path in path_to_directories:
             os.makedirs(path, exist_ok=True)
             if not os.path.exists(path):
-                open(path, 'w').close()
+                open(path, "w").close()
                 if verbose:
                     logging.info(f"Created file at: {path}")
             elif verbose:
@@ -43,14 +69,14 @@ def create_directories(path_to_directories: list, verbose=True):
 
 
 def read_yaml(file_path: Path) -> dict:
-    """ read yaml file and returns
-    Args : 
-        file_path (str) :path like input
+    """Read a YAML file and return its content as a dictionary.
+    Args:
+        file_path (Path): Path to the YAML file.
+    Returns:
+        dict: Content of the YAML file.
     Raises:
-        ValueError: if yaml file is empty
-        e: empty file
-        Returns: dict
-        """
+        FraudDetectionException: If an error occurs while reading the file.
+    """
     try:
         # yaml = ruamel.yaml.YAML()
         if not file_path.is_file():
@@ -59,9 +85,9 @@ def read_yaml(file_path: Path) -> dict:
             raise ValueError(f"{file_path} is empty.")
         file_path = str(file_path)
 
-        with open(file_path, 'r') as f:
-            content = yaml.load(f,Loader=yaml.Loader)
-            logging.info(f'yaml file:{file_path} loaded successfully')
+        with open(file_path, "r") as f:
+            content = yaml.load(f, Loader=yaml.Loader)
+            logging.info(f"yaml file:{file_path} loaded successfully")
             return content
 
     except ValueError as e:
@@ -70,34 +96,31 @@ def read_yaml(file_path: Path) -> dict:
         raise FraudDetectionException(e, sys) from e
 
 
-# @ensure_annotations    
+# @ensure_annotations
 def write_yaml(file_path: Path, data: dict) -> yaml:
-    """create yaml file
-    Args:
-        file _path: str
-        data:dict
+    """Create a YAML file and write data to it.
 
-    Parameters
-    ----------
-    data
-    file_path"""
+    Args:
+        file_path (Path): Path to the YAML file.
+        data (dict): Data to be written to the YAML file.
+    """
     try:
         dir_path = os.path.dirname(file_path)
         os.makedirs(dir_path, exist_ok=True)
-        with open(file=file_path, mode='w') as yaml_file:
+        with open(file=file_path, mode="w") as yaml_file:
             yaml.dump(data=data, stream=yaml_file)
     except Exception as e:
         raise FraudDetectionException(e, sys) from e
 
+
 def write_pickle(file_path: Path, obj: object) -> pickle:
-    """seriralize object and save file
+    """Serialize an object and save it to a file using pickle.
     Args:
-        file _path: str
-        obj:obj
-    Parameters
-    ----------
-    obj
-    file_path"""
+        file_path (Path): Path to the file.
+        obj (object): Object to be serialized and saved.
+    Raises:
+        FraudDetectionException: If an error occurs while saving the object.
+    """
     try:
         dir_path = os.path.dirname(file_path)
         os.makedirs(dir_path, exist_ok=True)
@@ -107,16 +130,17 @@ def write_pickle(file_path: Path, obj: object) -> pickle:
 
     except Exception as e:
         raise FraudDetectionException(e, sys) from e
-    
+
+
 # @ensure_annotations
 def save_json(path: Path, data: dict) -> None:
-    """ save json data
-    Args: 
-        path(Path): path to json file
-        data(dict): data to be saved in json format
+    """Save data in JSON format to a file.
+    Args:
+        path (Path): Path to the JSON file.
+        data (dict): Data to be saved in JSON format.
     """
     try:
-        with open(path, 'w') as f:
+        with open(path, "w") as f:
             json.dump(data, f, indent=4)
         logging.info("f json file saved at: {path}")
     except Exception as e:
@@ -125,9 +149,13 @@ def save_json(path: Path, data: dict) -> None:
 
 @ensure_annotations
 def load_json(path: Path) -> ConfigBox:
-    """load json files data
-    Args: 
-    path(Path): path to json files 
+    """Load data from a JSON file.
+    Args:
+        path (Path): Path to the JSON file.
+    Returns:
+        ConfigBox: Configuration box containing the loaded data.
+    Raises:
+        FraudDetectionException: If an error occurs while loading the JSON file.
     """
     try:
         with open(path) as f:
@@ -139,45 +167,30 @@ def load_json(path: Path) -> ConfigBox:
 
 
 @ensure_annotations
-def get_size(path: Path) -> str:
-    """get size in kb
-    Args: 
-        path(Path): path to file
-    Returns: 
-        str: size in kb
+def get_directory_size(directory):
+    """ "Get size of the directory in MB
+    Args:
+        directory (Path): directory path
     """
-    size_in_kb = round(os.path.getsize(path) / 1024)
-    return f"~ {size_in_kb} KB"
+    total_size = 0
+    for dirpath, _, filenames in os.walk(directory):
+        for filename in filenames:
+            filepath = os.path.join(dirpath, filename)
+            total_size += os.path.getsize(filepath)
+    return round(total_size)
 
-
-# def save_numpy_array_data(file_path, array, chunk_size= 1024):
-#     """ Save numpy array data to file in chunks
-#     Args:
-#         file_path : str location of file to save
-#         array : numpy array data to save
-#         chunk_size : number of elements to write at a time, defaults to 1024
-#     """
-#     try:
-#         create_directories([file_path])
-#         with open(file=file_path, mode='a') as f:
-#             for i in range(0, len(array), chunk_size):
-#                 np.save(f, array[i:i+chunk_size])
-#                 f.flush()
-#                 os.fsync(f.fileno())
-#             np.save(f,array)
-#     except Exception as e:
-#         raise FraudDetectionException(e,sys) from e
 
 def save_numpy_array_data(file_path: str, array: np.ndarray):
-    """
-    Save numpy array data to file
-    file_path: str location of file to save
-    array: np. Array data to save
-    """
+    """Save numpy array data to a file.
+    Args:
+        file_path (str): Path to the file.
+        array (np.ndarray): Numpy array data to be saved.
+    Raises:
+        FraudDetectionException: If an error occurs while saving the data."""
     try:
         dir_path = os.path.dirname(file_path)
-        os.makedirs(dir_path, exist_ok=True)
-        with open(file_path, 'wb') as file_obj:
+        os.makedirs(name=dir_path, exist_ok=True)
+        with open(file_path, "wb") as file_obj:
             np.save(file_obj, array)
     except Exception as e:
         raise FraudDetectionException(e, sys) from e
@@ -185,12 +198,15 @@ def save_numpy_array_data(file_path: str, array: np.ndarray):
 
 @ensure_annotations
 def load_numpy_array_data(file_path: Path) -> np.ndarray:
-    """load numpy array data from file
+    """Load numpy array data from a file.
     Args:
-        file_path(Path): location of file to load
-    """
+        file_path (Path): Path to the file.
+    Returns:
+        np.ndarray: Loaded numpy array data.
+    Raises:
+        FraudDetectionException: If an error occurs while loading the data."""
     try:
-        with open(file=file_path, mode='rb') as f:
+        with open(file=file_path, mode="rb") as f:
             return np.load(f)
     except Exception as e:
         raise FraudDetectionException(e, sys) from e
@@ -198,49 +214,50 @@ def load_numpy_array_data(file_path: Path) -> np.ndarray:
 
 def save_object(file_path: Path, obj):
     """
-    file_path: str
-    obj: Any sort of object
+    Save an object to a file using dill serialization.
+    Args:
+        file_path (Path): Path to the file.
+        obj: Object to be saved.
+    Raises:
+        FraudDetectionException: If an error occurs while saving the object.
     """
+
     try:
-        dir_path = os.path.dirname(file_path)
-        os.makedirs(dir_path, exist_ok=True)
-        with open(file_path, "wb") as file_obj:
-            dill.dump(obj, file_obj)
+        dir_path: str = os.path.dirname(p=file_path)
+        os.makedirs(name=dir_path, exist_ok=True)
+        with open(file=file_path, mode="wb") as file_obj:
+            dill.dump(obj=obj, file=file_obj)
     except Exception as e:
         raise FraudDetectionException(e, sys) from e
 
 
 @ensure_annotations
 def load_object(file_path: Path):
-    """
-    file_path:str
-
-    Returns
-    -------
-    object
+    """Load an object from a file using dill deserialization.
+    Args:
+        file_path (Path): Path to the file.
+    Returns:
+        object: Loaded object.
+    Raises:
+        FraudDetectionException: If an error occurs while loading the object.
     """
     try:
-        with open(file=file_path, mode='rb') as file_obj:
-            return dill.load(file_obj)
+        with open(file=file_path, mode="rb") as file_obj:
+            return dill.load(file=file_obj)
     except Exception as e:
         raise FraudDetectionException(e, sys) from e
 
 
 @ensure_annotations
 def compare_schema(schema: dict, csv_path: Path) -> None:
-    """
-    Compare the schema in a dictionary format with the schema of a CSV file.
-    
-    Parameters:
-        schema (dict): The schema in a dictionary format, where the keys represent column names and 
-            the values represent data types.
-        csv_path (pathlib.Path): The path to the CSV file.
-    
+    """Compare the schema in a dictionary format with the schema of a CSV file.
+    Args:
+        schema (dict): Schema in a dictionary format.
+        csv_path (Path): Path to the CSV file.
     Raises:
-        FraudDetectionException: If the schemas do not match.
-    """
+        FraudDetectionException: If the schemas do not match."""
     try:
-        df = pd.read_csv(csv_path)
+        df: pd.DataFrame = pd.read_csv(filepath_or_buffer=csv_path)
     except Exception as e:
         raise FraudDetectionException("Failed to read CSV file.", f"{str(e)}")
 
@@ -248,24 +265,34 @@ def compare_schema(schema: dict, csv_path: Path) -> None:
 
     for col, dtype in schema.items():
         if col not in df_schema:
-            raise FraudDetectionException(f"Column '{col}' not found in CSV schema.", "")
-        if str(df_schema[col]) != str(dtype):
-            raise FraudDetectionException(f"Column '{col}' has a different data type in CSV schema.",
-                                          f"Expected data type: {dtype}, Actual data type: {df_schema[col]}")
+            raise FraudDetectionException(
+                f"Column '{col}' not found in CSV schema.", ""
+            )
+        if str(object=df_schema[col]) != str(object=dtype):
+            raise FraudDetectionException(
+                f"Column '{col}' has a different data type in CSV schema.",
+                f"Expected data type: {dtype}, Actual data type: {df_schema[col]}",
+            )
 
 
 # @ensure_annotations
 def save_dfs_to_csv(df, file_path: Path, chunk_size: int) -> None:
+    """Save DataFrames to CSV files in chunks.
+    Args:
+        df: DataFrame to be saved.
+        file_path (Path): Path to the CSV file.
+        chunk_size (int): Number of elements to write at a time.
+    Raises:
+        FraudDetectionException: If an error occurs while saving the data.
+    """
     try:
-
         with tqdm(total=len(df), desc=f"Saving test data to CSV {file_path}") as pbar:
-
             for i, (_, chunk) in enumerate(df.groupby(df.index // chunk_size)):
                 chunk_file_path = Path(file_path / f"file_{i}.csv")
-                print(f'chunk_file_path: {chunk_file_path}')
+                print(f"chunk_file_path: {chunk_file_path}")
                 chunk.to_csv(chunk_file_path, index=False)
 
-                pbar.update(len(chunk))
+                pbar.update(n=len(chunk))
 
     except Exception as e:
         raise FraudDetectionException(e, sys) from e
@@ -273,6 +300,12 @@ def save_dfs_to_csv(df, file_path: Path, chunk_size: int) -> None:
 
 @ensure_annotations
 def get_dtypes(df) -> ConfigBox:
+    """Get data types of DataFrame columns.
+    Args:
+        df: DataFrame.
+    Returns:
+        ConfigBox: Configuration box containing data types.
+    """
     try:
         dtypes_groups = df.columns.to_series().groupby(df.dtypes)
 
@@ -282,7 +315,7 @@ def get_dtypes(df) -> ConfigBox:
             dtypes_dict[str(TYPE)] = list(col_names)
 
         # print the dictionary
-        logging.info(f'datatypes of {df}')
+        logging.info(f"datatypes of {df}")
         return ConfigBox(dtypes_dict)
     except Exception as e:
         raise FraudDetectionException(e, sys) from e
@@ -290,30 +323,22 @@ def get_dtypes(df) -> ConfigBox:
 
 @ensure_annotations
 def load_data(file_path: Path, schema: dict, args: tuple = ()) -> pd.DataFrame:
-    """Validates the schema of data downloaded with the provided schema.
-
+    """Load data from CSV files, validate the schema, and return a DataFrame.
     Args:
-        file_path: The path to the directory containing CSV files.
-        schema: The YAML file for a DataFrame.
-        start_index: The start index to select the files from a list of files in the directory. Default or 'None' is 0. 
-        end_index: The end index to select the files from a list of files in the directory. Default is 2. If `None`,
-            all files in the directory will be selected.
-
+        file_path (Path): Path to the directory containing CSV files.
+        schema (dict): Schema for the DataFrame.
+        args (tuple): Tuple containing start_index and end_index for selecting files.
     Returns:
-        A DataFrame containing the concatenated data from the selected CSV files.
-
-    Parameters
-    ----------
-    file_path
-    schema
-    args
+        pd.DataFrame: Concatenated data from selected CSV files.
+    Raises:
+        FraudDetectionException: If an error occurs during data loading or schema validation.
     """
 
     try:
         start_index, end_index = args if len(args) > 0 else (0, 2)
 
         # Get a list of files from train and test data dir
-        dataset_files = glob(str(file_path / "*.csv"))
+        dataset_files = glob(pathname=str(object=file_path / "*.csv"))
         if not dataset_files:
             raise Exception(f"No CSV files found in {file_path}")
 
@@ -322,16 +347,16 @@ def load_data(file_path: Path, schema: dict, args: tuple = ()) -> pd.DataFrame:
         if end_index is None:
             end_index = len(dataset_files)
 
-        is_file_path_exist = os.path.exists(file_path)
+        is_file_path_exist = os.path.exists(path=file_path)
         if not is_file_path_exist:
             raise Exception(f"train_file_dir {file_path} does not exist", sys)
 
-        logging.info(f"first train file with first files as : {dataset_files[0]}")
+        logging.info(msg=f"first train file with first files as : {dataset_files[0]}")
 
         # concat all  the files in the train and test directory and convert them to dataframe
         dataset_files: list[str] = dataset_files[start_index:end_index]
 
-        num_files = len(dataset_files)
+        num_files: int = len(dataset_files)
 
         data_df = concat_csv_files(dataset_files, file_path)
 
@@ -341,7 +366,7 @@ def load_data(file_path: Path, schema: dict, args: tuple = ()) -> pd.DataFrame:
             if column in data_df.columns:
                 data_df[column].astype(schema[column])
             else:
-                error_message.append(f'Column: {column} is not in the schema')
+                error_message.append(f"Column: {column} is not in the schema")
 
         if len(error_message) > 0:
             raise Exception(error_message)
@@ -353,39 +378,74 @@ def load_data(file_path: Path, schema: dict, args: tuple = ()) -> pd.DataFrame:
 
 @ensure_annotations
 def concat_csv_files(files: list, file_dir: Path) -> pd.DataFrame:
+    """
+    Concatenate CSV files into a DataFrame.
+    Args:
+        files (list): List of file names.
+        file_dir (Path): Directory containing the CSV files.
+    Returns:
+        pd.DataFrame: Concatenated data from CSV files.
+    Raises:
+        FraudDetectionException: If an error occurs during concatenation.
+    """
     try:
         dfs = []
-        for i, file in enumerate(files):
-            if file.endswith('.csv'):
+        for i, file in enumerate(iterable=files):
+            if file.endswith(".csv"):
                 path = Path(os.path.join(file_dir, file))
-                df = pd.read_csv(path)
+                df: pd.DataFrame = pd.read_csv(filepath_or_buffer=path)
                 dfs.append(df)
-        return pd.concat(dfs)
+        return pd.concat(objs=dfs)
     except Exception as e:
         raise FraudDetectionException(e, sys) from e
 
 
 @ensure_annotations
-def validate_schema(df: pd.DataFrame, schema: dict):
+def validate_schema(df: pd.DataFrame, schema: dict) -> [True]:
+    """
+    Validate the schema of a DataFrame against a given schema.
+    Args:
+        df (pd.DataFrame): DataFrame to be validated.
+        schema (dict): Expected schema.
+    Raises:
+        FraudDetectionException: If the schema validation fails.
+    """
     try:
         missing_cols = [col for col in schema if col not in df.columns]
-        mismatch_type_cols = [col for col, dtype in schema.items() if col in df.columns and df[col].dtype != dtype]
+        mismatch_type_cols = [
+            col
+            for col, dtype in schema.items()
+            if col in df.columns and df[col].dtype != dtype
+        ]
 
         if missing_cols:
-            raise Exception(f"The following columns are missing from the DataFrame schema: {missing_cols}")
+            raise Exception(
+                f"The following columns are missing from the DataFrame schema: {missing_cols}"
+            )
         elif mismatch_type_cols:
-            raise Exception(f"The following columns data types does not match with schema: {mismatch_type_cols}")
+            raise Exception(
+                f"The following columns data types does not match with schema: {mismatch_type_cols}"
+            )
         else:
             logging.info(f"train test file schema are as per the Schema {schema}")
 
         logging.info("Data validated")
         return True
     except Exception as e:
-        raise FraudDetectionException(f"Error comparing schema: {e}", sys) from e
+        raise FraudDetectionException(
+            error_message=f"Error comparing schema: {e}", error_details=sys
+        ) from e
 
 
 @ensure_annotations
 def is_dir_empty(path: Path) -> bool:
+    """
+    Check if a directory is empty.
+    Args:
+        path (Path): Path to the directory.
+    Returns:
+        bool: True if the directory is empty, False otherwise.
+    """
     with os.scandir(path) as entries:
         for _ in entries:
             return False
@@ -393,13 +453,19 @@ def is_dir_empty(path: Path) -> bool:
 
 
 @ensure_annotations
-def check_data_dir(raw_data_dir: Path) -> None:
-    raw_data_dir_str = raw_data_dir.as_posix()
-    if not os.path.exists(raw_data_dir_str):
+def check_data_dir(directory: Path) -> None:
+    """Check if the raw data directory exists and contains files.
+    Args:
+        directory (Path): Path to the raw data directory.
+    Raises:
+        ValueError: If the raw data directory is not found, is not a directory, or is empty.
+    """
+    directory_str = directory.as_posix()
+    if not os.path.exists(path=directory_str):
         raise ValueError("Raw data directory does not exist.")
-    if not os.path.isdir(raw_data_dir_str):
+    if not os.path.isdir(s=directory_str):
         raise ValueError("Raw data directory is not a directory.")
-    if not os.listdir(raw_data_dir_str):
-        raise ValueError(f"No files found in the raw data directory: {raw_data_dir_str}")
-    if not os.listdir(raw_data_dir_str)[0]:
+    if not os.listdir(path=directory_str):
+        raise ValueError(f"No files found in the raw data directory: {directory_str}")
+    if not os.listdir(path=directory_str)[0]:
         raise ValueError("Raw data directory is empty.")

@@ -27,19 +27,5 @@ model_selection:
       - balanced_subsample
       max_leaf_nodes:
       - 6
-      oob_score:
-      - true
       random_state:
       - 42
-  module_2:
-    class: LinearSVC
-    module: sklearn.svm
-    params:
-      class_weight:
-        0:1: null
-        '70': null
-      dual: false
-      random_state: 42
-    search_param_grid:
-      class_weight:
-      - balanced
