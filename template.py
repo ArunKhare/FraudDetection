@@ -2,7 +2,7 @@ import logging
 import os
 from pathlib import Path
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s:%(message)s:')
+logging.basicConfig(level=logging.INFO, format="%(asctime)s:%(message)s:")
 
 package_name = "fraudDetection"
 
@@ -19,7 +19,7 @@ list_of_files = [
     f"src/{package_name}/exception/__init__.py",
     f"src/{package_name}/logger/__init__.py",
     "tests/__init__.py",
-    "test/unit/__init__.py",
+    "tests/unit/__init__.py",
     "tests/integration/__init__.py",
     "configs/__init__.py",
     "configs/config.yaml",
@@ -31,11 +31,11 @@ list_of_files = [
     "requirements.txt",
     "requirements_dev.txt",
     "setup.py",
-    'setup.cfg',
+    "setup.cfg",
     "pyproject.toml",
     "tox.ini",
     "notebook/trials.ipynb",
-    ]
+]
 
 for filepath in list_of_files:
     filepath = Path(filepath)
@@ -50,4 +50,3 @@ for filepath in list_of_files:
             logging.info(f"Creating empty file: {filepath}")
     else:
         logging.info(f"{filename} already exists")
-
