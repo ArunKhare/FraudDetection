@@ -31,6 +31,9 @@ import pandas as pd
 
 from fraudDetection.constants import get_current_time_stamp, LOGS_DIR
 
+def get_log_file_name():
+    return f'log_{get_current_time_stamp()}.log'
+
 LOG_FILE_NAME = get_log_file_name()
 os.makedirs(LOGS_DIR, exist_ok=True)
 LOG_FILE_PATH = os.path.join(LOGS_DIR, LOG_FILE_NAME)

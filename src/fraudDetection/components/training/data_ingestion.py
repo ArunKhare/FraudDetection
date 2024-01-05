@@ -2,10 +2,8 @@
 This module downloads the data and chunk, split the data in to train test
 """
 import os
-import time
 from pathlib import Path
 import sys
-import keyboard
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from tqdm import tqdm
@@ -100,7 +98,7 @@ class DataIngestion:
             is_ingested = False
             raw_data_dir: Path = self.data_ingestion_config.raw_data_dir
 
-            if is_dir_empty(train_file_path):
+            if is_dir_empty(raw_data_dir):
                 raise ValueError("raw_data_dir must contain data file")
 
             directory_size = get_directory_size(raw_data_dir)

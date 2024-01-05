@@ -37,8 +37,6 @@ from box import ConfigBox
 from ensure import ensure_annotations
 from tqdm import tqdm
 import pandas as pd
-
-# import ruamel.yaml
 import yaml
 from fraudDetection.exception import FraudDetectionException
 from fraudDetection.logger import logging
@@ -78,7 +76,6 @@ def read_yaml(file_path: Path) -> dict:
         FraudDetectionException: If an error occurs while reading the file.
     """
     try:
-        # yaml = ruamel.yaml.YAML()
         if not file_path.is_file():
             raise FileNotFoundError(f"{file_path} does not exist.")
         if os.stat(file_path).st_size == 0:
