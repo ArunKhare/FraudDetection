@@ -145,3 +145,4 @@ test_code.py
 .vscode/launch.json
 */snowflake/*
 snowflake*
+.vscode/settings.json
