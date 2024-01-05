@@ -35,7 +35,7 @@ class DataValidation:
     def get_train_test_df(self) -> tuple:
         """validation the schema of data downloaded with the provided schema
         Returns:
-            train_df (ob:'pd.DataFrame'): combining non empty filetraining dataset
+            train_df (obj:'pd.DataFrame'): combining non empty filetraining dataset
         """
         try:
             # logging checking training and test files are available
@@ -109,9 +109,9 @@ class DataValidation:
 
     def validate_dataset_scheme(self, train_df, test_df):
         """Validating dataset schema with schema provided
-        Returns:
+        Returns: 
             bool: valid or not
-            target_col: target feature of the dataset
+            target_col(obj:'pd.Series'): target feature of the dataset
         """
         try:
             # Getting schema

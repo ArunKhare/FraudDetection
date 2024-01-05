@@ -1,10 +1,13 @@
-"""This module defines a training application for fraud detection, including the FraudDetectionTrainingApp
-class. It uses a Pipeline for training models, MLflow for experiment tracking, and Streamlit for the user interface."""
+""" This module defines a training application for fraud detection, including 
+the FraudDetectionTrainingApp class. It uses a Pipeline for training models, 
+MLflow for experiment tracking, and Streamlit for the user interface."""
+
 import os
 import json
-import yaml
 from pathlib import Path
+import yaml
 import pandas as pd
+import streamlit as st
 from fraudDetection.pipeline.pipeline import Pipeline
 from fraudDetection.config.configuration import (
     ConfigurationManager,
@@ -16,7 +19,6 @@ from fraudDetection.constants import CONFIG_DIR
 from fraudDetection.components import FraudDetectionPredictorApp
 from fraudDetection.logger import get_log_dataframe, logging
 from mlflowapp import exp_tracking
-import streamlit as st
 
 
 class Constants:
@@ -134,7 +136,7 @@ class FraudDetectionTrainingApp:
                 FraudDetectionTrainingApp.predict()
 
         except Exception as e:
-            st.exception(f"An error occurred. Please check the logs for more details")
+            st.exception("An error occurred. Please check the logs for more details")
             logging.info(e)
 
     def display_home(self):
@@ -171,7 +173,8 @@ class FraudDetectionTrainingApp:
             return hierarchy_dict
         except Exception as e:
             st.error(
-                f"An error occurred while generating the file structure in to a dict. Please check the logs for more details"
+                """An error occurred while generating the file structure in to a dict.
+                Please check the logs for more details"""
             )
             logging.info(e)
             return {}
@@ -230,7 +233,7 @@ class FraudDetectionTrainingApp:
                                             st.write(f"{subdir}/")
         except Exception as e:
             st.error(
-                f"Error while displaying artifact heirarchy pl check logs for details"
+                "Error while displaying artifact heirarchy pl check logs for details"
             )
             logging.info(e)
 
@@ -321,7 +324,8 @@ class FraudDetectionTrainingApp:
 
         except Exception as e:
             st.error(
-                "An error occured may be the file format is not correct. pl check the logs for details"
+                """An error occured may be the file format is not correct. 
+                pl check the logs for details"""
             )
             logging.info(e)
             return str(e)

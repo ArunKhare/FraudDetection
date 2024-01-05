@@ -29,18 +29,17 @@ import os
 import sys
 from glob import glob
 from pathlib import Path
-import dill
 import json
+import dill
 import numpy as np
 import pandas as pd
+import pickle
 from box import ConfigBox
 from ensure import ensure_annotations
 from tqdm import tqdm
-import pandas as pd
 import yaml
 from fraudDetection.exception import FraudDetectionException
 from fraudDetection.logger import logging
-import pickle
 
 
 @ensure_annotations

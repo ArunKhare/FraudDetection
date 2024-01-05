@@ -21,9 +21,7 @@ from fraudDetection.utils import (
 
 
 class DataIngestion:
-    """
-    Description:
-        Downloaded datawith API. Process, split data,
+    """Downloaded datawith API. Process, split data,
     storing them to specified location
     Attributes:
         DataIngestionconfig: specfiying the artifacts paths
@@ -81,17 +79,16 @@ class DataIngestion:
             raise FraudDetectionException(e, error_details=sys) from e
 
     def split_data_as_train_test(self) -> DataIngestionArtifact:
-        """
-        Split the datase into train and test
+        """ Split the datase into train and test
         Returns:
-            data_ingestion_artifacts(:obj:'DataIngestionArtifact'): Split datasets with message as DataIngestionartifact
+                data_ingestion_artifacts(:obj:'DataIngestionArtifact'): Split datasets with message as DataIngestionartifact
         Example:
-        data_ingestion_artifacts = create_data_ingestion_artifacts(
-            train_file_path="/path/to/train.csv",
-            test_file_path="/path/to/test.csv",
-            is_ingested=True,
-            message="Data successfully ingested."
-        )
+            data_ingestion_artifacts = create_data_ingestion_artifacts(
+                                                train_file_path="/path/to/train.csv",
+                                                test_file_path="/path/to/test.csv",
+                                                is_ingested=True,
+                                                message="Data successfully ingested."
+                                                )
         logging.info(f"Data ingestion artifacts: {data_ingestion_artifacts}")
         """
         try:

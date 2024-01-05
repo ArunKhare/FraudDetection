@@ -1,5 +1,8 @@
+# dvc.yaml - Definition of DVC pipeline stages
+
 stages:
   data_ingestion:
+    # Stage for data ingestion
     cmd: python src/fraudDetection/components/training/data_ingestion.py
     deps:
       - src/fraudDetection/components/training/data_ingestion.py
@@ -7,6 +10,7 @@ stages:
       - src/fraudDetection/config/configuration.py
   
   data_validation:
+    # Stage for data validation
     cmd: python src/fraudDetection/components/training/data_validation.py
     deps: 
       - src/fraudDetection/components/training/data_validation.py
@@ -14,12 +18,14 @@ stages:
       - configs/schema.yaml
 
   data_transformation:
+    # Stage for data transformation
     cmd: python src/fraudDetection/components/training/data_transformation.py
     deps:
       -  src/fraudDetection/components/training/data_transformation.py
       - configs/config.yaml
 
   model_trainer: 
+    # Stage for model training
     cmd: python src/fraudDetection/components/training/model_trainer.py
     deps:
       - src/fraudDetection/components/training/model_trainer.py
@@ -29,16 +35,19 @@ stages:
       - configs/model.yaml
  
   model_evaluation: 
+    # Stage for model evaluation
     cmd: python src/fraudDetection/components/training/model_evaluation.py
     deps: 
       - src/fraudDetection/components/training/model_evaluation.py
 
   model_pusher: 
+    # Stage for pushing the trained model
     cmd: python src/fraudDetection/components/training/model_pusher.py
     deps:
       - src/fraudDetection/components/training/model_pusher.py
   
   pipeline:
+    # Stage for the overall pipeline
     cmd: python src/fraudDetection/pipeline/pipeline.py
     deps:
       - src/fraudDetection/pipeline/pipeline.py

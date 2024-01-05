@@ -1,7 +1,9 @@
+# Configuration for the overall training pipeline
 training_pipeline_config:
   pipeline_name: FraudDetection
   artifacts_root: artifacts
-  
+
+# Configuration for data ingestion
 data_ingestion_config:
   source_url: rupakroy/online-payments-fraud-detection-dataset
   kaggle_config_file: kaggle/kaggle.json
@@ -11,13 +13,15 @@ data_ingestion_config:
   ingested_test_dir: test
   stratify: isFraud
   test_size: 0.2
-  
+
+# Configuration for data validation
 data_validation_config:
   schema_dir: configs
   schema_file_name: schema.yaml
   report_file_name: report.json
   report_file_dir: driftReport
 
+# Configuration for data transformation
 data_transformation_config:
   transformed_dir: transformed_data
   transformed_train_dir: train
@@ -26,6 +30,7 @@ data_transformation_config:
   preprocessed_object_file_name: preprocessed.pkl
   imputer_sampler_object_file_name: imputer_sampler.pkl
 
+# Configuration for model training
 model_trainer_config:
   trained_model_dir: trained_model
   model_file_name: model.pkl
@@ -33,12 +38,13 @@ model_trainer_config:
   model_config_dir: configs
   model_config_file_name: model.yaml
   threshold_diff_train_test_acc: 0.2
-  
+
+# Configuration for model evaluation
 model_evaluation_config:
   model_evaluation_dir: model_evaluation
   model_evaluation_file_name: model_evaluation.yaml
   
-  
+# # Configuration for model pushing  
 model_pusher_config:
   model_export_dir: saved_models
 

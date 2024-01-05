@@ -1,3 +1,36 @@
+"""
+fraudDetection: A Python project for online Banking transaction fraud detection.
+
+This module contains the setup script for packaging and distributing the 'fraudDetection' project.
+
+Functions:
+- setup(): Configures the project metadata and dependencies for packaging.
+
+Usage:
+1. Run this script to configure the project metadata.
+2. Use 'setuptools' to package and distribute the project.
+
+Example:
+    from setuptools import setup
+
+    # (Your project metadata and dependencies here)
+
+    setup(
+        name="fraudDetection",
+        version="0.0.0",
+        author="ArunKhare",
+        description="A python project for online Banking transaction fraud detection",
+        long_description=long_description,
+        long_description_content_type="text/markdown",
+        url="https://github.com/ArunKhare/fraudDetection",
+        project_urls={
+            "Bug Tracker": "https://github.com/ArunKhare/fraudDetection/issues",
+        },
+        package_dir={"": "src"},
+        packages=setuptools.find_packages(where="src"),
+    )
+"""
+
 import setuptools
 from pathlib import Path
 

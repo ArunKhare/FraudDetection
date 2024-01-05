@@ -1,10 +1,15 @@
+# pyproject.toml - Configuration file for build system, tools, and options
+
 [build-system]
+# Build system configuration
 requires = ['setuptools>=42.0','wheel']
 build-backend = 'setuptools.build_meta'
 
 [tools.pytest.init_options]
+# Pytest configuration options
 testpaths = ['tests']
 
 [tool.mypy]
+# MyPy configuration
 mypy_path = 'src'
-ingore_missing_imports = true
+ignore_missing_imports = true

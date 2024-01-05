@@ -1,16 +1,21 @@
+# Schema Configuration
+
+# Define the columns with their data types
 columns:
   step: int64
   type: object
   amount: float64
   oldbalanceOrg: float64
   newbalanceOrig: float64
-  oldbalanceDest:  float64
-  newbalanceDest:  float64
+  oldbalanceDest: float64
+  newbalanceDest: float64
   isFraud: int64
 
-categorical_columns: 
+# Categorical columns in the dataset
+categorical_columns:
   - type
 
+# Numerical columns in the dataset
 numerical_columns:
   - step
   - amount
@@ -19,5 +24,6 @@ numerical_columns:
   - oldbalanceDest
   - newbalanceDest
 
+# Target column for model training
 target_column:
- - isFraud
+  - isFraud

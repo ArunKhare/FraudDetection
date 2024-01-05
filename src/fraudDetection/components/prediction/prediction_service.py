@@ -4,21 +4,22 @@ a FraudDetectionModel class for loading and using the trained model, and a Fraud
 class for creating a Streamlit web application for making predictions.
 
 Module Constants:
-    tags (dict): Dictionary containing version information.
-    INPUT_SCHEMA_JSON_FILE_NAME (str): Name of the input schema JSON file.
-    MODEL_EVALUATION_YAML (str): Name of the model evaluation YAML file.
-    SAVED_MODELS_DIR (Path): Directory path for saving models.
-    MODEL_NAME (str): Name of the model file.
-    PREPROCESSER_OBJ_PATH (Path): Path to the preprocessed data object.
-    EVALUATED_MODELS_PATH (Path): Path to the evaluated models.
+    - tags (dict): Dictionary containing version information.
+    - INPUT_SCHEMA_JSON_FILE_NAME (str): Name of the input schema JSON file.
+    - MODEL_EVALUATION_YAML (str): Name of the model evaluation YAML file.
+    - SAVED_MODELS_DIR (Path): Directory path for saving models.
+    - MODEL_NAME (str): Name of the model file.
+    - PREPROCESSER_OBJ_PATH (Path): Path to the preprocessed data object.
+    - EVALUATED_MODELS_PATH (Path): Path to the evaluated models.
 
 Classes:
     - FraudDetectionModel: Class for loading and using the trained model.
     - FraudDetectionPredictorApp: Class for creating a Streamlit web application for predictions.
 
 Usage:
-    if __name__ == "__main__":
-        FraudDetectionPredictorApp.run()
+
+if __name__ == "__main__":
+    FraudDetectionPredictorApp.run()
 """
 import os
 import numpy as np

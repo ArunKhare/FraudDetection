@@ -191,9 +191,8 @@ def get_data_processing_objects() -> Pipeline:
     """
     Module level function.
     Define the preprocessing data pipeline with SMOTENC and RandomUnderSampler
-    Return:
-        pipe_obj(obj:'Pipeline'): Pipeline with fitted steps
-        pipe_obj1(obj:'Pipeline'): Pipeline with fitted steps
+    Returns: pipe_obj(obj:'Pipeline'): Pipeline with fitted steps
+             pipe_obj1(obj:'Pipeline'): Pipeline with fitted steps
     """
     imputer = Pipeline([("CustomImputer", CustomImputer(thresh=0.3))])
 

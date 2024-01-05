@@ -1,3 +1,10 @@
+"""Test Module for ConfigurationManager in fraudDetection.config.configuration
+
+This module contains test functions for the ConfigurationManager class
+in the fraudDetection.config.configuration module.
+
+"""
+
 from pathlib import Path
 import pytest
 from unittest.mock import Mock, patch
@@ -6,13 +13,14 @@ from fraudDetection.config.configuration import ConfigurationManager, CONFIG_FIL
 
 @pytest.fixture
 def mock_read_yaml(monkeypatch):
-    # Mock read_yaml function
+    """Fixture for mocking the read_yaml function."""
     with patch("fraudDetection.config.configuration.read_yaml") as mock_read_yaml:
         monkeypatch.setattr(ConfigurationManager, "read_yaml", mock_read_yaml)
         yield mock_read_yaml
 
 
 def test_get_model_pusher_config(mock_read_yaml):
+    """Test the get_model_pusher_config method of ConfigurationManager."""
     # Set up the mock behavior for read_yaml
     mock_read_yaml.return_value = {
         "MODEL_PUSHER_CONFIG_KEY": {"MODEL_PUSHER_EXPORT_DIR_KEY": "export_dir"}
@@ -38,6 +46,7 @@ def test_get_model_pusher_config(mock_read_yaml):
 
 
 def test_get_model_pusher_config_exception(mock_read_yaml, monkeypatch):
+    """Test the get_model_pusher_config method when an exception is raised."""
     # Set up the mock behavior for read_yaml to raise an exception
     mock_read_yaml.side_effect = Exception("Mocked exception")
 

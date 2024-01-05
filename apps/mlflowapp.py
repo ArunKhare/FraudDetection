@@ -1,11 +1,21 @@
-import streamlit as st
+"""
+This module defines functions related to MLflow experiment tracking and launching MLflow UI.
+"""
 import os
-import logging
-from dotenv import load_dotenv
 import subprocess
+import logging
+import streamlit as st
+from dotenv import load_dotenv
 
 
 def exp_tracking():
+    """
+    Function to set up Streamlit app for MLflow experiment tracking.
+    Loads MLFLOW_TRACKING_URI from the environment, and displays a Streamlit app with a
+    button to launch the MLflow UI.
+    If MLFLOW_TRACKING_URI is not set, it displays an error message.
+    :return: None
+    """
     load_dotenv()
 
     mlflow_tracking_uri = os.getenv(
@@ -29,6 +39,14 @@ def exp_tracking():
 
 
 def launch_mlflow_ui():
+    """Function to launch the MLflow UI using subprocess.
+    This function attempts to launch the MLflow UI using subprocess. It specifies the
+    port and backend-store-uri parameters for configuring the UI.
+    Args:
+        None
+    Returns:
+        None
+    """
     try:
         # Launch MLflow UI using subprocess
         subprocess.Popen(
