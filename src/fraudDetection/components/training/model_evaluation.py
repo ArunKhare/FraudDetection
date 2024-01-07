@@ -31,13 +31,13 @@ from fraudDetection.constants import (
 from fraudDetection.components import processing_data
 from sklearn import set_config
 import mlflow
-from IPython.display import display
+# from IPython.display import display
 from mlflow.models.signature import infer_signature
 import pickle
 import shutil
 from dotenv import load_dotenv
 
-set_config(display="diagram")
+# set_config(display="diagram")
 
 
 class ModelEvaluation:
@@ -246,7 +246,7 @@ class ModelEvaluation:
                 )
                 processing_obj = load_object(processor_file_path)
                 imputed_sampler_obj = load_object(imputed_sampler_file_path)
-                logging.info(f"processing pipline {display(processing_obj)}")
+                # logging.info(f"processing pipline {display(processing_obj)}")
                 train_arr_with_y, test_arr_with_y = processing_data(
                     impute_sampler_obj=imputed_sampler_obj,
                     preprocessor_obj=processing_obj,
