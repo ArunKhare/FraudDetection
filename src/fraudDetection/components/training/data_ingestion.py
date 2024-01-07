@@ -192,7 +192,7 @@ class DataIngestion:
                 f"\n{'_':_>10}You pressed 'n'. The data must be already downloaded {'_':_>10}\n"
             )
             logging.info("User pressed 'n',  data is not downloaded")
-
+                 
     def initiate_data_ingestion(self) -> DataIngestionArtifact:
         """Initiate data ingestion and Return the artifacts
         Returns:

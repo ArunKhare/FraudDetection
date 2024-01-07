@@ -1,36 +1,18 @@
-python==3.10
-dvc
-pandas~=2.0.1
-notebook
-numpy~=1.24.3
-matplotlib
-seaborn
-python-box
-pyYAML~=6.0
-tqdm~=4.65.0
-ensure~=1.0.3
-joblib
-scipy
-streamlit~=1.29.0
-rangehttpserver
-scikit-learn~=1.2.2
-flask
-gunicorn
-mlflow
-dill~=0.3.6
-kaggle~=1.5.13
-evidently~=0.3.1
-imblearn~=0.0
-ruamel.yaml
-box
+dill==0.3.6
 -e .
-fraudDetection~=0.0.0
-ipython~=8.13.2
-setuptools~=66.0.0
-tox
-pytest
-sphinx
+imblearn==0.0
+kaggle==1.6.0
+mlflow==2.6.0
+python-decouple==3.8
+python-dotenv==0.21.0
+python-box==7.1.1
+streamlit==1.29.0
+scikit-learn==1.2.2
+ensure==1.0.3
 
-## Dev requirements 
-
-python-dotenv-1.0.0
+# dev only
+Sphinx==7.2.6
+sphinx-rtd-theme==2.0.0
+ipykernel==6.23.1
+dvc==2.56.0
+black==23.12.1

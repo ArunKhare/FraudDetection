@@ -1,8 +1,9 @@
 """ This module validates the ingested data with the schema from config yaml"""
+import os
 import sys
+from pathlib import Path
 import pandas as pd
-
-from fraudDetection.constants import *
+from fraudDetection.constants import (DATA_SCHEMA_COLUMNS_KEY, DATA_SCHEMA_TARGET_COLUMN_KEY)
 from fraudDetection.entity import (
     DataValidationConfig,
     DataValidationArtifact,
@@ -187,9 +188,6 @@ class DataValidation:
             return message
         except Exception as e:
             raise FraudDetectionException(e, sys) from e
-
-    def is_data_drift_found(self):
-        pass
 
     @staticmethod
     def check_class_balance(strat_train_set, strat_test_set, target_col) -> None:

@@ -1,6 +1,16 @@
 """ This module defines a training application for fraud detection, including 
 the FraudDetectionTrainingApp class. It uses a Pipeline for training models, 
-MLflow for experiment tracking, and Streamlit for the user interface."""
+**'MLflow'** for experiment tracking, and **'Streamlit'** for the user interface.
+With a user friendly UI you can 
+    - update the existing model configuration
+    - entirely new machine learning  model configuration 
+    - which is validated in UI using Json formatter 
+    - View the the and compare the experiments of training the models
+    - View Data, Logs
+    - With a click you can view  tracking UI of Mlfow and view, compare and download
+      the  model artifacts 'model.pickle, Signature, Processing object and Requirements'_
+    - A prediction service to predict with model, can upload a batch file or feed a single
+        record """
 
 import os
 import json
