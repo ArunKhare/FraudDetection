@@ -15,7 +15,7 @@ from sklearn.feature_selection import SelectPercentile, chi2, SelectFromModel
 from sklearn.impute import SimpleImputer
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import RobustScaler, OneHotEncoder
-from fraudDetection.constants import DATA_SCHEMA_COLUMNS_KEY, DATA_SCHEMA_TARGET_COLUMN_KEY
+from fraudDetection.constants import (DATA_SCHEMA_COLUMNS_KEY, DATA_SCHEMA_TARGET_COLUMN_KEY)
 from fraudDetection.entity import (
     DataIngestionArtifact,
     DataTransformationConfig,
