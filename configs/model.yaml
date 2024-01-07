@@ -1,41 +1,27 @@
-# Configuration for grid search
 grid_search:
-  # Class and module information for performing grid search
   class: GridSearchCV
   module: sklearn.model_selection
-  # Parameters for grid search
   params:
     cv: 10
     n_jobs: -1
     verbose: 2
-
-# Model selection configuration
 model_selection:
-  # Module 0: Logistic Regression
   module_0:
-    # Class and module information for Logistic Regression
     class: LogisticRegression
     module: sklearn.linear_model
-    # Parameters for Logistic Regression model
     params:
       class_weight: balanced
       fit_intercept: true
       max_iter: 1000
-    # Search parameter grid for hyperparameter tuning
     search_param_grid:
       penalty:
       - l2
-
-  # Module 1: Random Forest Classifier
   module_1:
-    # Class and module information for Random Forest Classifier
     class: RandomForestClassifier
     module: sklearn.ensemble
-    # Parameters for Random Forest Classifier model
     params:
       bootstrap: true
       min_samples_leaf: 3
-    # Search parameter grid for hyperparameter tuning
     search_param_grid:
       class_weight:
       - balanced_subsample

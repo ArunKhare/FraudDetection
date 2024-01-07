@@ -13,3 +13,9 @@ testpaths = ['tests']
 # MyPy configuration
 mypy_path = 'src'
 ignore_missing_imports = true
+
+[project.optional-dependencies]
+docs =
+    sphinx==7.2.6
+    sphinx-automodapi
+    sphinx-rtd-theme==2.0.0

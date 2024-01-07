@@ -12,6 +12,24 @@ Welcome to FraudDetection's documentation!
 
    modules
 
+.. include:: README.rst
+
+.. toctree::
+   :maxdepth: 8
+
+   installation
+   usage
+   contributing
+   license
+   acknowledgements
+   changelog
+   roadmap
+   
+.. toctree::
+   :maxdepth: 8
+
+   considerations
+
 Indices and tables
 ==================
 

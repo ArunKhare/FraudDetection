@@ -31,5 +31,4 @@ dvc.lock
 artifacts/
 logs/
 notebook/
-documentation/
-app.py
+/documentation
