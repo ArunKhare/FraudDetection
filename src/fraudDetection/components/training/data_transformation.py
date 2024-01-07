@@ -1,9 +1,11 @@
 """ This module Transforms the validated data from earlier stage using 'Custom 
 build classes'_ for SMOTENCWrapper, RandomUnderSamplerWrapper, CustomImputer"""
-import os, sys
+import os
+import sys
+from pathlib import Path
 import numpy as np
 import pandas as pd
-from IPython.display import display
+# from IPython.display import display
 from imblearn.over_sampling import SMOTENC
 from imblearn.under_sampling import RandomUnderSampler
 from sklearn.base import BaseEstimator, TransformerMixin
@@ -13,8 +15,7 @@ from sklearn.feature_selection import SelectPercentile, chi2, SelectFromModel
 from sklearn.impute import SimpleImputer
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import RobustScaler, OneHotEncoder
-from pathlib import Path
-from fraudDetection.constants import *
+from fraudDetection.constants import DATA_SCHEMA_COLUMNS_KEY, DATA_SCHEMA_TARGET_COLUMN_KEY
 from fraudDetection.entity import (
     DataIngestionArtifact,
     DataTransformationConfig,
@@ -379,7 +380,7 @@ class DataTransformation:
 
             inputer_sampler_obj, preprocessor_obj = get_data_processing_objects()
 
-            logging.info(f"processing pipeline : {display(preprocessor_obj)}")
+            # logging.info(f"processing pipeline : {display(preprocessor_obj)}")
 
             train_arr_with_y, test_arr_with_y = processing_data(
                 inputer_sampler_obj,
