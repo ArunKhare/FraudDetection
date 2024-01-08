@@ -50,7 +50,7 @@ class DataIngestion:
         os.environ["KAGGLE_CONFIG_DIR"] = str(conn_location)
         os.environ["KAGGLE_USERNAME"] = connect["username"]
         os.environ["KAGGLE_KEY"] = connect["key"]
-        
+
         api = KaggleApi()
         api.authenticate()
         return api
@@ -84,6 +84,8 @@ class DataIngestion:
             )
             assert isinstance(download_dataset_link, str) is True
             api = self._authenticate_kaggle_api()
+            logging.info("Kaggle API Authenticated")
+            print("Kaggle Api authenticated")
             # Download the dataset using the Kaggle API
             tqdm(
                 api.dataset_download_files(

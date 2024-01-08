@@ -107,12 +107,13 @@ Running MLflow UI:
 
 Environment Variable:
 
-    - Use <root_dir>/.FraudDetection
+    - use *<root_dir>/.env*
+        *MLFLOW_TRACKING_URI=sqlite:///mlruns.db*
 
 Kaggle Authentication:
 
     - Download the kaggle authentication from Kaggle setting as kaggle.json file
-    - Place the file in <root>/kaggle location
+    - Place the file in *<root>/.kaggle*
 
 .. code-block:: shell
 

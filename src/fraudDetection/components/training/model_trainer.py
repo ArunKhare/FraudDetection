@@ -101,7 +101,7 @@ class ModelTrainer:
         """implements the training of models"""
         try:
             load_dotenv()
-            tracking_uri = os.getenv("MLFLOW_TRACKING_URI")
+            tracking_uri = os.getenv("MLFLOWTRACKINGURI")
 
             if tracking_uri is not None:
                 mlflow.set_tracking_uri(tracking_uri)
