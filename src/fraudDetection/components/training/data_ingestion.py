@@ -4,11 +4,12 @@ This module downloads the data and chunk, split the data in to train test
 import os
 from pathlib import Path
 import sys
-import pandas as pd
 import threading
-from sklearn.model_selection import train_test_split
+import pandas as pd
 from zipfile import ZipFile
+from sklearn.model_selection import train_test_split
 from tqdm import tqdm
+from dotenv import load_dotenv
 from kaggle.api.kaggle_api_extended import KaggleApi
 from fraudDetection.entity import DataIngestionConfig, DataIngestionArtifact
 from fraudDetection.exception import FraudDetectionException
@@ -21,7 +22,7 @@ from fraudDetection.utils import (
     get_directory_size,
 )
 
-
+load_dotenv()
 class DataIngestion:
     """Downloaded datawith API. Process, split data,
     storing them to specified location
@@ -49,6 +50,7 @@ class DataIngestion:
         os.environ["KAGGLE_CONFIG_DIR"] = str(conn_location)
         os.environ["KAGGLE_USERNAME"] = connect["username"]
         os.environ["KAGGLE_KEY"] = connect["key"]
+        
         api = KaggleApi()
         api.authenticate()
         return api
