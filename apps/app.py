@@ -14,15 +14,13 @@ Configuration and Directory Setup:
     - Defines constants for artifact directory, project folder name, logs directory, model configuration file path, model directory, saved models directory, and pipeline directory.
 """
 
-
+import os
 from fraudDetection.pipeline.pipeline import Pipeline
 from fraudDetection.config.configuration import (
     ConfigurationManager,
     ROOT_DIR,
     CONFIG_FILE_PATH,
 )
-from fraudDetection.constants import get_current_time_stamp
-import os
 
 config = ConfigurationManager(config=CONFIG_FILE_PATH)
 training_pipeline_config = config.get_training_pipeline_config

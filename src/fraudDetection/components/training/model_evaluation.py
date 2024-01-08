@@ -2,6 +2,12 @@
 import os
 import sys
 from pathlib import Path
+import pickle
+import shutil
+import mlflow
+# from IPython.display import display
+from mlflow.models.signature import infer_signature
+from dotenv import load_dotenv
 from fraudDetection.logger import logging
 from fraudDetection.exception import FraudDetectionException
 from fraudDetection.entity import (
@@ -29,16 +35,9 @@ from fraudDetection.constants import (
     DATA_SCHEMA_COLUMNS_KEY,
 )
 from fraudDetection.components import processing_data
-from sklearn import set_config
-import mlflow
-# from IPython.display import display
-from mlflow.models.signature import infer_signature
-import pickle
-import shutil
-from dotenv import load_dotenv
+
 
 # set_config(display="diagram")
-
 
 class ModelEvaluation:
     """implements the evaluation of models"""
@@ -408,6 +407,7 @@ class ModelEvaluation:
         except Exception as e:
             raise FraudDetectionException(e, sys) from e
 
+    @staticmethod
     def _get_output_schema(eval_file_path, input_schema):
         input_schema_file_name = Path("input_schema.json")
         input_schema_file_path = os.path.join(eval_file_path, input_schema_file_name)

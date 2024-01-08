@@ -24,6 +24,7 @@ Attributes:
     DATA_INGESTION_CONFIG_KEY (str): Key for data ingestion configuration.
     DATA_INGESTION_ARTIFACT_DIR_KEY (str): Key for the data ingestion artifacts directory.
     DATA_INGESTION_URL_KEY (str): Key for the source URL in data ingestion configuration.
+    DATA_INGESTION_ZIP_DATA_DIR_KEY: Key for the zip data directory in data ingestion configuration
     DATA_INGESTION_RAW_DATA_DIR_KEY (str): Key for the raw data directory in data ingestion configuration.
     DATA_INGESTION_INGESTED_DIR_KEY (str): Key for the ingested data directory in data ingestion configuration.
     DATA_INGESTION_TRAIN_DIR_KEY (str): Key for the ingested train data directory in data ingestion configuration.
@@ -113,6 +114,7 @@ TRAINING_PIPELINE_ARTIFACT_DIR_KEY = "artifacts_root"
 DATA_INGESTION_CONFIG_KEY = "data_ingestion_config"
 DATA_INGESTION_ARTIFACT_DIR_KEY = "data_ingestion"
 DATA_INGESTION_URL_KEY = "source_url"
+DATA_INGESTION_ZIP_DATA_DIR_KEY = "zip_data_dir"
 DATA_INGESTION_RAW_DATA_DIR_KEY = "raw_data_dir"
 DATA_INGESTION_INGESTED_DIR_KEY = "ingested_dir"
 DATA_INGESTION_TRAIN_DIR_KEY = "ingested_train_dir"

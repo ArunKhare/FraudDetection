@@ -5,7 +5,9 @@ import os
 from pathlib import Path
 import sys
 import pandas as pd
+import threading
 from sklearn.model_selection import train_test_split
+from zipfile import ZipFile
 from tqdm import tqdm
 from kaggle.api.kaggle_api_extended import KaggleApi
 from fraudDetection.entity import DataIngestionConfig, DataIngestionArtifact
@@ -31,6 +33,8 @@ class DataIngestion:
         try:
             logging.info(f"\n{'=' * 20} Data ingestion start {'=' * 20}")
             self.data_ingestion_config: DataIngestionConfig = data_ingestion_config
+            self.zip_data_dir= self.data_ingestion_config.zip_data_dir
+            self.raw_data_dir = self.data_ingestion_config.raw_data_dir
         except Exception as e:
             raise FraudDetectionException(e, sys) from e
 
@@ -49,37 +53,50 @@ class DataIngestion:
         api.authenticate()
         return api
 
-    def download_transaction_data(
-        self,
-    ) -> str:
+    def unzip_data(self) -> str:
         """Downloading data from kaggle using API in directory"""
 
         try:
-            # extraction remote url to download dataset
-            download_dataset_link: str = self.data_ingestion_config.source_url
-            raw_data_dir: Path = self.data_ingestion_config.raw_data_dir
-            create_directories([raw_data_dir])
+            # extract file from zip_data_dir
+            create_directories([self.raw_data_dir])
+            if is_dir_empty(self.zip_data_dir):
+                raise ValueError(f"Zip file is not in {self.zip_data_dir}")
+            zipped_file = os.listdir(self.zip_data_dir)[0]
+            zip_file_path = os.path.join(self.zip_data_dir,zipped_file)
+            with ZipFile(zip_file_path, "r") as zip_file:
+                zip_file.extractall(self.raw_data_dir)
 
             logging.info(
-                f"Downloading file from :[{download_dataset_link}] into :[{raw_data_dir}]"
+                f"Extracted file from :[{self.zip_data_dir, zipped_file}] into :[{self.raw_data_dir}]"
+            )
+        except (Exception, ValueError) as e:
+            raise FraudDetectionException(e, error_details=sys) from e
+
+    def download_transaction_data(self):
+        """Unzip the downloaded zip file"""
+        try:
+            download_dataset_link: str = self.data_ingestion_config.source_url
+            create_directories([self.zip_data_dir])
+            logging.info(
+                f"Downloading file from :[{download_dataset_link}] into :[{self.zip_data_dir}]"
             )
             assert isinstance(download_dataset_link, str) is True
             api = self._authenticate_kaggle_api()
             # Download the dataset using the Kaggle API
             tqdm(
                 api.dataset_download_files(
-                    download_dataset_link, raw_data_dir, unzip=True
+                    download_dataset_link, self.zip_data_dir, unzip=False
                 ),
                 mininterval=5,
                 desc="downloading kaggle dataset in zip format",
             )
-            logging.info(f"File :[{raw_data_dir}] has been downloaded successfully.")
+            logging.info(f"File :[{self.zip_data_dir}] has been downloaded successfully.")
 
         except Exception as e:
-            raise FraudDetectionException(e, error_details=sys) from e
+            raise FraudDetectionException(e, sys) from e
 
     def split_data_as_train_test(self) -> DataIngestionArtifact:
-        """ Split the datase into train and test
+        """Split the datase into train and test
         Returns:
                 data_ingestion_artifacts(:obj:'DataIngestionArtifact'): Split datasets with message as DataIngestionartifact
         Example:
@@ -93,15 +110,14 @@ class DataIngestion:
         """
         try:
             is_ingested = False
-            raw_data_dir: Path = self.data_ingestion_config.raw_data_dir
-
-            if is_dir_empty(raw_data_dir):
+      
+            if is_dir_empty(self.raw_data_dir):
                 raise ValueError("raw_data_dir must contain data file")
 
-            directory_size = get_directory_size(raw_data_dir)
+            directory_size = get_directory_size(self.raw_data_dir)
 
             logging.info(
-                f"Total size of files in directory '{raw_data_dir}': {directory_size:0.2f} MB"
+                f"Total size of files in directory '{self.raw_data_dir}': {directory_size:0.2f} MB"
             )
 
             train_file_path = Path(
@@ -120,8 +136,8 @@ class DataIngestion:
                     "Both train and test directories must contain data before splitting."
                 )
 
-            file_name = Path(os.listdir(raw_data_dir)[0])
-            file_path = Path(os.path.join(raw_data_dir, file_name))
+            file_name = Path(os.listdir(self.raw_data_dir)[0])
+            file_path = Path(os.path.join(self.raw_data_dir, file_name))
             logging.info(f"Reading CSV file: {file_path}")
             df = pd.read_csv(file_path)
             # Check if test_size is within valid range
@@ -176,23 +192,46 @@ class DataIngestion:
         except (ValueError, FraudDetectionException) as e:
             raise FraudDetectionException(e, sys) from e
 
-    def user_input_to_downloaddata(self):
-        """Choice to download  the data If 'y' download the data"""
-        # Prompt the user for input
+    def user_input_to_downloaddata(self, timeout_seconds=5):
+        """Choice to download the data. If 'y', download the data."""
+        # Prompt the user for input with a timeout
         print(
-            f"{'*':.^10}Do you want to download transaction data? press y or n and enter"
+            f"{'*':.^10} Do you want to download transaction data? Press y or n and enter"
         )
 
-        if input().strip().lower() == "y":
-            print("! Proceeding with Download ...")
-            self.download_transaction_data()
+        user_input = None
 
-        if input().strip().lower() == "n":
-            print(
-                f"\n{'_':_>10}You pressed 'n'. The data must be already downloaded {'_':_>10}\n"
-            )
-            logging.info("User pressed 'n',  data is not downloaded")
-                 
+        def get_input():
+            nonlocal user_input
+            user_input = input().strip().lower()
+
+        try:
+            # Create a thread to get user input
+            input_thread = threading.Thread(target=get_input)
+            input_thread.start()
+            input_thread.join(timeout=timeout_seconds)
+
+            if user_input == "y":
+                print("! Proceeding with Download ...")
+                self.download_transaction_data()
+            elif user_input == "n":
+                print(
+                    f"\n{'_':_>10} You pressed 'n'. The data must be already downloaded {'_':_>10}\n"
+                )
+                logging.info("User pressed 'n', data is not downloaded")
+            else:
+                print(
+                    f"\n{'_':_>10} Timeout reached. Proceeding with Download ... {'_':_>10}\n"
+                )
+                self.download_transaction_data()
+
+        except Exception as e:
+            raise FraudDetectionException(e,sys) from e
+        else: 
+            logging.info(f"zip file is in diretory {self.zip_data_dir}")
+        finally:
+            self.unzip_data()
+
     def initiate_data_ingestion(self) -> DataIngestionArtifact:
         """Initiate data ingestion and Return the artifacts
         Returns:

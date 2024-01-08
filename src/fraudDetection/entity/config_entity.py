@@ -13,6 +13,7 @@ Classes:
 Attributes:
     - source_url (str): The source URL for data ingestion.
     - kaggle_config_file (Path): Path to the Kaggle configuration file.
+    - zip_data_dir(Path): Path to the zip data directory
     - raw_data_dir (Path): Path to the raw data directory.
     - ingested_dir (Path): Path to the ingested data directory.
     - ingested_train_dir (Path): Path to the ingested training data directory.
@@ -60,6 +61,7 @@ from pathlib import Path
 class DataIngestionConfig:
     source_url: str
     kaggle_config_file: Path
+    zip_data_dir: Path
     raw_data_dir: Path
     ingested_dir: Path
     ingested_train_dir: Path
