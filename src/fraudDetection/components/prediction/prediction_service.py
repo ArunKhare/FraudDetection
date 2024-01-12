@@ -22,24 +22,24 @@ if __name__ == "__main__":
     FraudDetectionPredictorApp.run()
 """
 import os
-import numpy as np
-import pandas as pd
 from pathlib import Path
-import yaml
-import joblib
 import json
 import re
+import numpy as np
+import pandas as pd
+import yaml
+import joblib
 import streamlit as st
 
 tags = {"Version": "v1"}
-INPUT_SCHEMA_JSON_FILE_NAME = "input_schema.json"
-MODEL_EVALUATION_YAML = "model_evaluation.yaml"
-SAVED_MODELS_DIR = Path("artifacts\saved_models")
+INPUT_SCHEMA_JSON_FILE_NAME = Path("input_schema.json")
+MODEL_EVALUATION_YAML = Path("model_evaluation.yaml")
+SAVED_MODELS_DIR = Path("artifacts/saved_models")
 MODEL_NAME = "model.pkl"
 PREPROCESSER_OBJ_PATH = Path(
-    r"artifacts\transformed_data\preprocessed\preprocessed.pkl"
+    "artifacts/transformed_data/preprocessed/preprocessed.pkl"
 )
-EVALUATED_MODELS_PATH = Path(r"artifacts\model_evaluation")
+EVALUATED_MODELS_PATH = Path("artifacts/model_evaluation")
 
 
 # schema_file_path = Path(r"C:\Users\arunk\FraudDetection\configs\schema.yaml")
@@ -58,6 +58,12 @@ class FraudDetectionModel:
         self.model_name = MODEL_NAME
         self.evaluated_models_path = EVALUATED_MODELS_PATH
         self.preprocessd_obj_path = PREPROCESSER_OBJ_PATH
+        self.evaluated_models_file_path = Path(
+                os.path.join(self.evaluated_models_path, MODEL_EVALUATION_YAML)
+            )
+        self.input_schema_path = Path(
+            os.path.join(self.evaluated_models_path, INPUT_SCHEMA_JSON_FILE_NAME)
+        )
 
     def get_latest_model(self):
         """Get the latest trained model from evaluated models.
@@ -67,12 +73,9 @@ class FraudDetectionModel:
             ValueError: If there is an issue during the process.
         """
         try:
-            """Load best model from the saved models and the input schema"""
-            self.evaluated_models_file_path = Path(
-                os.path.join(self.evaluated_models_path, MODEL_EVALUATION_YAML)
-            )
-
-            with open(self.evaluated_models_file_path, "r") as f:
+            # Load best model from the saved models and the input schema
+            
+            with open(file=self.evaluated_models_file_path, mode="r", encoding="utf-8") as f:
                 model_registry_paths = yaml.load(f, Loader=yaml.Loader)
 
             # model_registry_paths = read_yaml(self.evaluated_models_file_path)
@@ -88,7 +91,7 @@ class FraudDetectionModel:
             if match:
                 best_model_name_dir = match.group()
 
-            matching_dirs = SAVED_MODELS_DIR.glob(best_model_name_dir)
+            matching_dirs = list(SAVED_MODELS_DIR.glob(best_model_name_dir))
             # Check if any matching directories were found
             if matching_dirs:
                 # matching directory
@@ -109,10 +112,7 @@ class FraudDetectionModel:
         Raises:
             ValueError: If there is an issue during the process.
         """
-        self.input_schema_path = Path(
-            os.path.join(self.evaluated_models_path, INPUT_SCHEMA_JSON_FILE_NAME)
-        )
-        with open(self.input_schema_path, "r") as json_file:
+        with open(file=self.input_schema_path, mode="r", encoding="utf-8") as json_file:
             schema = json.load(json_file)
         return schema
 
@@ -126,7 +126,7 @@ class FraudDetectionModel:
             ValueError: If there is an issue during the process.
         """
         try:
-            """Load the pipeline object"""
+            # Load the pipeline object
             preprocessing_pipe_obj = joblib.load(self.preprocessd_obj_path)
             schema = self.get_frauddetection_input_schema()
             df_input = df[schema["columns"]]

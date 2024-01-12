@@ -112,9 +112,7 @@ class ConfigurationManager:
             dataset_download_url: ConfigBox = data_ingestion_info[
                 DATA_INGESTION_URL_KEY
             ]
-            kaggle_config_file = Path(
-                data_ingestion_info[DATA_INGESTION_KAGGLE_CONFIG_FILE_PATH]
-            )
+
             zip_data_dir = Path(
                 os.path.join(
                     data_ingestion_artifact_dir,
@@ -150,7 +148,6 @@ class ConfigurationManager:
 
             data_ingestion_config = DataIngestionConfig(
                 source_url=dataset_download_url,
-                kaggle_config_file=kaggle_config_file,
                 zip_data_dir=zip_data_dir,
                 raw_data_dir=raw_data_dir,
                 ingested_dir=ingested_data_dir,

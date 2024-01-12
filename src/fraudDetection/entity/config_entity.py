@@ -60,7 +60,6 @@ from pathlib import Path
 @dataclass(frozen=True)
 class DataIngestionConfig:
     source_url: str
-    kaggle_config_file: Path
     zip_data_dir: Path
     raw_data_dir: Path
     ingested_dir: Path

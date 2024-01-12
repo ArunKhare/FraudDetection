@@ -101,6 +101,7 @@ DATA_SCHEMA_COLUMNS_KEY = "columns"
 DATA_SCHEMA_CATEGORICAL_COLUMN_KEY = "categorical_columns"
 DATA_SCHEMA_NUMERICAL_COLUMN_KEY = "numerical_columns"
 DATA_SCHEMA_TARGET_COLUMN_KEY = "target_column"
+DATA_INGESTION_KAGGLE_CONFIG_FILE_PATH = ".kaggle/kaggle.json"
 LOGS_DIR = "logs"
 
 CURRENT_TIME_STAMP = get_current_time_stamp()
@@ -121,7 +122,6 @@ DATA_INGESTION_TRAIN_DIR_KEY = "ingested_train_dir"
 DATA_INGESTION_TEST_DIR_KEY = "ingested_test_dir"
 DATA_INGESTION_TEST_SIZE_KEY = "test_size"
 DATA_INGESTION_STRATIFY_COL_KEY = "stratify"
-DATA_INGESTION_KAGGLE_CONFIG_FILE_PATH = "kaggle_config_file"
 
 # Data Validation related variable
 DATA_VALIDATION_CONFIG_KEY = "data_validation_config"

@@ -12,15 +12,30 @@ Configuration and Directory Setup:
     - Initializes the ConfigurationManager with the specified configuration file path.
     - Retrieves training pipeline, model pusher, and model trainer configurations.
     - Defines constants for artifact directory, project folder name, logs directory, model configuration file path, model directory, saved models directory, and pipeline directory.
+
+Note: for running on local machine only
 """
 
 import os
+from pathlib import Path
+
 from fraudDetection.pipeline.pipeline import Pipeline
+from fraudDetection.utils import load_json
 from fraudDetection.config.configuration import (
     ConfigurationManager,
     ROOT_DIR,
     CONFIG_FILE_PATH,
 )
+from fraudDetection.constants import DATA_INGESTION_KAGGLE_CONFIG_FILE_PATH
+
+conn_location = Path(DATA_INGESTION_KAGGLE_CONFIG_FILE_PATH)
+connect = load_json(conn_location)
+# Kaggle
+os.environ["KAGGLE_CONFIG_DIR"] = str(conn_location.parent)
+os.environ["KAGGLE_USERNAME"] = connect["username"]
+os.environ["KAGGLE_KEY"] = connect["key"]
+print("No specific deployment check provided. Performing default actions...")
+
 
 config = ConfigurationManager(config=CONFIG_FILE_PATH)
 training_pipeline_config = config.get_training_pipeline_config

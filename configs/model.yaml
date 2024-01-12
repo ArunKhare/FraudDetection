@@ -21,7 +21,7 @@ model_selection:
     module: sklearn.ensemble
     params:
       bootstrap: true
-      min_samples_leaf: 3
+      # min_samples_leaf: 3
     search_param_grid:
       class_weight:
       - balanced_subsample

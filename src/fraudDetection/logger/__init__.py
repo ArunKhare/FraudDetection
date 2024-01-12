@@ -1,5 +1,7 @@
 """
 This module provides functionality for creating a custom logger and transforming log messages into a DataFrame.
+The logging configuration is executed when the module is imported. Specifically, the basicConfig method is 
+called, and it sets up the logging system to write log messages to a file in the specified format.
 
 Functions:
     - get_log_file_name(): Generates a log file name based on the current timestamp.
@@ -59,7 +61,7 @@ def get_log_dataframe(file_path):
     """
     data = []
 
-    with open(file_path) as log_file:
+    with open(file=file_path, encoding="utf-8") as log_file:
         for line in log_file.readlines():
             data.append(line.split("^;"))
 
@@ -75,7 +77,11 @@ def get_log_dataframe(file_path):
         "Message",
     ]
     log_df.columns = columns
-    log_df["log_message"] = (
-        log_df["Time Stamp"].astype(str, copy=False) + ":$" + log_df["Message"]
+
+    log_df = log_df.assign(
+        log_message=log_df.loc[:, "Time Stamp"].astype(str)
+        + ":$"
+        + log_df.loc[:, "Message"]
     )
+
     return log_df[["log_message"]]

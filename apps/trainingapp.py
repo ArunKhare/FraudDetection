@@ -1,6 +1,7 @@
 """ This module defines a training application for fraud detection, including 
 the FraudDetectionTrainingApp class. It uses a Pipeline for training models, 
 **'MLflow'** for experiment tracking, and **'Streamlit'** for the user interface.
+set up Streamlit app for MLflow experiment tracking. Loads MLFLOW_TRACKING_URI from the environment
 With a user friendly UI you can 
     - update the existing model configuration
     - entirely new machine learning  model configuration 
@@ -13,22 +14,76 @@ With a user friendly UI you can
         record """
 
 import os
+import sys
 import json
 from pathlib import Path
 import yaml
 import pandas as pd
 import streamlit as st
+import mlflow
+from mlflow.exceptions import InvalidUrlException
+from dotenv import load_dotenv
 from fraudDetection.pipeline.pipeline import Pipeline
 from fraudDetection.config.configuration import (
     ConfigurationManager,
     ROOT_DIR,
     CONFIG_FILE_PATH,
 )
-from fraudDetection.utils import read_yaml, write_yaml
-from fraudDetection.constants import CONFIG_DIR
+from fraudDetection.utils import read_yaml, write_yaml, load_json
+from fraudDetection.constants import CONFIG_DIR, DATA_INGESTION_KAGGLE_CONFIG_FILE_PATH
 from fraudDetection.components import FraudDetectionPredictorApp
 from fraudDetection.logger import get_log_dataframe, logging
+from fraudDetection.exception import FraudDetectionException
 from mlflowapp import exp_tracking
+
+
+load_dotenv()
+
+
+def set_tracking_uri():
+    """Set Mlflow Tracking URI
+    Raises:
+        InvalidUrlException: when URI is not in proper format
+        """
+    mlflow_tracking_uri = os.getenv(
+        "MLFLOWTRACKINGURI", default="http://localhost:8080"
+    )
+    try:
+        mlflow.set_tracking_uri(mlflow_tracking_uri)
+    except InvalidUrlException as e:
+        st.error("MLFLOW_TRACKING_URI not set.")
+        raise FraudDetectionException(e, sys) from e
+    finally:
+        logging.info(f"Tracking URI set {mlflow_tracking_uri}")
+
+
+
+# # Deployment in Streamlit Community Cloud
+# def streamlit_community_cloud():
+#     """Deploy in Stremlit Community Cloud """
+#     # Get Kaggle API credentials from environment variables
+#     kaggle_username = st.secrets["KAGGLE_USERNAME"]
+#     kaggle_key = st.secrets["KAGGLE_KEY"]
+#     # Define the directory path and file path
+#     KAGGLE_DIR = "/home/appuser/.kaggle"
+#     kaggle_file_path = os.path.join(KAGGLE_DIR, "kaggle.json")
+#     # Create the directory if it doesn't exist
+#     os.makedirs(KAGGLE_DIR, exist_ok=True)
+#     # Create the Kaggle JSON file
+#     kaggle_credentials = {"username": kaggle_username, "key": kaggle_key}
+#     with open(kaggle_file_path, "w") as kaggle_file:
+#         json.dump(kaggle_credentials, kaggle_file)
+#     # Set appropriate permissions
+#     os.chmod(kaggle_file_path, 0o600)
+#     print("Performing actions for Streamlit Community deployment...")
+
+# # LOCAL RUN
+# conn_location = Path(DATA_INGESTION_KAGGLE_CONFIG_FILE_PATH)
+# connect = load_json(conn_location)
+# os.environ["KAGGLE_CONFIG_DIR"] = str(conn_location.parent)
+# os.environ["KAGGLE_USERNAME"] = connect["username"]
+# os.environ["KAGGLE_KEY"] = connect["key"]
+# print("No specific deployment check provided. Performing default actions...")
 
 
 class Constants:
@@ -148,6 +203,7 @@ class FraudDetectionTrainingApp:
         except Exception as e:
             st.exception("An error occurred. Please check the logs for more details")
             logging.info(e)
+            raise FraudDetectionException(e, sys) from e
 
     def display_home(self):
         """Display the home page."""
@@ -181,7 +237,7 @@ class FraudDetectionTrainingApp:
                     # If it's a file, add it to the dictionary
                     hierarchy_dict[item] = [item]
             return hierarchy_dict
-        except Exception as e:
+        except ValueError as e:
             st.error(
                 """An error occurred while generating the file structure in to a dict.
                 Please check the logs for more details"""
@@ -246,6 +302,7 @@ class FraudDetectionTrainingApp:
                 "Error while displaying artifact heirarchy pl check logs for details"
             )
             logging.info(e)
+            raise FraudDetectionException(e, sys) from e
 
     @staticmethod
     def display_file_content(file_path):
@@ -278,6 +335,7 @@ class FraudDetectionTrainingApp:
                 st.info(f"Full File Path: {file_path}")
         except Exception as e:
             st.error(f"Error while displaying file content: {e}")
+            raise FraudDetectionException(e, sys) from e
 
     def view_experiment_history(self):
         """View the experiment history."""
@@ -296,6 +354,7 @@ class FraudDetectionTrainingApp:
                 f"An error occurred. Please check the logs for details. Error: {e}"
             )
             logging.info(e)
+            raise FraudDetectionException(e, sys) from e
 
     def train(self):
         """Train models using the pipeline"""
@@ -415,6 +474,8 @@ class FraudDetectionTrainingApp:
         except Exception as e:
             st.exception("An error occured pl check the logs for details")
             logging.info(e)
+            raise FraudDetectionException(e, sys) from e
+
 
     @staticmethod
     def delete_empty_files(directory):
@@ -435,7 +496,14 @@ class FraudDetectionTrainingApp:
                 os.remove(file_path)
 
 
-if __name__ == "__main__":
+def init_app():
+    """Initialize training and prediction app"""
+    set_tracking_uri()
     instance_training = FraudDetectionTrainingApp()
     instance_training.initialize_pipeline()
     instance_training.main()
+
+
+if __name__ == "__main__":
+    # streamlit_community_cloud()
+    init_app()  

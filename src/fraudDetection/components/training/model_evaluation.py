@@ -173,7 +173,6 @@ class ModelEvaluation:
                 mlflow.set_tracking_uri(tracking_uri)
             else:
                 logging.info("Tracking_URI not set")
-                return
 
             mlflow.start_run(run_name="Evaluation")
             logging.info("Mlflow run model Evaluation tracking on ")

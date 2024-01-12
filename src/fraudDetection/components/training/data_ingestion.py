@@ -5,11 +5,10 @@ import os
 from pathlib import Path
 import sys
 import threading
-import pandas as pd
 from zipfile import ZipFile
+import pandas as pd
 from sklearn.model_selection import train_test_split
 from tqdm import tqdm
-from dotenv import load_dotenv
 from kaggle.api.kaggle_api_extended import KaggleApi
 from fraudDetection.entity import DataIngestionConfig, DataIngestionArtifact
 from fraudDetection.exception import FraudDetectionException
@@ -18,11 +17,10 @@ from fraudDetection.utils import (
     create_directories,
     save_dfs_to_csv,
     is_dir_empty,
-    load_json,
     get_directory_size,
 )
 
-load_dotenv()
+
 class DataIngestion:
     """Downloaded datawith API. Process, split data,
     storing them to specified location
@@ -34,7 +32,7 @@ class DataIngestion:
         try:
             logging.info(f"\n{'=' * 20} Data ingestion start {'=' * 20}")
             self.data_ingestion_config: DataIngestionConfig = data_ingestion_config
-            self.zip_data_dir= self.data_ingestion_config.zip_data_dir
+            self.zip_data_dir = self.data_ingestion_config.zip_data_dir
             self.raw_data_dir = self.data_ingestion_config.raw_data_dir
         except Exception as e:
             raise FraudDetectionException(e, sys) from e
@@ -44,27 +42,19 @@ class DataIngestion:
         Authenticate Kaggle API using Kaggle.json
         return (str): api instance
         """
-        conn_location = self.data_ingestion_config.kaggle_config_file
-        connect = load_json(conn_location)
-        # Kaggle
-        os.environ["KAGGLE_CONFIG_DIR"] = str(conn_location)
-        os.environ["KAGGLE_USERNAME"] = connect["username"]
-        os.environ["KAGGLE_KEY"] = connect["key"]
-
         api = KaggleApi()
         api.authenticate()
         return api
 
     def unzip_data(self) -> str:
-        """Downloading data from kaggle using API in directory"""
-
+        """Unzip the downloaded zip file"""
         try:
             # extract file from zip_data_dir
             create_directories([self.raw_data_dir])
             if is_dir_empty(self.zip_data_dir):
                 raise ValueError(f"Zip file is not in {self.zip_data_dir}")
             zipped_file = os.listdir(self.zip_data_dir)[0]
-            zip_file_path = os.path.join(self.zip_data_dir,zipped_file)
+            zip_file_path = os.path.join(self.zip_data_dir, zipped_file)
             with ZipFile(zip_file_path, "r") as zip_file:
                 zip_file.extractall(self.raw_data_dir)
 
@@ -75,7 +65,7 @@ class DataIngestion:
             raise FraudDetectionException(e, error_details=sys) from e
 
     def download_transaction_data(self):
-        """Unzip the downloaded zip file"""
+        """Downloading data from kaggle using API in directory"""
         try:
             download_dataset_link: str = self.data_ingestion_config.source_url
             create_directories([self.zip_data_dir])
@@ -94,7 +84,9 @@ class DataIngestion:
                 mininterval=5,
                 desc="downloading kaggle dataset in zip format",
             )
-            logging.info(f"File :[{self.zip_data_dir}] has been downloaded successfully.")
+            logging.info(
+                f"File :[{self.zip_data_dir}] has been downloaded successfully."
+            )
 
         except Exception as e:
             raise FraudDetectionException(e, sys) from e
@@ -114,7 +106,7 @@ class DataIngestion:
         """
         try:
             is_ingested = False
-      
+
             if is_dir_empty(self.raw_data_dir):
                 raise ValueError("raw_data_dir must contain data file")
 
@@ -228,10 +220,12 @@ class DataIngestion:
                     f"\n{'_':_>10} Timeout reached. Proceeding with Download ... {'_':_>10}\n"
                 )
                 self.download_transaction_data()
-
+        except EOFError:
+            logging.info("downloading data")
+            self.download_transaction_data()
         except Exception as e:
-            raise FraudDetectionException(e,sys) from e
-        else: 
+            raise FraudDetectionException(e, sys) from e
+        else:
             logging.info(f"zip file is in diretory {self.zip_data_dir}")
         finally:
             self.unzip_data()
@@ -242,7 +236,9 @@ class DataIngestion:
             data_ingestion_artifacts(:obj:'DataIngestionArtifact')
         """
         try:
-            self.user_input_to_downloaddata()
+            # self.user_input_to_downloaddata()
+            self.download_transaction_data()
+            self.unzip_data()
             return self.split_data_as_train_test()
         except Exception as e:
             raise FraudDetectionException(e, sys) from e

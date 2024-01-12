@@ -2,7 +2,7 @@
 import os
 import shutil
 import sys
-
+from pathlib import Path
 from fraudDetection.entity import (
     ModelPusherConfig,
     ModelPusherArtifacts,
@@ -11,7 +11,6 @@ from fraudDetection.entity import (
 from fraudDetection.exception import FraudDetectionException
 from fraudDetection.logger import logging
 from fraudDetection.utils import create_directories
-from pathlib import Path
 
 
 class ModelPusher:

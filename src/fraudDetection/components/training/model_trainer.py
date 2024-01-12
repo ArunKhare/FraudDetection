@@ -10,7 +10,6 @@ Note: Ensure MLflow is properly configured with the desired tracking URI.
 import os
 import sys
 from pathlib import Path
-from dotenv import load_dotenv
 import mlflow
 from fraudDetection.exception import FraudDetectionException
 from fraudDetection.logger import logging
@@ -96,11 +95,11 @@ class ModelTrainer:
             )
         except Exception as e:
             raise FraudDetectionException(e, sys) from e
-
+            
+  
     def initiate_model_trainer(self) -> ModelTrainerArtifact:
         """implements the training of models"""
         try:
-            load_dotenv()
             tracking_uri = os.getenv("MLFLOWTRACKINGURI")
 
             if tracking_uri is not None:
