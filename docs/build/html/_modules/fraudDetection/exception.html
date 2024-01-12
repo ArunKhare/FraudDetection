@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>fraudDetection.exception &#8212; FraudDetection 0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b3523f8e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=039e1c02" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=eafc0fe6" />
+    <script src="../../_static/documentation_options.js?v=2709fde1"></script>
+    <script src="../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for fraudDetection.exception</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Fraud Detection Exception Module</span>
+
+<span class="sd">This module defines a custom exception class, FraudDetectionException, for handling exceptions in the fraud detection system.</span>
+
+<span class="sd">Classes:</span>
+<span class="sd">    - FraudDetectionException: Custom exception class for fraud detection.</span>
+
+<span class="sd">Functions:</span>
+<span class="sd">    None</span>
+
+<span class="sd">Attributes:</span>
+<span class="sd">    None</span>
+
+<span class="sd">Usage:</span>
+<span class="sd">    Example usage of the FraudDetectionException class:</span>
+<span class="sd">    </span>
+<span class="sd">    try:</span>
+<span class="sd">        # Code that may raise an exception</span>
+<span class="sd">        raise ValueError(&quot;Invalid input data&quot;)</span>
+<span class="sd">    except ValueError as ve:</span>
+<span class="sd">        # Catch the exception and wrap it with FraudDetectionException</span>
+<span class="sd">        raise FraudDetectionException(ve, sys) from ve</span>
+
+<span class="sd">Classes Description:</span>
+<span class="sd">    - FraudDetectionException: Custom exception class that extends the base Exception class. It includes additional</span>
+<span class="sd">      functionality for generating a detailed error message using the sys module.</span>
+
+<span class="sd">Methods:</span>
+<span class="sd">    - __init__(self, error_message: Exception, error_details: sys): Initializes a FraudDetectionException object with</span>
+<span class="sd">      the original exception object and sys module containing error details.</span>
+
+<span class="sd">    - get_detailed_error_message(error_message: Exception, error_details: sys) -&gt; str: Static method that generates a</span>
+<span class="sd">      detailed error message using information from the original exception and sys module.</span>
+
+<span class="sd">    - __str__(self) -&gt; str: String representation of the exception. Returns the detailed error message.</span>
+
+<span class="sd">    - __repr__(self) -&gt; str: String representation of the class. Returns the class name.</span>
+
+<span class="sd">Example:</span>
+<span class="sd">    Example usage of the FraudDetectionException class:</span>
+
+<span class="sd">    ```python</span>
+<span class="sd">    try:</span>
+<span class="sd">        # Code that may raise an exception</span>
+<span class="sd">        raise ValueError(&quot;Invalid input data&quot;)</span>
+<span class="sd">    except ValueError as ve:</span>
+<span class="sd">        # Catch the exception and wrap it with FraudDetectionException</span>
+<span class="sd">        raise FraudDetectionException(ve, sys) from ve</span>
+<span class="sd">    ```</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">sys</span>
+
+
+<div class="viewcode-block" id="FraudDetectionException">
+<a class="viewcode-back" href="../../fraudDetection.exception.html#fraudDetection.exception.FraudDetectionException">[docs]</a>
+<span class="k">class</span> <span class="nc">FraudDetectionException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">error_message</span><span class="p">:</span> <span class="ne">Exception</span><span class="p">,</span> <span class="n">error_details</span><span class="p">:</span> <span class="n">sys</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes a FraudDetectionException.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            error_message (Exception): The original exception object.</span>
+<span class="sd">            error_details (sys): The sys module object containing error details.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">error_message</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">error_message</span> <span class="o">=</span> <span class="n">FraudDetectionException</span><span class="o">.</span><span class="n">get_detailed_error_message</span><span class="p">(</span>
+            <span class="n">error_message</span><span class="p">,</span> <span class="n">error_details</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="FraudDetectionException.get_detailed_error_message">
+<a class="viewcode-back" href="../../fraudDetection.exception.html#fraudDetection.exception.FraudDetectionException.get_detailed_error_message">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">get_detailed_error_message</span><span class="p">(</span><span class="n">error_message</span><span class="p">:</span> <span class="ne">Exception</span><span class="p">,</span> <span class="n">error_details</span><span class="p">:</span> <span class="n">sys</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generates a detailed error message.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            error_message (Exception): The original exception object.</span>
+<span class="sd">            error_details (sys): The sys module object containing error details.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            str: Detailed error message.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">exec_tb</span> <span class="o">=</span> <span class="n">error_details</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()</span>
+        <span class="n">exception_block_line_number</span> <span class="o">=</span> <span class="n">exec_tb</span><span class="o">.</span><span class="n">tb_frame</span><span class="o">.</span><span class="n">f_lineno</span>
+        <span class="n">try_block_line_number</span> <span class="o">=</span> <span class="n">exec_tb</span><span class="o">.</span><span class="n">tb_lineno</span>
+        <span class="n">file_name</span> <span class="o">=</span> <span class="n">exec_tb</span><span class="o">.</span><span class="n">tb_frame</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_filename</span>
+
+        <span class="n">error_message</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot; </span>
+<span class="s2">        Error occurred in script: [</span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2">] at </span>
+<span class="s2">        try block line number: [</span><span class="si">{</span><span class="n">try_block_line_number</span><span class="si">}</span><span class="s2">] and</span>
+<span class="s2">        exception block line number: [</span><span class="si">{</span><span class="n">exception_block_line_number</span><span class="si">}</span><span class="s2">]</span>
+<span class="s2">        error message: [</span><span class="si">{</span><span class="n">error_message</span><span class="si">}</span><span class="s2">]</span>
+<span class="s2">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">error_message</span></div>
+
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        String representation of the exception.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            str: The error message.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">error_message</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        String representation of the class.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            str: The class name.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">FraudDetectionException</span><span class="o">.</span><span class="vm">__name__</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span></div>
+
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">FraudDetection</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">FraudDetection</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2024, Arun Khare.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 7.2.6</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.13</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
