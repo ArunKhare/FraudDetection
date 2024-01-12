@@ -8,7 +8,6 @@ __pycache__/
 
 # Distribution / packaging
 .Python
-build/
 develop-eggs/
 dist/
 downloads/
@@ -145,7 +144,7 @@ test_code.py
 */snowflake/*
 snowflake*
 .vscode/settings.json
-documentation/*
-documentation/metrics.txt
+documentation
 notebook/online-payments-fraud-detection-dataset.zip
-documentation/metrics.txt
+logs
+.vscode
