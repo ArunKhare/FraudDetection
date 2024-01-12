@@ -16,3 +16,4 @@ sphinx-rtd-theme==2.0.0
 ipykernel==6.23.1
 dvc==2.56.0
 black==23.12.1
+pytest

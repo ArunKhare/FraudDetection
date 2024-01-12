@@ -1,0 +1,41 @@
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+# Poetry configuration
+name = "Fraud-Dectection"
+version = "0.0.0"
+description = "A python project for online Banking transaction fraud detection"
+authors = ["ArunKhare"]
+license = "MIT"
+readme = "README.md"
+repository = "https://github.com/ArunKhare/fraudDetection"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+dill = "^0.3.6"
+imblearn = "^0.0"
+kaggle = "^1.6.0"
+mlflow = "^2.9.2"
+python-decouple = "^3.8"
+python-dotenv = "^0.21.0"
+python-box = "^7.1.1"
+streamlit = "^1.29.0"
+scikit-learn = "^1.2.2"
+ensure = "^1.0.3"
+
+[tool.poetry.group.dev.dependencies]
+# Development dependencies
+Sphinx = "7.2.6"
+sphinx-rtd-theme = "2.0.0"
+ipykernel = "6.23.1"
+dvc = "2.56.0"
+black = "23.12.1"
+pytest = "7.3.1"
+
+[tool.poetry.scripts]
+# Entry points or scripts for testing and linting
+test = "pytest"
+lint = "pylint"
+format = "black"

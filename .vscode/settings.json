@@ -1,7 +1,0 @@
-{
-    "python.analysis.inlayHints.functionReturnTypes": true,
-    "python.analysis.inlayHints.pytestParameters": true,
-    "python.analysis.inlayHints.variableTypes": true,
-    "terminal.integrated.defaultProfile.windows": "PowerShell",
-    "editor.foldingImportsByDefault": true
-}
