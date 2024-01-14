@@ -1,0 +1,37 @@
+FraudDetection.apps package
+===========================
+
+Submodules
+----------
+
+FraudDetection.apps.app module
+------------------------------
+
+.. automodule:: FraudDetection.apps.app
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+FraudDetection.apps.mlflowapp module
+------------------------------------
+
+.. automodule:: FraudDetection.apps.mlflowapp
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+FraudDetection.apps.trainingapp module
+--------------------------------------
+
+.. automodule:: FraudDetection.apps.trainingapp
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: FraudDetection.apps
+   :members:
+   :undoc-members:
+   :show-inheritance:

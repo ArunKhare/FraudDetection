@@ -1,0 +1,10 @@
+FraudDetection.tests.integration package
+========================================
+
+Module contents
+---------------
+
+.. automodule:: FraudDetection.tests.integration
+   :members:
+   :undoc-members:
+   :show-inheritance:

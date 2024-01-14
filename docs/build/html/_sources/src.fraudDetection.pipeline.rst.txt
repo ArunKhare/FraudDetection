@@ -1,0 +1,21 @@
+src.fraudDetection.pipeline package
+===================================
+
+Submodules
+----------
+
+src.fraudDetection.pipeline.pipeline module
+-------------------------------------------
+
+.. automodule:: src.fraudDetection.pipeline.pipeline
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: src.fraudDetection.pipeline
+   :members:
+   :undoc-members:
+   :show-inheritance:

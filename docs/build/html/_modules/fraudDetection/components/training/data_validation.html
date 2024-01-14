@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>fraudDetection.components.training.data_validation &mdash; Fraud-Detection beta:v1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=92fd9be5" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=eafc0fe6" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../_static/documentation_options.js?v=e630dfc1"></script>
+        <script src="../../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            Fraud-Detection
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">FraudDetection</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">Fraud-Detection</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">fraudDetection.components.training.data_validation</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for fraudDetection.components.training.data_validation</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot; This module validates the ingested data with the schema from config yaml&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">fraudDetection.constants</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">DATA_SCHEMA_COLUMNS_KEY</span><span class="p">,</span>
+    <span class="n">DATA_SCHEMA_TARGET_COLUMN_KEY</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">fraudDetection.entity</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">DataValidationConfig</span><span class="p">,</span>
+    <span class="n">DataValidationArtifact</span><span class="p">,</span>
+    <span class="n">DataIngestionArtifact</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">fraudDetection.exception</span> <span class="kn">import</span> <span class="n">FraudDetectionException</span>
+<span class="kn">from</span> <span class="nn">fraudDetection.logger</span> <span class="kn">import</span> <span class="n">logging</span>
+<span class="kn">from</span> <span class="nn">fraudDetection.utils</span> <span class="kn">import</span> <span class="n">create_directories</span><span class="p">,</span> <span class="n">read_yaml</span>
+
+
+<div class="viewcode-block" id="DataValidation">
+<a class="viewcode-back" href="../../../../fraudDetection.components.training.html#fraudDetection.components.training.data_validation.DataValidation">[docs]</a>
+<span class="k">class</span> <span class="nc">DataValidation</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;implements the data vlidation&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">data_ingestion_artifact</span><span class="p">:</span> <span class="n">DataIngestionArtifact</span><span class="p">,</span>
+        <span class="n">data_validation_config</span><span class="p">:</span> <span class="n">DataValidationConfig</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;initialize the Configuration artifacts with paths to artifacts&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="si">{</span><span class="s1">&#39;=&#39;</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">20</span><span class="si">}</span><span class="s2">Data validation log started </span><span class="si">{</span><span class="s1">&#39;=&#39;</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">20</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_validation_config</span><span class="p">:</span> <span class="n">DataValidationConfig</span> <span class="o">=</span> <span class="n">data_validation_config</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_ingestion_artifact</span><span class="p">:</span> <span class="n">DataIngestionArtifact</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">data_ingestion_artifact</span>
+            <span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">FraudDetectionException</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">sys</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+
+<div class="viewcode-block" id="DataValidation.get_train_test_df">
+<a class="viewcode-back" href="../../../../fraudDetection.components.training.html#fraudDetection.components.training.data_validation.DataValidation.get_train_test_df">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_train_test_df</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;validation the schema of data downloaded with the provided schema</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            train_df (obj:&#39;pd.DataFrame&#39;): combining non empty filetraining dataset</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># logging checking training and test files are available</span>
+            <span class="n">train_file_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_ingestion_artifact</span><span class="o">.</span><span class="n">train_file_path</span>
+            <span class="n">test_file_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_ingestion_artifact</span><span class="o">.</span><span class="n">test_file_path</span>
+
+            <span class="n">is_training_path_exist</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">train_file_dir</span><span class="p">)</span>
+            <span class="n">is_testing_path_exist</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">test_file_dir</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">is_training_path_exist</span> <span class="ow">and</span> <span class="n">is_testing_path_exist</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;train_file_dir </span><span class="si">{</span><span class="n">train_file_dir</span><span class="si">}</span><span class="s2"> or test_file_dir </span><span class="si">{</span><span class="n">test_file_dir</span><span class="si">}</span><span class="s2"> does not exist&quot;</span><span class="p">,</span>
+                    <span class="n">sys</span><span class="p">,</span>
+                <span class="p">)</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">train_file_dir</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">test_file_dir</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">train_file_dir</span><span class="si">}</span><span class="s2"> and </span><span class="si">{</span><span class="n">test_file_dir</span><span class="si">}</span><span class="s2"> no file found&quot;</span><span class="p">,</span> <span class="n">sys</span>
+                <span class="p">)</span>
+
+            <span class="c1"># Get a list of files from train and test data dir</span>
+            <span class="n">train_files</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">train_file_dir</span><span class="p">)</span>
+            <span class="n">test_files</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">test_file_dir</span><span class="p">)</span>
+
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Is train file and test file list exist with first files as : </span><span class="si">{</span><span class="n">train_files</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">test_files</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+            <span class="c1"># concat all  the files in the train and test directory and convert them to dataframe</span>
+            <span class="n">train_files</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">train_files</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span>
+            <span class="n">test_files</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">test_files</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span>
+
+            <span class="c1"># number of files in each test and train dir</span>
+            <span class="n">num_files_train</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span>
+                <span class="p">[</span>
+                    <span class="n">f</span>
+                    <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">train_files</span>
+                    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">train_file_dir</span><span class="p">,</span> <span class="n">f</span><span class="p">)))</span>
+                    <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.csv&quot;</span><span class="p">)</span>
+                <span class="p">]</span>
+            <span class="p">)</span>
+            <span class="n">num_files_test</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span>
+                <span class="p">[</span>
+                    <span class="n">f</span>
+                    <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">test_files</span>
+                    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">test_file_dir</span><span class="p">,</span> <span class="n">f</span><span class="p">)))</span>
+                    <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.csv&quot;</span><span class="p">)</span>
+                <span class="p">]</span>
+            <span class="p">)</span>
+
+            <span class="k">def</span> <span class="nf">concat_csv_files</span><span class="p">(</span><span class="n">files</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">file_dir</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+                <span class="n">dfs</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">file</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">files</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">file</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.csv&quot;</span><span class="p">):</span>
+                        <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">file_dir</span><span class="p">,</span> <span class="n">file</span><span class="p">))</span>
+                        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+                        <span class="n">dfs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">dfs</span><span class="p">)</span>
+
+            <span class="n">train_df</span> <span class="o">=</span> <span class="n">concat_csv_files</span><span class="p">(</span><span class="n">train_files</span><span class="p">,</span> <span class="n">train_file_dir</span><span class="p">)</span>
+            <span class="n">test_df</span> <span class="o">=</span> <span class="n">concat_csv_files</span><span class="p">(</span><span class="n">test_files</span><span class="p">,</span> <span class="n">test_file_dir</span><span class="p">)</span>
+
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;train_df and test_df created. Total train_dir CSV files :</span><span class="si">{</span><span class="n">num_files_train</span><span class="si">}</span><span class="s2"> test_dir csv files </span><span class="si">{</span><span class="n">num_files_test</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">train_df</span><span class="p">,</span> <span class="n">test_df</span>
+
+        <span class="k">except</span> <span class="p">(</span><span class="ne">Exception</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">FraudDetectionException</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">sys</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span></div>
+
+
+<div class="viewcode-block" id="DataValidation.validate_dataset_scheme">
+<a class="viewcode-back" href="../../../../fraudDetection.components.training.html#fraudDetection.components.training.data_validation.DataValidation.validate_dataset_scheme">[docs]</a>
+    <span class="k">def</span> <span class="nf">validate_dataset_scheme</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">train_df</span><span class="p">,</span> <span class="n">test_df</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Validating dataset schema with schema provided</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            train_df (_type_): _description_</span>
+<span class="sd">            test_df (_type_): _description_</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            Exception: _description_</span>
+<span class="sd">            Exception: _description_</span>
+<span class="sd">            Exception: _description_</span>
+<span class="sd">            FraudDetectionException: _description_</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            _type_: _description_</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Getting schema</span>
+            <span class="n">schema_file_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_validation_config</span><span class="o">.</span><span class="n">schema_file_path</span>
+            <span class="n">schema</span> <span class="o">=</span> <span class="n">read_yaml</span><span class="p">(</span><span class="n">schema_file_path</span><span class="p">)</span>
+            <span class="n">data_schema</span> <span class="o">=</span> <span class="n">schema</span><span class="p">[</span><span class="n">DATA_SCHEMA_COLUMNS_KEY</span><span class="p">]</span>
+            <span class="n">target_col</span> <span class="o">=</span> <span class="n">schema</span><span class="p">[</span><span class="n">DATA_SCHEMA_TARGET_COLUMN_KEY</span><span class="p">]</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot; train_df: </span><span class="si">{</span><span class="n">train_df</span><span class="o">.</span><span class="n">columns</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">train_df</span><span class="o">.</span><span class="n">dtypes</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2"> test_df: </span><span class="si">{</span><span class="n">test_df</span><span class="o">.</span><span class="n">columns</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">test_df</span><span class="o">.</span><span class="n">dtypes</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Compare Df schemas</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">train_df</span><span class="o">.</span><span class="n">dtypes</span><span class="o">.</span><span class="n">equals</span><span class="p">(</span><span class="n">test_df</span><span class="o">.</span><span class="n">dtypes</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;The schemas of the Test and Train DataFrames are not equal.&quot;</span>
+                <span class="p">)</span>
+
+            <span class="n">missing_cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">col</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">data_schema</span> <span class="k">if</span> <span class="n">col</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">train_df</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
+            <span class="n">mismatch_dtype_cols</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">col</span>
+                <span class="k">for</span> <span class="n">col</span><span class="p">,</span> <span class="n">dtype</span> <span class="ow">in</span> <span class="n">data_schema</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">train_df</span><span class="o">.</span><span class="n">columns</span> <span class="ow">and</span> <span class="n">train_df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="n">dtype</span>
+            <span class="p">]</span>
+
+            <span class="k">if</span> <span class="n">missing_cols</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;The column &#39;</span><span class="si">{</span><span class="n">missing_cols</span><span class="si">}</span><span class="s2">&#39; is missing from the DataFrame schema.&quot;</span>
+                <span class="p">)</span>
+            <span class="k">elif</span> <span class="n">mismatch_dtype_cols</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Data type mismatch detected in </span><span class="si">{</span><span class="n">mismatch_dtype_cols</span><span class="si">}</span><span class="s2">. Expected </span><span class="si">{</span><span class="n">dtype</span><span class="si">}</span><span class="s2">.&quot;</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;train test file schema are as per the Schema </span><span class="si">{</span><span class="n">data_schema</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Data validated&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="n">target_col</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">KeyError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">FraudDetectionException</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error comparing schema: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">sys</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span></div>
+
+
+<div class="viewcode-block" id="DataValidation.get_and_save_drift_report">
+<a class="viewcode-back" href="../../../../fraudDetection.components.training.html#fraudDetection.components.training.data_validation.DataValidation.get_and_save_drift_report">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_and_save_drift_report</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">train_df</span><span class="p">,</span> <span class="n">test_df</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; create a data drift report</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            train_df (_type_): _description_</span>
+<span class="sd">            test_df (_type_): _description_</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            FraudDetectionException: _description_</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            _type_: _description_</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Creating a datadrift report&quot;</span><span class="p">)</span>
+            <span class="n">report_file_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_validation_config</span><span class="o">.</span><span class="n">report_file_path</span>
+            <span class="n">create_directories</span><span class="p">([</span><span class="n">report_file_path</span><span class="p">])</span>
+            <span class="c1"># data_drift_datast_report = Report(metrics=[DatasetDriftMetric(), ])</span>
+
+            <span class="c1"># # record the start time</span>
+            <span class="c1"># start_time = time.time()</span>
+            <span class="c1"># for _ in tqdm(data_drift_datast_report.run(reference_data=train_df,current_data=test_df), mininterval=5, desc=&quot;Running a datadrift report&quot;,KeyboardInterrupt=True):</span>
+            <span class="c1">#     elapsed_time = time.time() - start_time</span>
+            <span class="c1">#     if elapsed_time &gt; 120:</span>
+            <span class="c1">#         raise TimeoutError(&quot;Report generation timed out&quot;)</span>
+
+            <span class="c1"># # data_drift_datast_report.save_json(self.data_validation_config.report_file_path)</span>
+            <span class="c1"># report = json.loads(data_drift_datast_report.json)</span>
+            <span class="c1"># logging.info(f&quot;saving report to {report_file_path}&quot;)</span>
+            <span class="c1"># with open(report_file_path,&quot;w&quot;) as report_file:</span>
+            <span class="c1">#     json.dump(report,report_file,indent=6)</span>
+            <span class="n">message</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Data validated successfully and data drift report saved at </span><span class="si">{</span><span class="n">report_file_path</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2"> </span><span class="si">{</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">data_ingestion_artifact</span><span class="o">.</span><span class="n">message</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;message : </span><span class="si">{</span><span class="n">message</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">message</span>
+        <span class="k">except</span> <span class="ne">TimeoutError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+            <span class="n">message</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Data validated successfully, Datadrift report generation aborted. Data validation timed out </span><span class="se">\n</span><span class="s2"> </span><span class="si">{</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">data_ingestion_artifact</span><span class="o">.</span><span class="n">message</span><span class="p">]</span><span class="si">}</span><span class="s2"> &quot;</span>
+            <span class="k">return</span> <span class="n">message</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">FraudDetectionException</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">sys</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span></div>
+
+
+<div class="viewcode-block" id="DataValidation.check_class_balance">
+<a class="viewcode-back" href="../../../../fraudDetection.components.training.html#fraudDetection.components.training.data_validation.DataValidation.check_class_balance">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">check_class_balance</span><span class="p">(</span><span class="n">strat_train_set</span><span class="p">,</span> <span class="n">strat_test_set</span><span class="p">,</span> <span class="n">target_col</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;static method checks for class imbalance in the target feature</span>
+<span class="sd">        Args:</span>
+<span class="sd">            strat_train_set (obj:&#39;pd.DataFrame&#39;): training dataset</span>
+<span class="sd">            strat_test_set (obj:&#39;pd.DataFrame&#39;): testing dataset</span>
+<span class="sd">            target_col (obj:&#39;pd.Series&#39;): target feature</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            class_proportion_ratio (float): ration of class balance in target feature</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># compute class proportions in the training set</span>
+        <span class="n">train_counts</span> <span class="o">=</span> <span class="n">strat_train_set</span><span class="p">[</span><span class="n">target_col</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span>
+        <span class="n">train_proportions</span> <span class="o">=</span> <span class="n">train_counts</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">strat_train_set</span><span class="p">)</span>
+
+        <span class="c1"># compute class proportions in the test set</span>
+        <span class="n">test_counts</span> <span class="o">=</span> <span class="n">strat_test_set</span><span class="p">[</span><span class="n">target_col</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span>
+        <span class="n">test_proportions</span> <span class="o">=</span> <span class="n">test_counts</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">strat_test_set</span><span class="p">)</span>
+
+        <span class="n">class_proportion_train</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">train_proportions</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">train_proportions</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">class_proportion_test</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">test_proportions</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">test_proportions</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+        <span class="c1"># check if the class proportions are proportional</span>
+        <span class="k">if</span> <span class="n">class_proportion_train</span> <span class="o">&lt;=</span> <span class="mf">0.10</span> <span class="ow">and</span> <span class="n">class_proportion_test</span> <span class="o">&lt;=</span> <span class="mf">0.10</span><span class="p">:</span>
+            <span class="n">message</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;The class proportions are Balanced [Train : </span><span class="si">{</span><span class="n">class_proportion_train</span><span class="si">}</span><span class="s2">, Test : </span><span class="si">{</span><span class="n">class_proportion_test</span><span class="si">}</span><span class="s2">]&quot;</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">message</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;The class proportions are ImBalanced [Train : </span><span class="si">{</span><span class="n">class_proportion_train</span><span class="si">}</span><span class="s2">, Test : </span><span class="si">{</span><span class="n">class_proportion_test</span><span class="si">}</span><span class="s2">]&quot;</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">class_proportion_train</span></div>
+
+
+<div class="viewcode-block" id="DataValidation.initiate_data_validation">
+<a class="viewcode-back" href="../../../../fraudDetection.components.training.html#fraudDetection.components.training.data_validation.DataValidation.initiate_data_validation">[docs]</a>
+    <span class="k">def</span> <span class="nf">initiate_data_validation</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataValidationArtifact</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;implement the data validation</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            data_validation_artifact:(obj:&#39;DataValidationArtifact): artifact having path the validation repots</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">train_df</span><span class="p">,</span> <span class="n">test_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_train_test_df</span><span class="p">()</span>
+            <span class="n">is_data_schema_validated</span><span class="p">,</span> <span class="n">target_col</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">validate_dataset_scheme</span><span class="p">(</span>
+                <span class="n">train_df</span><span class="p">,</span> <span class="n">test_df</span>
+            <span class="p">)</span>
+            <span class="n">class_proportion_train</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_class_balance</span><span class="p">(</span>
+                <span class="n">train_df</span><span class="p">,</span> <span class="n">test_df</span><span class="p">,</span> <span class="n">target_col</span>
+            <span class="p">)</span>
+            <span class="n">message</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_and_save_drift_report</span><span class="p">(</span><span class="n">train_df</span><span class="p">,</span> <span class="n">test_df</span><span class="p">)</span>
+
+            <span class="n">data_validation_artifact</span> <span class="o">=</span> <span class="n">DataValidationArtifact</span><span class="p">(</span>
+                <span class="n">report_file_path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data_validation_config</span><span class="o">.</span><span class="n">report_file_path</span><span class="p">,</span>
+                <span class="n">schema_file_path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data_validation_config</span><span class="o">.</span><span class="n">schema_file_path</span><span class="p">,</span>
+                <span class="n">class_proportion_train</span><span class="o">=</span><span class="n">class_proportion_train</span><span class="p">,</span>
+                <span class="n">is_validated</span><span class="o">=</span><span class="n">is_data_schema_validated</span><span class="p">,</span>
+                <span class="n">message</span><span class="o">=</span><span class="n">message</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Data validation artifact: </span><span class="si">{</span><span class="n">data_validation_artifact</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">data_validation_artifact</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">FraudDetectionException</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">sys</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span></div>
+
+
+    <span class="k">def</span> <span class="fm">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="si">{</span><span class="s1">&#39;=&#39;</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">20</span><span class="si">}</span><span class="s2"> Data Validation Log Completed. </span><span class="si">{</span><span class="s1">&#39;=&#39;</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">20</span><span class="si">}</span><span class="s2"> </span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Arun khare.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

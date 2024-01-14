@@ -1,0 +1,10 @@
+src.fraudDetection.constants package
+====================================
+
+Module contents
+---------------
+
+.. automodule:: src.fraudDetection.constants
+   :members:
+   :undoc-members:
+   :show-inheritance:

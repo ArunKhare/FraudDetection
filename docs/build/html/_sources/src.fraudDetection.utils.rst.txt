@@ -1,0 +1,10 @@
+src.fraudDetection.utils package
+================================
+
+Module contents
+---------------
+
+.. automodule:: src.fraudDetection.utils
+   :members:
+   :undoc-members:
+   :show-inheritance:

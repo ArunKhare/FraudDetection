@@ -1,0 +1,21 @@
+FraudDetection.src.fraudDetection.components.prediction package
+===============================================================
+
+Submodules
+----------
+
+FraudDetection.src.fraudDetection.components.prediction.prediction\_service module
+----------------------------------------------------------------------------------
+
+.. automodule:: FraudDetection.src.fraudDetection.components.prediction.prediction_service
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: FraudDetection.src.fraudDetection.components.prediction
+   :members:
+   :undoc-members:
+   :show-inheritance:

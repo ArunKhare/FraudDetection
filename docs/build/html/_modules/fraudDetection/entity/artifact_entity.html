@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>fraudDetection.entity.artifact_entity &mdash; Fraud-Detection beta:v1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=92fd9be5" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=eafc0fe6" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=e630dfc1"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Fraud-Detection
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">FraudDetection</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Fraud-Detection</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">fraudDetection.entity.artifact_entity</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for fraudDetection.entity.artifact_entity</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module defines data classes for various artifacts used in the project.</span>
+
+<span class="sd">Classes:</span>
+<span class="sd">    - DataIngestionArtifact: Artifact representing the result of data ingestion.</span>
+<span class="sd">    - DataValidationArtifact: Artifact representing the result of data validation.</span>
+<span class="sd">    - DataTransformationArtifact: Artifact representing the result of data transformation.</span>
+<span class="sd">    - ModelTrainerArtifact: Artifact representing the result of model training.</span>
+<span class="sd">    - ModelEvaluationArtifact: Artifact representing the result of model evaluation.</span>
+<span class="sd">    - ModelPusherArtifacts: Artifacts representing the result of model pushing.</span>
+<span class="sd">    - Experiment: Class representing an experiment with associated metadata.</span>
+
+<span class="sd">Attributes:</span>
+<span class="sd">    - train_file_path (Path): Path to the training file.</span>
+<span class="sd">    - test_file_path (Path): Path to the test file.</span>
+<span class="sd">    - is_ingested (bool): Flag indicating whether data is ingested.</span>
+<span class="sd">    - message (str): Additional message related to the artifact.</span>
+
+<span class="sd">    # (similar pattern for attributes in other classes)</span>
+
+<span class="sd">Examples:</span>
+<span class="sd">    - data_ingestion_artifact = DataIngestionArtifact( train_file_path=Path(&quot;/path/to/train.csv&quot;),</span>
+<span class="sd">                                                test_file_path=Path(&quot;/path/to/test.csv&quot;), is_ingested=True,</span>
+<span class="sd">                                                message=&quot;Data successfully ingested.&quot;)</span>
+<span class="sd">    - data_validation_artifact = DataValidationArtifact(report_file_path=Path(&quot;/path/to/validation_report.txt&quot;),</span>
+<span class="sd">                                                schema_file_path=Path(&quot;/path/to/schema.json&quot;),</span>
+<span class="sd">                                                class_proportion_train=0.8, is_validated=True,</span>
+<span class="sd">                                                message=&quot;Data validation completed.&quot;)</span>
+<span class="sd">    - data_transformation_artifact = DataTransformationArtifact(is_transformed=True, message=&quot;Data successfully transformed.&quot;,</span>
+<span class="sd">                                                transformed_train_file_path=Path(&quot;/path/to/transformed_train.csv&quot;),</span>
+<span class="sd">                                                transformed_test_file_path=Path(&quot;/path/to/transformed_test.csv&quot;),</span>
+<span class="sd">                                                processed_object_file_path=Path(&quot;/path/to/processed_object.pkl&quot;),</span>
+<span class="sd">                                                impute_sampler_object_file_path=Path(&quot;/path/to/impute_sampler_object.pkl&quot;))</span>
+
+<span class="sd">    - model_trainer_artifact = ModelTrainerArtifact(is_trained=True,message=&quot;Model training completed successfully.&quot;,</span>
+<span class="sd">                                                trained_model_file_path=Path(&quot;/path/to/trained_model.pkl&quot;), train_accuracy=0.85,</span>
+<span class="sd">                                                test_accuracy=0.82, train_f1_score=0.78,test_f1_score=0.75,</span>
+<span class="sd">                                                 # (Include other attributes similarly))</span>
+<span class="sd">    </span>
+<span class="sd">    - model_evaluation_artifact = ModelEvaluationArtifact(is_model_accepted=True, </span>
+<span class="sd">                                                evaluated_model_path=Path(&quot;/path/to/evaluated_model.pkl&quot;))</span>
+<span class="sd">    simliar for other classes</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">time</span>
+
+
+<div class="viewcode-block" id="DataIngestionArtifact">
+<a class="viewcode-back" href="../../../fraudDetection.entity.html#fraudDetection.entity.artifact_entity.DataIngestionArtifact">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">DataIngestionArtifact</span><span class="p">:</span>
+    <span class="n">train_file_path</span><span class="p">:</span> <span class="n">Path</span>
+    <span class="n">test_file_path</span><span class="p">:</span> <span class="n">Path</span>
+    <span class="n">is_ingested</span><span class="p">:</span> <span class="nb">bool</span>
+    <span class="n">message</span><span class="p">:</span> <span class="nb">str</span></div>
+
+
+
+<div class="viewcode-block" id="DataValidationArtifact">
+<a class="viewcode-back" href="../../../fraudDetection.entity.html#fraudDetection.entity.artifact_entity.DataValidationArtifact">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">DataValidationArtifact</span><span class="p">:</span>
+    <span class="n">report_file_path</span><span class="p">:</span> <span class="n">Path</span>
+    <span class="n">schema_file_path</span><span class="p">:</span> <span class="n">Path</span>
+    <span class="n">class_proportion_train</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">is_validated</span><span class="p">:</span> <span class="nb">bool</span>
+    <span class="n">message</span><span class="p">:</span> <span class="nb">str</span></div>
+
+
+    
+<div class="viewcode-block" id="DataTransformationArtifact">
+<a class="viewcode-back" href="../../../fraudDetection.entity.html#fraudDetection.entity.artifact_entity.DataTransformationArtifact">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">DataTransformationArtifact</span><span class="p">:</span>
+    <span class="n">is_transformed</span><span class="p">:</span> <span class="nb">bool</span>
+    <span class="n">message</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">transformed_train_file_path</span><span class="p">:</span> <span class="n">Path</span>
+    <span class="n">transformed_test_file_path</span><span class="p">:</span> <span class="n">Path</span>
+    <span class="n">processed_object_file_path</span><span class="p">:</span> <span class="n">Path</span>
+    <span class="n">impute_sampler_object_file_path</span><span class="p">:</span> <span class="n">Path</span></div>
+
+
+
+<div class="viewcode-block" id="ModelTrainerArtifact">
+<a class="viewcode-back" href="../../../fraudDetection.entity.html#fraudDetection.entity.artifact_entity.ModelTrainerArtifact">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">ModelTrainerArtifact</span><span class="p">:</span>
+    <span class="n">is_trained</span><span class="p">:</span> <span class="nb">bool</span>
+    <span class="n">message</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">trained_model_file_path</span><span class="p">:</span> <span class="n">Path</span>
+    <span class="n">train_accuracy</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">test_accuracy</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">train_f1_score</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">test_f1_score</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">train_fbeta_score</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">test_fbeta_score</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">train_roc_auc_score</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">test_roc_auc_score</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">train_precision_score</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">test_precision_score</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">train_recall_score</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">test_recall_score</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">model_accuracy</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">train_accuracy_score</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">test_accuracy_score</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">threshold</span><span class="p">:</span> <span class="nb">float</span></div>
+
+
+
+<div class="viewcode-block" id="ModelEvaluationArtifact">
+<a class="viewcode-back" href="../../../fraudDetection.entity.html#fraudDetection.entity.artifact_entity.ModelEvaluationArtifact">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">ModelEvaluationArtifact</span><span class="p">:</span>
+    <span class="n">is_model_accepted</span><span class="p">:</span> <span class="nb">bool</span>
+    <span class="n">evaluated_model_path</span><span class="p">:</span> <span class="n">Path</span></div>
+
+
+
+<div class="viewcode-block" id="ModelPusherArtifacts">
+<a class="viewcode-back" href="../../../fraudDetection.entity.html#fraudDetection.entity.artifact_entity.ModelPusherArtifacts">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">ModelPusherArtifacts</span><span class="p">:</span>
+    <span class="n">is_model_pusher</span><span class="p">:</span> <span class="nb">bool</span>
+    <span class="n">export_model_file_path</span><span class="p">:</span> <span class="n">Path</span></div>
+
+
+
+<div class="viewcode-block" id="Experiment">
+<a class="viewcode-back" href="../../../fraudDetection.entity.html#fraudDetection.entity.artifact_entity.Experiment">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">Experiment</span><span class="p">:</span>
+    <span class="n">experiment_id</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">initialization_timestamp</span><span class="p">:</span> <span class="n">datetime</span>
+    <span class="n">artifact_timestamp</span><span class="p">:</span> <span class="n">datetime</span>
+    <span class="n">running_status</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">start_time</span><span class="p">:</span> <span class="n">time</span>
+    <span class="n">stop_time</span><span class="p">:</span> <span class="n">time</span>
+    <span class="n">execution_time</span><span class="p">:</span> <span class="n">time</span>
+    <span class="n">message</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">experiment_file_path</span><span class="p">:</span> <span class="n">Path</span>
+    <span class="n">accuracy</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">is_model_accepted</span><span class="p">:</span> <span class="nb">str</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Arun khare.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

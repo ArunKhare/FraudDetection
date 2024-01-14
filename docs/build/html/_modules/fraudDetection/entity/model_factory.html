@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>fraudDetection.entity.model_factory &mdash; Fraud-Detection beta:v1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=92fd9be5" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=eafc0fe6" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=e630dfc1"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Fraud-Detection
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">fraudDetection</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Fraud-Detection</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">fraudDetection.entity.model_factory</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for fraudDetection.entity.model_factory</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;This module initialize the models from config.yaml to the instance of sklearn models</span>
+<span class="sd">It provides functionalities to evaluate the trained models on various metrics and select the best model based on specified criteria.</span>
+
+<span class="sd">Module Functions:</span>
+<span class="sd">    - evaluate_classification_model: Evaluates the models on metrics like F1 score, precision, recall, ROC-AUC, etc.</span>
+<span class="sd">    - ModelFactory: Class for cross-validating models and obtaining the best model configurations from config.yaml.</span>
+<span class="sd">    - class_for_name: Instantiates sklearn models from the classes specified in the config file.</span>
+<span class="sd">    - update_property_of_class: Updates the parameters of the sklearn class.</span>
+<span class="sd">    - execute_grid_search_operation: Performs parameter search operation using GridSearchCV.</span>
+<span class="sd">    - get_initialized_model_list: Retrieves a list of all initialized models from the configuration file.</span>
+<span class="sd">    - initiate_best_parameter_search_for_initialized_models: Initiates the best parameter search for each initialized model.</span>
+<span class="sd">    - get_best_model_from_grid_searched_best_model_list: Selects the best model from the list of GridSearchedBestModel instances.</span>
+<span class="sd">    - get_best_model: Initializes models from the configuration file, performs grid search, and selects the best model.</span>
+
+<span class="sd">Classes:</span>
+<span class="sd">    - InitializedModelDetails: Represents details of an initialized model.</span>
+<span class="sd">    - GridSearchedBestModel: Represents the best model obtained from grid search.</span>
+<span class="sd">    - BestModel: Represents the final best model selected based on specified criteria.</span>
+<span class="sd">    - MetricInfoArtifact: Represents a dictionary of evaluated metrics as an artifact.</span>
+
+<span class="sd">Note: valid config &#39;model.yaml&#39;_ within the config directory fraudDetection package,.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
+<span class="kn">import</span> <span class="nn">importlib</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">yaml</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">f1_score</span><span class="p">,</span>
+    <span class="n">fbeta_score</span><span class="p">,</span>
+    <span class="n">roc_auc_score</span><span class="p">,</span>
+    <span class="n">precision_recall_curve</span><span class="p">,</span>
+    <span class="n">recall_score</span><span class="p">,</span>
+    <span class="n">classification_report</span><span class="p">,</span>
+    <span class="n">precision_score</span><span class="p">,</span>
+    <span class="n">accuracy_score</span><span class="p">,</span>
+    <span class="n">make_scorer</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">fraudDetection.exception</span> <span class="kn">import</span> <span class="n">FraudDetectionException</span>
+<span class="kn">from</span> <span class="nn">fraudDetection.logger</span> <span class="kn">import</span> <span class="n">logging</span>
+
+<span class="kn">from</span> <span class="nn">fraudDetection.constants</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">FACTORY_CLASS_KEY</span><span class="p">,</span>
+    <span class="n">FACTORY_GRID_SEARCH_KEY</span><span class="p">,</span>
+    <span class="n">FACTORY_MODEL_SELECTION_KEY</span><span class="p">,</span>
+    <span class="n">FACTORY_MODULE_KEY</span><span class="p">,</span>
+    <span class="n">FACTORY_SEARCH_PARAM_GRID_KEY</span><span class="p">,</span>
+    <span class="n">FACTORY_PARAMS_KEY</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">fraudDetection.entity</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">InitializedModelDetails</span><span class="p">,</span>
+    <span class="n">GridSearchedBestModel</span><span class="p">,</span>
+    <span class="n">BestModel</span><span class="p">,</span>
+    <span class="n">MetricInfoArtifact</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<div class="viewcode-block" id="evaluate_classification_model">
+<a class="viewcode-back" href="../../../fraudDetection.entity.html#fraudDetection.entity.model_factory.evaluate_classification_model">[docs]</a>
+<span class="k">def</span> <span class="nf">evaluate_classification_model</span><span class="p">(</span>
+    <span class="n">model_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+    <span class="n">X_train</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">y_train</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">X_test</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">y_test</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">base_score</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.6</span><span class="p">,</span>
+    <span class="n">threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.05</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MetricInfoArtifact</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Module level function to evaluate the models on the basis of metrics</span>
+<span class="sd">    Args:</span>
+<span class="sd">        model_list (List(str): list of trained models to be evaluated</span>
+<span class="sd">        X_train (obj:&#39;Numpy.ndarray&#39;): array of training dataset</span>
+<span class="sd">        y_train (obj:&#39;Numpy.ndarray&#39;): array of training target feature</span>
+<span class="sd">        X_test: (obj:&#39;Numpy.ndarray&#39;): array of test dataset</span>
+<span class="sd">        y_test  (obj:&#39;Numpy.ndarray&#39;): array of test target feature</span>
+<span class="sd">        base_score (float = 0.6): base scire of metric to be evaluated</span>
+<span class="sd">        threshold (float = 0.05): diff threshold of test and train  metrics</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        metric_info_artifact (obj:&#39;MetricInfoArtifact&#39;): dict of evaluted matrics as artifact</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">index_number</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">metric_info_artifact</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="c1"># initial_base_score = 0</span>
+        <span class="k">for</span> <span class="n">model</span> <span class="ow">in</span> <span class="n">model_list</span><span class="p">:</span>
+            <span class="n">model_name</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="si">{</span><span class="s1">&#39;&gt;&gt;&#39;</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">20</span><span class="si">}</span><span class="s2"> Starting evaluating model:</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">model</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}{</span><span class="s1">&#39;&lt;&lt;&#39;</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">20</span><span class="si">}</span><span class="s2"> &quot;</span>
+            <span class="p">)</span>
+
+            <span class="c1"># getting prediction for training and testing dataset</span>
+            <span class="n">y_train_pred</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span>
+            <span class="n">y_test_pred</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+
+            <span class="c1"># calculating f1 score on training and testing dataset</span>
+            <span class="n">train_f1_score</span> <span class="o">=</span> <span class="n">f1_score</span><span class="p">(</span><span class="n">y_train</span><span class="p">,</span> <span class="n">y_train_pred</span><span class="p">)</span>
+            <span class="n">test_f1_score</span> <span class="o">=</span> <span class="n">f1_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_test_pred</span><span class="p">)</span>
+
+            <span class="c1"># calculating f-beta-score on training and testing dataset</span>
+            <span class="n">train_fbeta_score</span> <span class="o">=</span> <span class="n">fbeta_score</span><span class="p">(</span><span class="n">y_train</span><span class="p">,</span> <span class="n">y_train_pred</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+            <span class="n">test_fbeta_score</span> <span class="o">=</span> <span class="n">fbeta_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_test_pred</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+            <span class="c1"># calculating f-betas-core on training and testing dataset</span>
+            <span class="n">train_roc_auc_score</span> <span class="o">=</span> <span class="n">roc_auc_score</span><span class="p">(</span><span class="n">y_train</span><span class="p">,</span> <span class="n">y_train_pred</span><span class="p">)</span>
+            <span class="n">test_roc_auc_score</span> <span class="o">=</span> <span class="n">roc_auc_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_test_pred</span><span class="p">)</span>
+
+            <span class="c1"># calculating precision  score for training and testing dataset</span>
+            <span class="n">train_precision_score</span> <span class="o">=</span> <span class="n">precision_score</span><span class="p">(</span><span class="n">y_train</span><span class="p">,</span> <span class="n">y_train_pred</span><span class="p">)</span>
+            <span class="n">test_precision_score</span> <span class="o">=</span> <span class="n">precision_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_test_pred</span><span class="p">)</span>
+            <span class="c1"># calculating recall score on training and testing dataset</span>
+            <span class="n">train_recall_score</span> <span class="o">=</span> <span class="n">recall_score</span><span class="p">(</span><span class="n">y_train</span><span class="p">,</span> <span class="n">y_train_pred</span><span class="p">)</span>
+            <span class="n">test_recall_score</span> <span class="o">=</span> <span class="n">recall_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_test_pred</span><span class="p">)</span>
+
+            <span class="c1"># getting classification report on training and testing dataset</span>
+            <span class="n">train_classification_report</span> <span class="o">=</span> <span class="n">classification_report</span><span class="p">(</span><span class="n">y_train</span><span class="p">,</span> <span class="n">y_train_pred</span><span class="p">)</span>
+            <span class="n">test_classification_report</span> <span class="o">=</span> <span class="n">classification_report</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_test_pred</span><span class="p">)</span>
+
+            <span class="n">train_precision_recall_curve</span> <span class="o">=</span> <span class="n">precision_recall_curve</span><span class="p">(</span><span class="n">y_train</span><span class="p">,</span> <span class="n">y_train_pred</span><span class="p">)</span>
+            <span class="n">test_precision_recall_curve</span> <span class="o">=</span> <span class="n">precision_recall_curve</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_test_pred</span><span class="p">)</span>
+
+            <span class="c1"># Accuracy Score on train and test dataset</span>
+            <span class="n">train_accuracy_score</span> <span class="o">=</span> <span class="n">accuracy_score</span><span class="p">(</span><span class="n">y_train</span><span class="p">,</span> <span class="n">y_train_pred</span><span class="p">)</span>
+            <span class="n">test_accuracy_score</span> <span class="o">=</span> <span class="n">accuracy_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_test_pred</span><span class="p">)</span>
+
+            <span class="c1"># logging all important metric</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="si">{</span><span class="s1">&#39;&gt;&gt;&#39;</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">20</span><span class="si">}</span><span class="s2">Score </span><span class="si">{</span><span class="s1">&#39;&lt;&lt;&#39;</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">20</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;F1 Score: train </span><span class="si">{</span><span class="n">train_f1_score</span><span class="si">}</span><span class="s2">, test </span><span class="si">{</span><span class="n">test_f1_score</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;F-beta Score: train </span><span class="si">{</span><span class="n">train_fbeta_score</span><span class="si">}</span><span class="s2">, test </span><span class="si">{</span><span class="n">test_fbeta_score</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Roc_Auc Score: train </span><span class="si">{</span><span class="n">train_roc_auc_score</span><span class="si">}</span><span class="s2">, test </span><span class="si">{</span><span class="n">test_roc_auc_score</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Precision Score :  train </span><span class="si">{</span><span class="n">train_precision_score</span><span class="si">}</span><span class="s2"> test </span><span class="si">{</span><span class="n">test_precision_score</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Recall Score : train </span><span class="si">{</span><span class="n">train_recall_score</span><span class="si">}</span><span class="s2"> test </span><span class="si">{</span><span class="n">test_recall_score</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Classification Report : train </span><span class="se">\n</span><span class="s2"> </span><span class="si">{</span><span class="n">train_classification_report</span><span class="si">}</span><span class="s2"> test </span><span class="se">\n</span><span class="s2"> </span><span class="si">{</span><span class="n">test_classification_report</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Precision Recall Curve: train </span><span class="si">{</span><span class="n">train_precision_recall_curve</span><span class="si">}</span><span class="s2">, test </span><span class="si">{</span><span class="n">test_precision_recall_curve</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Accuracy Score: train  </span><span class="si">{</span><span class="n">train_accuracy_score</span><span class="si">}</span><span class="s2"> test </span><span class="si">{</span><span class="n">test_recall_score</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+            <span class="c1"># calculating harmonic mean of train and test accuracy_score</span>
+            <span class="n">model_accuracy</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">train_accuracy_score</span> <span class="o">*</span> <span class="n">test_accuracy_score</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span>
+                <span class="n">train_accuracy_score</span> <span class="o">+</span> <span class="n">test_accuracy_score</span>
+            <span class="p">)</span>
+            <span class="n">diff_test_train_acc</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">train_accuracy_score</span> <span class="o">-</span> <span class="n">test_accuracy_score</span><span class="p">)</span>
+
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Diff. test train accuracy: </span><span class="si">{</span><span class="n">diff_test_train_acc</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Model accuracy: </span><span class="si">{</span><span class="n">model_accuracy</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="c1"># defining threshold</span>
+            <span class="k">if</span> <span class="n">train_fbeta_score</span> <span class="o">&gt;=</span> <span class="n">base_score</span> <span class="ow">and</span> <span class="n">diff_test_train_acc</span> <span class="o">&lt;</span> <span class="n">threshold</span><span class="p">:</span>
+                <span class="c1"># base_score = train_fbeta_score</span>
+                <span class="n">metric_info_artifact</span> <span class="o">=</span> <span class="n">MetricInfoArtifact</span><span class="p">(</span>
+                    <span class="n">model_name</span><span class="o">=</span><span class="n">model_name</span><span class="p">,</span>
+                    <span class="n">model_object</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
+                    <span class="n">train_f1_score</span><span class="o">=</span><span class="n">train_f1_score</span><span class="p">,</span>
+                    <span class="n">test_f1_score</span><span class="o">=</span><span class="n">test_f1_score</span><span class="p">,</span>
+                    <span class="n">train_fbeta_score</span><span class="o">=</span><span class="n">train_fbeta_score</span><span class="p">,</span>
+                    <span class="n">test_fbeta_score</span><span class="o">=</span><span class="n">test_fbeta_score</span><span class="p">,</span>
+                    <span class="n">train_roc_auc_score</span><span class="o">=</span><span class="n">train_roc_auc_score</span><span class="p">,</span>
+                    <span class="n">test_roc_auc_score</span><span class="o">=</span><span class="n">test_roc_auc_score</span><span class="p">,</span>
+                    <span class="n">train_precision_score</span><span class="o">=</span><span class="n">train_precision_score</span><span class="p">,</span>
+                    <span class="n">test_precision_score</span><span class="o">=</span><span class="n">test_precision_score</span><span class="p">,</span>
+                    <span class="n">train_recall_score</span><span class="o">=</span><span class="n">train_recall_score</span><span class="p">,</span>
+                    <span class="n">test_recall_score</span><span class="o">=</span><span class="n">test_recall_score</span><span class="p">,</span>
+                    <span class="n">model_accuracy</span><span class="o">=</span><span class="n">model_accuracy</span><span class="p">,</span>
+                    <span class="n">train_accuracy_score</span><span class="o">=</span><span class="n">train_accuracy_score</span><span class="p">,</span>
+                    <span class="n">test_accuracy_score</span><span class="o">=</span><span class="n">test_accuracy_score</span><span class="p">,</span>
+                    <span class="n">model_index</span><span class="o">=</span><span class="n">index_number</span><span class="p">,</span>
+                <span class="p">)</span>
+
+                <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Acceptable model found </span><span class="si">{</span><span class="n">metric_info_artifact</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">index_number</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="k">if</span> <span class="n">metric_info_artifact</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;No Models score &gt; base_score: f-beta </span><span class="si">{</span><span class="n">train_fbeta_score</span><span class="p">,</span><span class="w"> </span><span class="n">test_fbeta_score</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Models score  diff_test_train_accuracy: </span><span class="si">{</span><span class="n">diff_test_train_acc</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">metric_info_artifact</span>
+
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">FraudDetectionException</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">sys</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span></div>
+
+
+
+<div class="viewcode-block" id="ModelFactory">
+<a class="viewcode-back" href="../../../fraudDetection.entity.html#fraudDetection.entity.model_factory.ModelFactory">[docs]</a>
+<span class="k">class</span> <span class="nc">ModelFactory</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;cross validating the models and getting the best model configurations for models in config.yaml&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">model_config_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;initialized ModelFactory object</span>
+<span class="sd">        Args:</span>
+<span class="sd">            mode_config_path (str): to store path to config.yaml</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="n">ModelFactory</span><span class="o">.</span><span class="n">read_params</span><span class="p">(</span><span class="n">model_config_path</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">grid_search_cv_module</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="n">FACTORY_GRID_SEARCH_KEY</span><span class="p">][</span>
+                <span class="n">FACTORY_MODULE_KEY</span>
+            <span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">grid_search_class_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="n">FACTORY_GRID_SEARCH_KEY</span><span class="p">][</span>
+                <span class="n">FACTORY_CLASS_KEY</span>
+            <span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">grid_search_property_data</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="n">FACTORY_GRID_SEARCH_KEY</span><span class="p">][</span><span class="n">FACTORY_PARAMS_KEY</span><span class="p">]</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">models_initialized_model_config</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="n">FACTORY_MODEL_SELECTION_KEY</span><span class="p">]</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">initialized_model_list</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">grid_search_best_model_list</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">FraudDetectionException</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">sys</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+
+<div class="viewcode-block" id="ModelFactory.read_params">
+<a class="viewcode-back" href="../../../fraudDetection.entity.html#fraudDetection.entity.model_factory.ModelFactory.read_params">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">read_params</span><span class="p">(</span><span class="n">config_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Read Parameters form model.yaml file</span>
+<span class="sd">        Args:</span>
+<span class="sd">            config_path (str): Path to model config file</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            config  (Dict): parameters for model tunning</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">config_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">yaml_file</span><span class="p">:</span>
+                <span class="n">config</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">yaml_file</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">config</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">FraudDetectionException</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">sys</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ModelFactory.class_for_name">
+<a class="viewcode-back" href="../../../fraudDetection.entity.html#fraudDetection.entity.model_factory.ModelFactory.class_for_name">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">class_for_name</span><span class="p">(</span><span class="n">module_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">class_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;instantiate the sklearn model from models in model config file</span>
+<span class="sd">        Args:</span>
+<span class="sd">            module_name (str): module name of sklearn model  mention in config file</span>
+<span class="sd">            class_name (str): model class name</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            class_ref (obj:&#39;sklearn&#39;): referenc to the model class</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># load the module, will raise ImportError if module cannot be loaded</span>
+            <span class="n">module</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="n">module_name</span><span class="p">)</span>
+            <span class="c1"># get the class, will raise attribute error if class cannot be found</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Executing command: from </span><span class="si">{</span><span class="n">module</span><span class="si">}</span><span class="s2"> import </span><span class="si">{</span><span class="n">class_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">class_ref</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">class_name</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">class_ref</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">FraudDetectionException</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">sys</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span></div>
+
+
+<div class="viewcode-block" id="ModelFactory.update_property_of_class">
+<a class="viewcode-back" href="../../../fraudDetection.entity.html#fraudDetection.entity.model_factory.ModelFactory.update_property_of_class">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">update_property_of_class</span><span class="p">(</span><span class="n">instance_ref</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">property_data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;update the parameters of the sklearn class</span>
+<span class="sd">        Args:</span>
+<span class="sd">            instance_ref (obj:&#39;sklearn&#39;): instance of class</span>
+<span class="sd">            property_data (dict): parameters of class</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            instance_ref (obj:&#39;sklearn): instance with parameters updated</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">property_data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;property data parameter required to be a dictionary&quot;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">property_data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Executing : $</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">instance_ref</span><span class="p">)</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="nb">setattr</span><span class="p">(</span><span class="n">instance_ref</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">instance_ref</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">FraudDetectionException</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">sys</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span></div>
+
+
+<div class="viewcode-block" id="ModelFactory.execute_grid_search_operation">
+<a class="viewcode-back" href="../../../fraudDetection.entity.html#fraudDetection.entity.model_factory.ModelFactory.execute_grid_search_operation">[docs]</a>
+    <span class="k">def</span> <span class="nf">execute_grid_search_operation</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">initialized_model</span><span class="p">:</span> <span class="n">InitializedModelDetails</span><span class="p">,</span> <span class="n">input_feature</span><span class="p">,</span> <span class="n">output_feature</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GridSearchedBestModel</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        function will perform parameter search operation, and it will return you the best optimistic  model with the</span>
+<span class="sd">        best parameter:</span>
+<span class="sd">        Args:</span>
+<span class="sd">            input_feature (obj:&#39;pd.DataFrame&#39;):  all input features</span>
+<span class="sd">            output_featur (obj:&#39;pd.Series&#39;): Target/Dependent features</span>
+<span class="sd">            initalized_model(obj:&#39;InitializedModelsDetails&#39;): initialized model from the list</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            grid_search_best_model (obj:&#39;GridSearchedBestModel&#39;: contains &#39;best (model,parameters,score)&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># instantiating GridSearch CV</span>
+            <span class="n">grid_search_cv_ref</span> <span class="o">=</span> <span class="n">ModelFactory</span><span class="o">.</span><span class="n">class_for_name</span><span class="p">(</span>
+                <span class="n">module_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">grid_search_cv_module</span><span class="p">,</span>
+                <span class="n">class_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">grid_search_class_name</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">grid_search_cv</span> <span class="o">=</span> <span class="n">grid_search_cv_ref</span><span class="p">(</span>
+                <span class="n">estimator</span><span class="o">=</span><span class="n">initialized_model</span><span class="o">.</span><span class="n">model</span><span class="p">,</span>
+                <span class="n">param_grid</span><span class="o">=</span><span class="n">initialized_model</span><span class="o">.</span><span class="n">param_grid_search</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="n">scoring</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;f1&quot;</span><span class="p">:</span> <span class="n">make_scorer</span><span class="p">(</span><span class="n">f1_score</span><span class="p">),</span>
+                <span class="s2">&quot;precision&quot;</span><span class="p">:</span> <span class="n">make_scorer</span><span class="p">(</span><span class="n">precision_score</span><span class="p">),</span>
+            <span class="p">}</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">grid_search_property_data</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;scoring&quot;</span><span class="p">:</span> <span class="n">scoring</span><span class="p">,</span> <span class="s2">&quot;refit&quot;</span><span class="p">:</span> <span class="s2">&quot;f1&quot;</span><span class="p">})</span>
+
+            <span class="n">grid_search_cv</span> <span class="o">=</span> <span class="n">ModelFactory</span><span class="o">.</span><span class="n">update_property_of_class</span><span class="p">(</span>
+                <span class="n">grid_search_cv</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid_search_property_data</span>
+            <span class="p">)</span>
+
+            <span class="n">message</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="si">{</span><span class="s2">&quot;&gt;&gt;&quot;</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">20</span><span class="si">}</span><span class="s1"> Training </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">initialized_model</span><span class="o">.</span><span class="n">model</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1"> Started </span><span class="si">{</span><span class="s2">&quot;&lt;&lt;&quot;</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">20</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+
+            <span class="n">grid_search_cv</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">input_feature</span><span class="p">,</span> <span class="n">output_feature</span><span class="p">)</span>
+
+            <span class="n">grid_search_best_model</span> <span class="o">=</span> <span class="n">GridSearchedBestModel</span><span class="p">(</span>
+                <span class="n">model_serial_number</span><span class="o">=</span><span class="n">initialized_model</span><span class="o">.</span><span class="n">model_serial_number</span><span class="p">,</span>
+                <span class="n">model</span><span class="o">=</span><span class="n">initialized_model</span><span class="o">.</span><span class="n">model</span><span class="p">,</span>
+                <span class="n">best_model</span><span class="o">=</span><span class="n">grid_search_cv</span><span class="o">.</span><span class="n">best_estimator_</span><span class="p">,</span>
+                <span class="n">best_parameters</span><span class="o">=</span><span class="n">grid_search_cv</span><span class="o">.</span><span class="n">best_params_</span><span class="p">,</span>
+                <span class="n">best_score</span><span class="o">=</span><span class="n">grid_search_cv</span><span class="o">.</span><span class="n">best_score_</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="n">grid_search_best_model</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">FraudDetectionException</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">sys</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span></div>
+
+
+<div class="viewcode-block" id="ModelFactory.get_initialized_model_list">
+<a class="viewcode-back" href="../../../fraudDetection.entity.html#fraudDetection.entity.model_factory.ModelFactory.get_initialized_model_list">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_initialized_model_list</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">InitializedModelDetails</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;get the list of  all the initialized model</span>
+<span class="sd">        Returns:</span>
+<span class="sd">           model_initialization_config (obj:&#39;InitializedModelDetails&#39;): list of initialized model, params, name</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">initialized_model_list</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">model_serial_number</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">models_initialized_model_config</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="n">model_initialization_config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">models_initialized_model_config</span><span class="p">[</span>
+                    <span class="n">model_serial_number</span>
+                <span class="p">]</span>
+                <span class="n">model_obj_ref</span> <span class="o">=</span> <span class="n">ModelFactory</span><span class="o">.</span><span class="n">class_for_name</span><span class="p">(</span>
+                    <span class="n">module_name</span><span class="o">=</span><span class="n">model_initialization_config</span><span class="p">[</span><span class="n">FACTORY_MODULE_KEY</span><span class="p">],</span>
+                    <span class="n">class_name</span><span class="o">=</span><span class="n">model_initialization_config</span><span class="p">[</span><span class="n">FACTORY_CLASS_KEY</span><span class="p">],</span>
+                <span class="p">)</span>
+
+                <span class="n">model</span> <span class="o">=</span> <span class="n">model_obj_ref</span><span class="p">()</span>
+
+                <span class="k">if</span> <span class="n">FACTORY_PARAMS_KEY</span> <span class="ow">in</span> <span class="n">model_initialization_config</span><span class="p">:</span>
+                    <span class="n">model_obj_property_data</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+                        <span class="n">model_initialization_config</span><span class="p">[</span><span class="n">FACTORY_PARAMS_KEY</span><span class="p">]</span>
+                    <span class="p">)</span>
+                    <span class="n">model</span> <span class="o">=</span> <span class="n">ModelFactory</span><span class="o">.</span><span class="n">update_property_of_class</span><span class="p">(</span>
+                        <span class="n">instance_ref</span><span class="o">=</span><span class="n">model</span><span class="p">,</span> <span class="n">property_data</span><span class="o">=</span><span class="n">model_obj_property_data</span>
+                    <span class="p">)</span>
+                <span class="n">param_grid_search</span> <span class="o">=</span> <span class="n">model_initialization_config</span><span class="p">[</span>
+                    <span class="n">FACTORY_SEARCH_PARAM_GRID_KEY</span>
+                <span class="p">]</span>
+                <span class="n">model_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">model_initialization_config</span><span class="p">[</span><span class="n">FACTORY_MODULE_KEY</span><span class="p">]</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">model_initialization_config</span><span class="p">[</span><span class="n">FACTORY_CLASS_KEY</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+
+                <span class="n">model_initialization_config</span> <span class="o">=</span> <span class="n">InitializedModelDetails</span><span class="p">(</span>
+                    <span class="n">model_serial_number</span><span class="o">=</span><span class="n">model_serial_number</span><span class="p">,</span>
+                    <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
+                    <span class="n">param_grid_search</span><span class="o">=</span><span class="n">param_grid_search</span><span class="p">,</span>
+                    <span class="n">model_name</span><span class="o">=</span><span class="n">model_name</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="n">initialized_model_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">model_initialization_config</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">initialized_model_list</span> <span class="o">=</span> <span class="n">initialized_model_list</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">initialized_model_list</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">FraudDetectionException</span> <span class="kn">from</span> <span class="nn">e</span></div>
+
+
+<div class="viewcode-block" id="ModelFactory.initiate_best_parameter_search_for_initialized_models">
+<a class="viewcode-back" href="../../../fraudDetection.entity.html#fraudDetection.entity.model_factory.ModelFactory.initiate_best_parameter_search_for_initialized_models">[docs]</a>
+    <span class="k">def</span> <span class="nf">initiate_best_parameter_search_for_initialized_models</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">initialized_model_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">InitializedModelDetails</span><span class="p">],</span>
+        <span class="n">input_feature</span><span class="p">,</span>
+        <span class="n">output_feature</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">GridSearchedBestModel</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        function will perform parameter search operation for</span>
+<span class="sd">        each model in list, it will return you the best optimistic  model with the</span>
+<span class="sd">        Args:</span>
+<span class="sd">            initialized_model_list (obj:List(InitializedModelDetails)): list of initialized models</span>
+<span class="sd">            input_feature (obj:&#39;pd.DataFrame&#39;): input data features</span>
+<span class="sd">            Output_feature (obj:&#39;pd.DataFrame&#39;): output data features</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            grid_search_best_model_list(obj:&#39;List(GridSearchedBestModel)&#39;): contains</span>
+<span class="sd">            best parameter:</span>
+<span class="sd">            estimator: Model object</span>
+<span class="sd">            param_grid: dictionary of parameter to perform search operation</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">grid_search_best_model_list</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">initialized_model</span> <span class="ow">in</span> <span class="n">initialized_model_list</span><span class="p">:</span>
+                <span class="n">grid_searched_best_model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">execute_grid_search_operation</span><span class="p">(</span>
+                    <span class="n">initialized_model</span><span class="o">=</span><span class="n">initialized_model</span><span class="p">,</span>
+                    <span class="n">input_feature</span><span class="o">=</span><span class="n">input_feature</span><span class="p">,</span>
+                    <span class="n">output_feature</span><span class="o">=</span><span class="n">output_feature</span><span class="p">,</span>
+                <span class="p">)</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">grid_search_best_model_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">grid_searched_best_model</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid_search_best_model_list</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">FraudDetectionException</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">sys</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span></div>
+
+
+<div class="viewcode-block" id="ModelFactory.get_best_model_from_grid_searched_best_model_list">
+<a class="viewcode-back" href="../../../fraudDetection.entity.html#fraudDetection.entity.model_factory.ModelFactory.get_best_model_from_grid_searched_best_model_list">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">get_best_model_from_grid_searched_best_model_list</span><span class="p">(</span>
+        <span class="n">grid_searched_best_model_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">GridSearchedBestModel</span><span class="p">],</span> <span class="n">base_score</span><span class="o">=</span><span class="mf">0.6</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BestModel</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        function Accepts the models with score greater than base accuracy threshold.</span>
+<span class="sd">        raise exception if no model accuracy greater than base accuracy found.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            grid_searched_best_model_list (obj:&#39;List(GridSearchedBestModel)&#39;): list of Grid-searched best models</span>
+<span class="sd">            base_score (float): accuracy threshold set</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            best models (obj:&#39;sklearn&#39;) : model with best fbeta and accuracy score</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">best_model</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">for</span> <span class="n">grid_searched_best_model</span> <span class="ow">in</span> <span class="n">grid_searched_best_model_list</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">base_score</span> <span class="o">&lt;</span> <span class="n">grid_searched_best_model</span><span class="o">.</span><span class="n">best_score</span><span class="p">:</span>
+                    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Acceptable model found: </span><span class="si">{</span><span class="n">grid_searched_best_model</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="n">base_score</span> <span class="o">=</span> <span class="n">grid_searched_best_model</span><span class="o">.</span><span class="n">best_score</span>
+                    <span class="n">best_model</span> <span class="o">=</span> <span class="n">grid_searched_best_model</span>
+
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">best_model</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;None of Model has base Accuracy: </span><span class="si">{</span><span class="n">base_score</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+                <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Best model: </span><span class="si">{</span><span class="n">best_model</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">best_model</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">FraudDetectionException</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">sys</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span></div>
+
+
+<div class="viewcode-block" id="ModelFactory.get_best_model">
+<a class="viewcode-back" href="../../../fraudDetection.entity.html#fraudDetection.entity.model_factory.ModelFactory.get_best_model">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_best_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">base_score</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BestModel</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;implement the Grid search</span>
+<span class="sd">        Args:</span>
+<span class="sd">            X (obj:&#39;pd.DataFrame&#39;): input data</span>
+<span class="sd">            y (obj:&#39;pd.DataFrame&#39;): target input</span>
+<span class="sd">        Return:</span>
+<span class="sd">            object (obj:&#39;sklearn&#39;): best model</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Started Initializing model from config file&quot;</span><span class="p">)</span>
+            <span class="n">initialized_model_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span>
+                <span class="n">InitializedModelDetails</span>
+            <span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_initialized_model_list</span><span class="p">()</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;initialized model : </span><span class="si">{</span><span class="n">initialized_model_list</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="n">grid_searched_best_model_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span>
+                <span class="n">GridSearchedBestModel</span>
+            <span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">initiate_best_parameter_search_for_initialized_models</span><span class="p">(</span>
+                <span class="n">initialized_model_list</span><span class="o">=</span><span class="n">initialized_model_list</span><span class="p">,</span>
+                <span class="n">input_feature</span><span class="o">=</span><span class="n">X</span><span class="p">,</span>
+                <span class="n">output_feature</span><span class="o">=</span><span class="n">y</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="n">ModelFactory</span><span class="o">.</span><span class="n">get_best_model_from_grid_searched_best_model_list</span><span class="p">(</span>
+                <span class="n">grid_searched_best_model_list</span><span class="o">=</span><span class="n">grid_searched_best_model_list</span><span class="p">,</span>
+                <span class="n">base_score</span><span class="o">=</span><span class="n">base_score</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">FraudDetectionException</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">sys</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Arun khare.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

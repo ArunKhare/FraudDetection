@@ -1,0 +1,10 @@
+FraudDetection.src.fraudDetection.exception package
+===================================================
+
+Module contents
+---------------
+
+.. automodule:: FraudDetection.src.fraudDetection.exception
+   :members:
+   :undoc-members:
+   :show-inheritance:

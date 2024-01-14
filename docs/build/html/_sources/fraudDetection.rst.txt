@@ -1,0 +1,33 @@
+FraudDetection namespace
+========================
+
+.. py:module:: FraudDetection
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   FraudDetection.apps
+   FraudDetection.configs
+   FraudDetection.tests
+
+Submodules
+----------
+
+FraudDetection.setup module
+---------------------------
+
+.. automodule:: FraudDetection.setup
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+FraudDetection.template module
+------------------------------
+
+.. automodule:: FraudDetection.template
+   :members:
+   :undoc-members:
+   :show-inheritance:

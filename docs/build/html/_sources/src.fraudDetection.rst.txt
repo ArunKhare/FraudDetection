@@ -1,0 +1,25 @@
+src.fraudDetection package
+==========================
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   src.fraudDetection.components
+   src.fraudDetection.config
+   src.fraudDetection.constants
+   src.fraudDetection.entity
+   src.fraudDetection.exception
+   src.fraudDetection.logger
+   src.fraudDetection.pipeline
+   src.fraudDetection.utils
+
+Module contents
+---------------
+
+.. automodule:: src.fraudDetection
+   :members:
+   :undoc-members:
+   :show-inheritance:

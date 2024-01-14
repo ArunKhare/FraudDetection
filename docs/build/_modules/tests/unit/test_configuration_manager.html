@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>tests.unit.test_configuration_manager &mdash; Fraud-Detection beta:v1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=92fd9be5" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=eafc0fe6" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=e630dfc1"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Fraud-Detection
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">FraudDetection</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../considerations.html">Considerations</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Fraud-Detection</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">tests.unit.test_configuration_manager</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for tests.unit.test_configuration_manager</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Test Module for ConfigurationManager in fraudDetection.config.configuration</span>
+
+<span class="sd">This module contains test functions for the ConfigurationManager class</span>
+<span class="sd">in the fraudDetection.config.configuration module.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span> <span class="nn">pytest</span>
+<span class="kn">from</span> <span class="nn">unittest.mock</span> <span class="kn">import</span> <span class="n">Mock</span><span class="p">,</span> <span class="n">patch</span>
+<span class="kn">from</span> <span class="nn">fraudDetection.config.configuration</span> <span class="kn">import</span> <span class="n">ConfigurationManager</span><span class="p">,</span> <span class="n">CONFIG_FILE_PATH</span>
+
+
+<div class="viewcode-block" id="mock_read_yaml">
+<a class="viewcode-back" href="../../../tests.unit.html#tests.unit.test_configuration_manager.mock_read_yaml">[docs]</a>
+<span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span>
+<span class="k">def</span> <span class="nf">mock_read_yaml</span><span class="p">(</span><span class="n">monkeypatch</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Fixture for mocking the read_yaml function.&quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="n">patch</span><span class="p">(</span><span class="s2">&quot;fraudDetection.config.configuration.read_yaml&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">mock_read_yaml</span><span class="p">:</span>
+        <span class="n">monkeypatch</span><span class="o">.</span><span class="n">setattr</span><span class="p">(</span><span class="n">ConfigurationManager</span><span class="p">,</span> <span class="s2">&quot;read_yaml&quot;</span><span class="p">,</span> <span class="n">mock_read_yaml</span><span class="p">)</span>
+        <span class="k">yield</span> <span class="n">mock_read_yaml</span></div>
+
+
+
+<div class="viewcode-block" id="test_get_model_pusher_config">
+<a class="viewcode-back" href="../../../tests.unit.html#tests.unit.test_configuration_manager.test_get_model_pusher_config">[docs]</a>
+<span class="k">def</span> <span class="nf">test_get_model_pusher_config</span><span class="p">(</span><span class="n">mock_read_yaml</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Test the get_model_pusher_config method of ConfigurationManager.&quot;&quot;&quot;</span>
+    <span class="c1"># Set up the mock behavior for read_yaml</span>
+    <span class="n">mock_read_yaml</span><span class="o">.</span><span class="n">return_value</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;MODEL_PUSHER_CONFIG_KEY&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;MODEL_PUSHER_EXPORT_DIR_KEY&quot;</span><span class="p">:</span> <span class="s2">&quot;export_dir&quot;</span><span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="c1"># Set up the configuration manager</span>
+    <span class="n">config_manager</span> <span class="o">=</span> <span class="n">ConfigurationManager</span><span class="p">(</span><span class="n">CONFIG_FILE_PATH</span><span class="p">)</span>
+
+    <span class="c1"># Define the expected configuration</span>
+    <span class="n">expected_export_dir_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;mocked_export_dir/mock_timestamp&quot;</span><span class="p">)</span>
+    <span class="n">expected_saved_models_directory</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;mocked_saved_models_directory&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Mock the values used in the method</span>
+    <span class="n">config_manager</span><span class="o">.</span><span class="n">artifact_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;mocked_artifact_dir&quot;</span><span class="p">)</span>
+    <span class="n">config_manager</span><span class="o">.</span><span class="n">current_time_stamp</span> <span class="o">=</span> <span class="s2">&quot;mock_timestamp&quot;</span>
+
+    <span class="c1"># Call the method to get the configuration</span>
+    <span class="n">model_pusher_config</span> <span class="o">=</span> <span class="n">config_manager</span><span class="o">.</span><span class="n">get_model_pusher_config</span><span class="p">()</span>
+
+    <span class="c1"># Assert that the returned ModelPusherConfig matches the expected configuration</span>
+    <span class="k">assert</span> <span class="n">model_pusher_config</span><span class="o">.</span><span class="n">model_export_dir</span> <span class="o">==</span> <span class="n">expected_export_dir_path</span>
+    <span class="k">assert</span> <span class="n">model_pusher_config</span><span class="o">.</span><span class="n">saved_models_directory</span> <span class="o">==</span> <span class="n">expected_saved_models_directory</span></div>
+
+
+
+<div class="viewcode-block" id="test_get_model_pusher_config_exception">
+<a class="viewcode-back" href="../../../tests.unit.html#tests.unit.test_configuration_manager.test_get_model_pusher_config_exception">[docs]</a>
+<span class="k">def</span> <span class="nf">test_get_model_pusher_config_exception</span><span class="p">(</span><span class="n">mock_read_yaml</span><span class="p">,</span> <span class="n">monkeypatch</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Test the get_model_pusher_config method when an exception is raised.&quot;&quot;&quot;</span>
+    <span class="c1"># Set up the mock behavior for read_yaml to raise an exception</span>
+    <span class="n">mock_read_yaml</span><span class="o">.</span><span class="n">side_effect</span> <span class="o">=</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Mocked exception&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Set up the configuration manager</span>
+    <span class="n">config_manager</span> <span class="o">=</span> <span class="n">ConfigurationManager</span><span class="p">(</span><span class="n">CONFIG_FILE_PATH</span><span class="p">)</span>
+
+    <span class="c1"># Call the method and assert that it raises the expected exception</span>
+    <span class="k">with</span> <span class="n">pytest</span><span class="o">.</span><span class="n">raises</span><span class="p">(</span><span class="ne">Exception</span><span class="p">,</span> <span class="n">match</span><span class="o">=</span><span class="s2">&quot;Mocked exception&quot;</span><span class="p">):</span>
+        <span class="n">config_manager</span><span class="o">.</span><span class="n">get_model_pusher_config</span><span class="p">()</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Arun khare.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

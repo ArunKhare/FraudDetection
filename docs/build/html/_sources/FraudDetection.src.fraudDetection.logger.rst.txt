@@ -1,0 +1,10 @@
+FraudDetection.src.fraudDetection.logger package
+================================================
+
+Module contents
+---------------
+
+.. automodule:: FraudDetection.src.fraudDetection.logger
+   :members:
+   :undoc-members:
+   :show-inheritance:

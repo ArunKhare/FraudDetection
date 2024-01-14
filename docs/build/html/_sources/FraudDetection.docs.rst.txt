@@ -1,0 +1,12 @@
+FraudDetection.docs namespace
+=============================
+
+.. py:module:: FraudDetection.docs
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   FraudDetection.docs.source

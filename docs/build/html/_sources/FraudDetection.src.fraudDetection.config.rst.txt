@@ -1,0 +1,21 @@
+FraudDetection.src.fraudDetection.config package
+================================================
+
+Submodules
+----------
+
+FraudDetection.src.fraudDetection.config.configuration module
+-------------------------------------------------------------
+
+.. automodule:: FraudDetection.src.fraudDetection.config.configuration
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: FraudDetection.src.fraudDetection.config
+   :members:
+   :undoc-members:
+   :show-inheritance:

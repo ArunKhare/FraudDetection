@@ -1,0 +1,21 @@
+FraudDetection.tests.unit package
+=================================
+
+Submodules
+----------
+
+FraudDetection.tests.unit.test\_configuration\_manager module
+-------------------------------------------------------------
+
+.. automodule:: FraudDetection.tests.unit.test_configuration_manager
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: FraudDetection.tests.unit
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>apps.trainingapp &mdash; Fraud-Detection beta:v1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=92fd9be5" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=eafc0fe6" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=e630dfc1"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Fraud-Detection
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">FraudDetection</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../considerations.html">Considerations</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Fraud-Detection</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">apps.trainingapp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for apps.trainingapp</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">This module defines a training application for fraud detection, including </span>
+<span class="sd">the FraudDetectionTrainingApp class. It uses a Pipeline for training models, </span>
+<span class="sd">**&#39;MLflow&#39;** for experiment tracking, and **&#39;Streamlit&#39;** for the user interface.</span>
+<span class="sd">set up Streamlit app for MLflow experiment tracking. Loads MLFLOW_TRACKING_URI from the environment</span>
+<span class="sd">With a user friendly UI you can </span>
+<span class="sd">- update the existing model configuration</span>
+<span class="sd">- entirely new machine learning  model configuration </span>
+<span class="sd">- which is validated in UI using Json formatter </span>
+<span class="sd">- View the the and compare the experiments of training the models</span>
+<span class="sd">- View Data, Logs</span>
+<span class="sd">- With a click you can view  tracking UI of Mlfow and view, compare and download</span>
+<span class="sd">  the  model artifacts &#39;model.pickle, Signature, Processing object and Requirements&#39;_</span>
+<span class="sd">- A prediction service to predict with model, can upload a batch file or feed a singlerecord </span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span> <span class="nn">yaml</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">streamlit</span> <span class="k">as</span> <span class="nn">st</span>
+<span class="kn">import</span> <span class="nn">mlflow</span>
+<span class="kn">from</span> <span class="nn">mlflow.exceptions</span> <span class="kn">import</span> <span class="n">InvalidUrlException</span>
+<span class="kn">from</span> <span class="nn">dotenv</span> <span class="kn">import</span> <span class="n">load_dotenv</span>
+<span class="kn">from</span> <span class="nn">fraudDetection.pipeline.pipeline</span> <span class="kn">import</span> <span class="n">Pipeline</span>
+<span class="kn">from</span> <span class="nn">fraudDetection.config.configuration</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">ConfigurationManager</span><span class="p">,</span>
+    <span class="n">ROOT_DIR</span><span class="p">,</span>
+    <span class="n">CONFIG_FILE_PATH</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">fraudDetection.utils</span> <span class="kn">import</span> <span class="n">read_yaml</span><span class="p">,</span> <span class="n">write_yaml</span><span class="p">,</span> <span class="n">load_json</span>
+<span class="kn">from</span> <span class="nn">fraudDetection.constants</span> <span class="kn">import</span> <span class="n">CONFIG_DIR</span><span class="p">,</span> <span class="n">DATA_INGESTION_KAGGLE_CONFIG_FILE_PATH</span>
+<span class="kn">from</span> <span class="nn">fraudDetection.components</span> <span class="kn">import</span> <span class="n">FraudDetectionPredictorApp</span>
+<span class="kn">from</span> <span class="nn">fraudDetection.logger</span> <span class="kn">import</span> <span class="n">get_log_dataframe</span><span class="p">,</span> <span class="n">logging</span>
+<span class="kn">from</span> <span class="nn">fraudDetection.exception</span> <span class="kn">import</span> <span class="n">FraudDetectionException</span>
+<span class="kn">from</span> <span class="nn">.mlflowapp</span> <span class="kn">import</span> <span class="n">exp_tracking</span>
+
+
+<span class="n">load_dotenv</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="set_tracking_uri">
+<a class="viewcode-back" href="../../apps.html#apps.trainingapp.set_tracking_uri">[docs]</a>
+<span class="k">def</span> <span class="nf">set_tracking_uri</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set Mlflow Tracking URI</span>
+<span class="sd">    Raises:</span>
+<span class="sd">        InvalidUrlException: when URI is not in proper format</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">mlflow_tracking_uri</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span>
+        <span class="s2">&quot;MLFLOWTRACKINGURI&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;http://localhost:8080&quot;</span>
+    <span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">mlflow</span><span class="o">.</span><span class="n">set_tracking_uri</span><span class="p">(</span><span class="n">mlflow_tracking_uri</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">InvalidUrlException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">st</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;MLFLOW_TRACKING_URI not set.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">FraudDetectionException</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">sys</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Tracking URI set </span><span class="si">{</span><span class="n">mlflow_tracking_uri</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+
+<span class="c1"># # Deployment in Streamlit Community Cloud</span>
+<span class="c1"># def streamlit_community_cloud():</span>
+<span class="c1">#     &quot;&quot;&quot;Deploy in Stremlit Community Cloud &quot;&quot;&quot;</span>
+<span class="c1">#     # Get Kaggle API credentials from environment variables</span>
+<span class="c1">#     kaggle_username = st.secrets[&quot;KAGGLE_USERNAME&quot;]</span>
+<span class="c1">#     kaggle_key = st.secrets[&quot;KAGGLE_KEY&quot;]</span>
+<span class="c1">#     # Define the directory path and file path</span>
+<span class="c1">#     KAGGLE_DIR = &quot;/home/appuser/.kaggle&quot;</span>
+<span class="c1">#     kaggle_file_path = os.path.join(KAGGLE_DIR, &quot;kaggle.json&quot;)</span>
+<span class="c1">#     # Create the directory if it doesn&#39;t exist</span>
+<span class="c1">#     os.makedirs(KAGGLE_DIR, exist_ok=True)</span>
+<span class="c1">#     # Create the Kaggle JSON file</span>
+<span class="c1">#     kaggle_credentials = {&quot;username&quot;: kaggle_username, &quot;key&quot;: kaggle_key}</span>
+<span class="c1">#     with open(kaggle_file_path, &quot;w&quot;) as kaggle_file:</span>
+<span class="c1">#         json.dump(kaggle_credentials, kaggle_file)</span>
+<span class="c1">#     # Set appropriate permissions</span>
+<span class="c1">#     os.chmod(kaggle_file_path, 0o600)</span>
+<span class="c1">#     print(&quot;Performing actions for Streamlit Community deployment...&quot;)</span>
+
+<span class="c1"># # LOCAL RUN</span>
+<span class="c1"># conn_location = Path(DATA_INGESTION_KAGGLE_CONFIG_FILE_PATH)</span>
+<span class="c1"># connect = load_json(conn_location)</span>
+<span class="c1"># os.environ[&quot;KAGGLE_CONFIG_DIR&quot;] = str(conn_location.parent)</span>
+<span class="c1"># os.environ[&quot;KAGGLE_USERNAME&quot;] = connect[&quot;username&quot;]</span>
+<span class="c1"># os.environ[&quot;KAGGLE_KEY&quot;] = connect[&quot;key&quot;]</span>
+<span class="c1"># print(&quot;No specific deployment check provided. Performing default actions...&quot;)</span>
+
+
+<div class="viewcode-block" id="Constants">
+<a class="viewcode-back" href="../../apps.html#apps.trainingapp.Constants">[docs]</a>
+<span class="k">class</span> <span class="nc">Constants</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;This class holds constant values for the module.&quot;&quot;&quot;</span>
+
+    <span class="n">LOG_FOLDER_NAME</span> <span class="o">=</span> <span class="s2">&quot;logs&quot;</span>
+    <span class="n">PIPELINE_FOLDER_NAME</span> <span class="o">=</span> <span class="s2">&quot;FraudDetection&quot;</span>
+    <span class="n">SAVED_MODELS_DIR_NAME</span> <span class="o">=</span> <span class="s2">&quot;saved_models&quot;</span>
+    <span class="n">MODEL_CONFIG_FILE_PATH</span> <span class="o">=</span> <span class="n">ROOT_DIR</span> <span class="o">/</span> <span class="n">CONFIG_DIR</span> <span class="o">/</span> <span class="s2">&quot;model.yaml&quot;</span>
+    <span class="n">LOG_DIR</span> <span class="o">=</span> <span class="n">ROOT_DIR</span> <span class="o">/</span> <span class="n">LOG_FOLDER_NAME</span>
+    <span class="n">PIPELINE_DIR</span> <span class="o">=</span> <span class="n">ROOT_DIR</span> <span class="o">/</span> <span class="n">PIPELINE_FOLDER_NAME</span>
+    <span class="n">MODEL_DIR</span> <span class="o">=</span> <span class="n">ROOT_DIR</span> <span class="o">/</span> <span class="n">SAVED_MODELS_DIR_NAME</span>
+    <span class="n">ARCHIVE_FOLDER</span> <span class="o">=</span> <span class="n">ROOT_DIR</span> <span class="o">/</span> <span class="n">CONFIG_DIR</span> <span class="o">/</span> <span class="s2">&quot;archive&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="FraudDetectionTrainingApp">
+<a class="viewcode-back" href="../../apps.html#apps.trainingapp.FraudDetectionTrainingApp">[docs]</a>
+<span class="k">class</span> <span class="nc">FraudDetectionTrainingApp</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;This class defines the main training application for fraud detection.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize FraudDetectionTrainingApp.</span>
+<span class="sd">        Initializes attributes for configuration and pipeline.&quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">ConfigurationManager</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="n">CONFIG_FILE_PATH</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="FraudDetectionTrainingApp.initialize_pipeline">
+<a class="viewcode-back" href="../../apps.html#apps.trainingapp.FraudDetectionTrainingApp.initialize_pipeline">[docs]</a>
+    <span class="k">def</span> <span class="nf">initialize_pipeline</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize the pipeline for training.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="FraudDetectionTrainingApp.get_pipeline_artifact">
+<a class="viewcode-back" href="../../apps.html#apps.trainingapp.FraudDetectionTrainingApp.get_pipeline_artifact">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_pipeline_artifact</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the artifact directory for the training pipeline.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            str: Path to the artifact directory.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">training_pipeline_artifact</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get_training_pipeline_config</span>
+            <span class="n">artifact_dir</span> <span class="o">=</span> <span class="n">training_pipeline_artifact</span><span class="o">.</span><span class="n">artifacts_root</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">artifact_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">st</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">artifact_dir</span></div>
+
+
+<div class="viewcode-block" id="FraudDetectionTrainingApp.main">
+<a class="viewcode-back" href="../../apps.html#apps.trainingapp.FraudDetectionTrainingApp.main">[docs]</a>
+    <span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Main method to run the training application.&quot;&quot;&quot;</span>
+        <span class="n">st</span><span class="o">.</span><span class="n">set_page_config</span><span class="p">(</span>
+            <span class="n">page_title</span><span class="o">=</span><span class="s2">&quot;Fraud Detection System Training&quot;</span><span class="p">,</span>
+            <span class="n">page_icon</span><span class="o">=</span><span class="s2">&quot;🏦&quot;</span><span class="p">,</span>
+            <span class="n">layout</span><span class="o">=</span><span class="s2">&quot;wide&quot;</span><span class="p">,</span>
+            <span class="n">initial_sidebar_state</span><span class="o">=</span><span class="s2">&quot;expanded&quot;</span><span class="p">,</span>
+            <span class="n">menu_items</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;About&quot;</span><span class="p">:</span> <span class="s2">&quot;# This is a Fraud Detection System! by Arun khare&quot;</span><span class="p">},</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="s2">&quot;counter&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="p">:</span>
+            <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">counter</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="n">st</span><span class="o">.</span><span class="n">sidebar</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Navigation&quot;</span><span class="p">)</span>
+        <span class="n">selected_page</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">sidebar</span><span class="o">.</span><span class="n">radio</span><span class="p">(</span>
+            <span class="s2">&quot;Go to&quot;</span><span class="p">,</span>
+            <span class="p">[</span>
+                <span class="s2">&quot;Home&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;Artifacts&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;Logs&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;Experiments&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;Training&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;Model Configs&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;Mlflow Tracking&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;Prediction Service&quot;</span><span class="p">,</span>
+            <span class="p">],</span>
+        <span class="p">)</span>
+
+        <span class="n">artifact_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_pipeline_artifact</span><span class="p">()</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">selected_page</span> <span class="o">==</span> <span class="s2">&quot;Home&quot;</span><span class="p">:</span>
+                <span class="n">st</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;🎯 :rainbow[Training Index Page]&quot;</span><span class="p">)</span>
+                <span class="n">st</span><span class="o">.</span><span class="n">divider</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">display_home</span><span class="p">()</span>
+
+            <span class="k">elif</span> <span class="n">selected_page</span> <span class="o">==</span> <span class="s2">&quot;Artifacts&quot;</span><span class="p">:</span>
+                <span class="n">st</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;📀:orange[Artifacts]&quot;</span><span class="p">)</span>
+
+                <span class="n">hierarchy_dict</span> <span class="o">=</span> <span class="n">FraudDetectionTrainingApp</span><span class="o">.</span><span class="n">generate_hierarchy_dict</span><span class="p">(</span>
+                    <span class="n">artifact_path</span>
+                <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">display_hierarchy</span><span class="p">(</span><span class="n">hierarchy_dict</span><span class="p">,</span> <span class="n">artifact_path</span><span class="p">)</span>
+
+            <span class="k">elif</span> <span class="n">selected_page</span> <span class="o">==</span> <span class="s2">&quot;Logs&quot;</span><span class="p">:</span>
+                <span class="n">st</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;✉️ :orange[Log Message]&quot;</span><span class="p">)</span>
+                <span class="n">st</span><span class="o">.</span><span class="n">divider</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">display_logs</span><span class="p">()</span>
+
+            <span class="k">elif</span> <span class="n">selected_page</span> <span class="o">==</span> <span class="s2">&quot;Experiments&quot;</span><span class="p">:</span>
+                <span class="n">st</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;🧮 :orange[Experiments]&quot;</span><span class="p">)</span>
+                <span class="n">st</span><span class="o">.</span><span class="n">divider</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">view_experiment_history</span><span class="p">()</span>
+
+            <span class="k">elif</span> <span class="n">selected_page</span> <span class="o">==</span> <span class="s2">&quot;Model Configs&quot;</span><span class="p">:</span>
+                <span class="n">st</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;✍️ :orange[Model Configuration Editor]&quot;</span><span class="p">)</span>
+                <span class="n">st</span><span class="o">.</span><span class="n">divider</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">update_model_config</span><span class="p">()</span>
+
+            <span class="k">elif</span> <span class="n">selected_page</span> <span class="o">==</span> <span class="s2">&quot;Training&quot;</span><span class="p">:</span>
+                <span class="n">st</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot; :orange[Train Models]&quot;</span><span class="p">)</span>
+                <span class="n">st</span><span class="o">.</span><span class="n">divider</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
+                <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">counter</span> <span class="o">+=</span> <span class="mi">1</span>
+
+            <span class="k">elif</span> <span class="n">selected_page</span> <span class="o">==</span> <span class="s2">&quot;Mlflow Tracking&quot;</span><span class="p">:</span>
+                <span class="n">st</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;✍️ :orange[MLflow Integration with Streamlit]&quot;</span><span class="p">)</span>
+                <span class="n">st</span><span class="o">.</span><span class="n">divider</span><span class="p">()</span>
+                <span class="n">exp_tracking</span><span class="p">()</span>
+
+            <span class="k">elif</span> <span class="n">selected_page</span> <span class="o">==</span> <span class="s2">&quot;Prediction Service&quot;</span><span class="p">:</span>
+                <span class="n">FraudDetectionTrainingApp</span><span class="o">.</span><span class="n">predict</span><span class="p">()</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">st</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;An error occurred. Please check the logs for more details&quot;</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">FraudDetectionException</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">sys</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span></div>
+
+
+<div class="viewcode-block" id="FraudDetectionTrainingApp.display_home">
+<a class="viewcode-back" href="../../apps.html#apps.trainingapp.FraudDetectionTrainingApp.display_home">[docs]</a>
+    <span class="k">def</span> <span class="nf">display_home</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Display the home page.&quot;&quot;&quot;</span>
+        <span class="n">st</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;Welcome to the Home Page!&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="FraudDetectionTrainingApp.generate_hierarchy_dict">
+<a class="viewcode-back" href="../../apps.html#apps.trainingapp.FraudDetectionTrainingApp.generate_hierarchy_dict">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">generate_hierarchy_dict</span><span class="p">(</span><span class="n">root_path</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate a hierarchy dictionary for file structure.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            root_path (str): Root path for file structure.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: Hierarchy dictionary.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">hierarchy_dict</span> <span class="o">=</span> <span class="p">{}</span>
+
+            <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">root_path</span><span class="p">):</span>
+                <span class="n">item_path</span> <span class="o">=</span> <span class="n">root_path</span> <span class="o">/</span> <span class="n">item</span>
+
+                <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">item_path</span><span class="p">):</span>
+                    <span class="c1"># Recursively call the function for subdirectories</span>
+                    <span class="n">sub_dict</span> <span class="o">=</span> <span class="n">FraudDetectionTrainingApp</span><span class="o">.</span><span class="n">generate_hierarchy_dict</span><span class="p">(</span>
+                        <span class="n">item_path</span>
+                    <span class="p">)</span>
+
+                    <span class="c1"># Merge common prefixes in keys</span>
+                    <span class="k">if</span> <span class="n">sub_dict</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">sub_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                            <span class="n">full_key</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">key</span><span class="p">))</span>
+                            <span class="n">hierarchy_dict</span><span class="p">[</span><span class="n">full_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+                <span class="k">elif</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">item_path</span><span class="p">):</span>
+                    <span class="c1"># If it&#39;s a file, add it to the dictionary</span>
+                    <span class="n">hierarchy_dict</span><span class="p">[</span><span class="n">item</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">item</span><span class="p">]</span>
+            <span class="k">return</span> <span class="n">hierarchy_dict</span>
+        <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">st</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+<span class="w">                </span><span class="sd">&quot;&quot;&quot;An error occurred while generating the file structure in to a dict.</span>
+<span class="sd">                Please check the logs for more details&quot;&quot;&quot;</span>
+            <span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">{}</span></div>
+
+
+<div class="viewcode-block" id="FraudDetectionTrainingApp.display_hierarchy">
+<a class="viewcode-back" href="../../apps.html#apps.trainingapp.FraudDetectionTrainingApp.display_hierarchy">[docs]</a>
+    <span class="k">def</span> <span class="nf">display_hierarchy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hierarchy_dict</span><span class="p">,</span> <span class="n">current_path</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Display the hierarchy of artifacts and content of files in tabs.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            hierarchy_dict (dict): Hierarchy dictionary.</span>
+<span class="sd">            current_path (str): Current path for artifacts.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">current_path_sub_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">current_path</span><span class="p">)</span>
+            <span class="n">tabs</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">tabs</span><span class="p">(</span><span class="n">current_path_sub_dir</span><span class="p">)</span>
+            <span class="n">parent_folder_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">current_path</span><span class="p">)</span>
+
+            <span class="n">dict_paths</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">hierarchy_dict</span><span class="p">:</span>
+                <span class="n">key</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dict_paths</span><span class="p">:</span>
+                    <span class="n">dict_paths</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">item</span><span class="p">)]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">dict_paths</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">item</span><span class="p">))</span>
+
+            <span class="c1"># Display parent folder name as header</span>
+            <span class="k">with</span> <span class="n">st</span><span class="o">.</span><span class="n">container</span><span class="p">(</span><span class="n">border</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+                <span class="c1"># Display files and subdirectories under the parent folder</span>
+                <span class="n">st</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;📁 _Parent Folder_: </span><span class="si">{</span><span class="n">parent_folder_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">tab</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">tabs</span><span class="p">):</span>
+                    <span class="k">with</span> <span class="n">tab</span><span class="p">:</span>
+                        <span class="n">st</span><span class="o">.</span><span class="n">header</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">current_path_sub_dir</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">capitalize</span><span class="p">())</span>
+                        <span class="n">temp</span> <span class="o">=</span> <span class="p">[]</span>
+                        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">temp</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">temp</span><span class="p">:</span>
+                                <span class="n">dict_paths</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">dict_paths</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                            <span class="n">sub_dirs</span> <span class="o">=</span> <span class="p">[</span><span class="o">*</span><span class="n">key</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span><span class="p">)]</span>
+                            <span class="k">if</span> <span class="n">current_path_sub_dir</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="n">sub_dirs</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+                                <span class="n">temp</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+                                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                                    <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">value</span><span class="p">:</span>
+                                        <span class="n">file_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span>
+                                            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">current_path</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
+                                        <span class="p">)</span>
+                                        <span class="k">if</span> <span class="n">st</span><span class="o">.</span><span class="n">button</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;📄 File: </span><span class="si">{</span><span class="n">file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">file_path</span><span class="p">):</span>
+                                            <span class="n">FraudDetectionTrainingApp</span><span class="o">.</span><span class="n">display_file_content</span><span class="p">(</span>
+                                                <span class="n">file_path</span>
+                                            <span class="p">)</span>
+
+                                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sub_dirs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                                        <span class="n">st</span><span class="o">.</span><span class="n">subheader</span><span class="p">(</span>
+                                            <span class="s2">&quot;:blue[Subdirectories] :herb:&quot;</span><span class="p">,</span>
+                                            <span class="n">divider</span><span class="o">=</span><span class="s2">&quot;rainbow&quot;</span><span class="p">,</span>
+                                        <span class="p">)</span>
+                                        <span class="k">for</span> <span class="n">subdir</span> <span class="ow">in</span> <span class="n">sub_dirs</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+                                            <span class="n">st</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">subdir</span><span class="si">}</span><span class="s2">/&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">st</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                <span class="s2">&quot;Error while displaying artifact heirarchy pl check logs for details&quot;</span>
+            <span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">FraudDetectionException</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">sys</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span></div>
+
+
+<div class="viewcode-block" id="FraudDetectionTrainingApp.display_file_content">
+<a class="viewcode-back" href="../../apps.html#apps.trainingapp.FraudDetectionTrainingApp.display_file_content">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">display_file_content</span><span class="p">(</span><span class="n">file_path</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Display the file content .</span>
+<span class="sd">        Args:</span>
+<span class="sd">            file_path (str)&quot;&quot;&quot;</span>
+
+        <span class="n">file_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">file_extension</span> <span class="o">=</span> <span class="n">file_path</span><span class="o">.</span><span class="n">suffix</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="n">file_extension</span> <span class="o">==</span> <span class="s2">&quot;.csv&quot;</span><span class="p">:</span>
+                <span class="c1"># Display content of CSV file</span>
+                <span class="c1"># with open(file_path, &quot;r&quot;) as file:</span>
+                <span class="c1">#     file_contents = file.read()</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+                <span class="c1"># st.text_area(f&quot;Contents of {file_path}&quot;, file_contents, height=300)</span>
+                <span class="n">st</span><span class="o">.</span><span class="n">dataframe</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">file_extension</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;.json&quot;</span><span class="p">,</span> <span class="s2">&quot;.yaml&quot;</span><span class="p">]:</span>
+                <span class="c1"># Display content of JSON or YAML file</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+                    <span class="n">file_contents</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+                    <span class="n">st</span><span class="o">.</span><span class="n">text_area</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Contents of </span><span class="si">{</span><span class="n">file_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">file_contents</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">file_extension</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;.pkl&quot;</span><span class="p">,</span> <span class="s2">&quot;.npz&quot;</span><span class="p">]:</span>
+                <span class="c1"># Display full file path for models or npz files</span>
+                <span class="n">st</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Full File Path: </span><span class="si">{</span><span class="n">file_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">st</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Unsupported file type. Click to see full file path.&quot;</span><span class="p">)</span>
+                <span class="n">st</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Full File Path: </span><span class="si">{</span><span class="n">file_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">st</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error while displaying file content: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">FraudDetectionException</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">sys</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span></div>
+
+
+<div class="viewcode-block" id="FraudDetectionTrainingApp.view_experiment_history">
+<a class="viewcode-back" href="../../apps.html#apps.trainingapp.FraudDetectionTrainingApp.view_experiment_history">[docs]</a>
+    <span class="k">def</span> <span class="nf">view_experiment_history</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;View the experiment history.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">experiment_df</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="o">.</span><span class="n">get_experiment_status</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="n">experiment_df</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+                <span class="n">st</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;No experiment data available.&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">st</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">experiment_df</span><span class="p">)</span>
+                <span class="n">st</span><span class="o">.</span><span class="n">header</span><span class="p">(</span><span class="s2">&quot;Experiment Stats&quot;</span><span class="p">)</span>
+                <span class="n">st</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">experiment_df</span><span class="o">.</span><span class="n">describe</span><span class="p">())</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">st</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;An error occurred. Please check the logs for details. Error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">FraudDetectionException</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">sys</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span></div>
+
+
+<div class="viewcode-block" id="FraudDetectionTrainingApp.train">
+<a class="viewcode-back" href="../../apps.html#apps.trainingapp.FraudDetectionTrainingApp.train">[docs]</a>
+    <span class="k">def</span> <span class="nf">train</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Train models using the pipeline&quot;&quot;&quot;</span>
+        <span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">st</span><span class="o">.</span><span class="n">button</span><span class="p">(</span><span class="s2">&quot;⚔️start training&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;primary&quot;</span><span class="p">):</span>
+            <span class="k">with</span> <span class="n">st</span><span class="o">.</span><span class="n">spinner</span><span class="p">(</span><span class="s2">&quot;Training in progess............&quot;</span><span class="p">):</span>
+                <span class="n">st</span><span class="o">.</span><span class="n">session_state</span>
+                <span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="n">ConfigurationManager</span><span class="p">(</span><span class="n">CONFIG_FILE_PATH</span><span class="p">))</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">Pipeline</span><span class="o">.</span><span class="n">experiment</span><span class="o">.</span><span class="n">running_status</span><span class="p">:</span>
+                    <span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;Training started.&quot;</span>
+                    <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span>
+                    <span class="n">pipeline</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;Training is already in progress.&quot;</span>
+                    <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span></div>
+
+
+<div class="viewcode-block" id="FraudDetectionTrainingApp.predict">
+<a class="viewcode-back" href="../../apps.html#apps.trainingapp.FraudDetectionTrainingApp.predict">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">predict</span><span class="p">():</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Run the FraudDetectionPredictorApp for predictions.&quot;&quot;&quot;</span>
+        <span class="n">FraudDetectionPredictorApp</span><span class="o">.</span><span class="n">run</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="FraudDetectionTrainingApp.update_model_config">
+<a class="viewcode-back" href="../../apps.html#apps.trainingapp.FraudDetectionTrainingApp.update_model_config">[docs]</a>
+    <span class="k">def</span> <span class="nf">update_model_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update the model configuration.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Load existing configuration</span>
+            <span class="n">current_config</span> <span class="o">=</span> <span class="n">read_yaml</span><span class="p">(</span><span class="n">Constants</span><span class="o">.</span><span class="n">MODEL_CONFIG_FILE_PATH</span><span class="p">)</span>
+            <span class="n">toggle_function</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">toggle</span><span class="p">(</span>
+                <span class="s2">&quot;:red[__Edit configuration__ 🌷]&quot;</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="s2">&quot;edit configuration&quot;</span>
+            <span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">toggle_function</span><span class="p">:</span>
+                <span class="n">FraudDetectionTrainingApp</span><span class="o">.</span><span class="n">edit</span><span class="p">(</span><span class="n">current_config</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">FraudDetectionTrainingApp</span><span class="o">.</span><span class="n">display_configuration</span><span class="p">(</span><span class="n">current_config</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">st</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+<span class="w">                </span><span class="sd">&quot;&quot;&quot;An error occured may be the file format is not correct. </span>
+<span class="sd">                pl check the logs for details&quot;&quot;&quot;</span>
+            <span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="FraudDetectionTrainingApp.display_configuration">
+<a class="viewcode-back" href="../../apps.html#apps.trainingapp.FraudDetectionTrainingApp.display_configuration">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">display_configuration</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Display the current model configuration.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            config: Model configuration.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">st</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;Current Configuration:&quot;</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">st</span><span class="o">.</span><span class="n">container</span><span class="p">(</span><span class="n">border</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+            <span class="n">st</span><span class="o">.</span><span class="n">code</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span> <span class="n">language</span><span class="o">=</span><span class="s2">&quot;json&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="FraudDetectionTrainingApp.edit">
+<a class="viewcode-back" href="../../apps.html#apps.trainingapp.FraudDetectionTrainingApp.edit">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">edit</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Edit the model configuration.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            config: Model configuration.&quot;&quot;&quot;</span>
+
+        <span class="c1"># User can edit the configuration</span>
+        <span class="n">st</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;Edit Configuration:&quot;</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">st</span><span class="o">.</span><span class="n">container</span><span class="p">(</span><span class="n">border</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+            <span class="n">edited_config</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">text_area</span><span class="p">(</span>
+                <span class="s2">&quot;Edit the YAML configuration&quot;</span><span class="p">,</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span> <span class="n">height</span><span class="o">=</span><span class="mi">1000</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Validate the edited configuration using the JSON formatter</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">validated_config</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">edited_config</span><span class="p">)</span>
+            <span class="n">st</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="s2">&quot;Configuration is valid!&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">st</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+
+        <span class="c1"># Save the updated configuration</span>
+        <span class="n">write_yaml</span><span class="p">(</span><span class="n">Constants</span><span class="o">.</span><span class="n">MODEL_CONFIG_FILE_PATH</span><span class="p">,</span> <span class="n">validated_config</span><span class="p">)</span>
+
+        <span class="c1"># Archive the current configuration with a version name</span>
+        <span class="n">version_name</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">text_input</span><span class="p">(</span><span class="s2">&quot;:red[__Enter version name for archiving:__]&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">version_name</span><span class="p">:</span>
+            <span class="c1"># archive_config(current_config, version_name)</span>
+            <span class="n">archive_path</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">Constants</span><span class="o">.</span><span class="n">ARCHIVE_FOLDER</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;model_config_</span><span class="si">{</span><span class="n">version_name</span><span class="si">}</span><span class="s2">.yaml&quot;</span>
+            <span class="p">)</span>
+            <span class="n">write_yaml</span><span class="p">(</span><span class="n">archive_path</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
+            <span class="n">st</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Configuration archived as version: </span><span class="si">{</span><span class="n">version_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">st</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Yaml format error&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="FraudDetectionTrainingApp.display_logs">
+<a class="viewcode-back" href="../../apps.html#apps.trainingapp.FraudDetectionTrainingApp.display_logs">[docs]</a>
+    <span class="k">def</span> <span class="nf">display_logs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Display logs in the logs directory.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">logs_path</span> <span class="o">=</span> <span class="n">ROOT_DIR</span> <span class="o">/</span> <span class="n">Constants</span><span class="o">.</span><span class="n">LOG_FOLDER_NAME</span>
+
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">logs_path</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">FraudDetectionTrainingApp</span><span class="o">.</span><span class="n">delete_empty_files</span><span class="p">(</span><span class="n">Constants</span><span class="o">.</span><span class="n">LOG_DIR</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;logs_Path: </span><span class="si">{</span><span class="n">logs_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">logs_path</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">st</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;&#39;logs&#39; directory Path does not exist&quot;</span><span class="p">)</span>
+            <span class="c1"># Show directory contents</span>
+            <span class="n">files_path</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">logs_path</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span> <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">logs_path</span><span class="p">)</span>
+            <span class="p">]</span>
+            <span class="c1"># display log file</span>
+            <span class="n">log_file_selected</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">selectbox</span><span class="p">(</span>
+                <span class="s2">&quot;Log files&quot;</span><span class="p">,</span> <span class="n">files_path</span><span class="p">,</span> <span class="n">label_visibility</span><span class="o">=</span><span class="s2">&quot;hidden&quot;</span>
+            <span class="p">)</span>
+
+            <span class="n">log_df</span> <span class="o">=</span> <span class="n">get_log_dataframe</span><span class="p">(</span><span class="n">log_file_selected</span><span class="p">)</span>
+            <span class="k">with</span> <span class="n">st</span><span class="o">.</span><span class="n">container</span><span class="p">(</span><span class="n">border</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+                <span class="n">st</span><span class="o">.</span><span class="n">dataframe</span><span class="p">(</span><span class="n">log_df</span><span class="p">,</span> <span class="n">use_container_width</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">st</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;An error occured pl check the logs for details&quot;</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">FraudDetectionException</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">sys</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span></div>
+
+
+<div class="viewcode-block" id="FraudDetectionTrainingApp.delete_empty_files">
+<a class="viewcode-back" href="../../apps.html#apps.trainingapp.FraudDetectionTrainingApp.delete_empty_files">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">delete_empty_files</span><span class="p">(</span><span class="n">directory</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Delete empty files in a directory.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            directory (str): Directory path.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">directory</span><span class="p">):</span>
+            <span class="n">file_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="n">filename</span><span class="p">))</span>
+
+            <span class="c1"># FraudDetectionTraningApp.remove_blank_lines(file_path)</span>
+
+            <span class="c1"># Check if the file is empty</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getsize</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Deleting empty log files&quot;</span><span class="p">)</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="init_app">
+<a class="viewcode-back" href="../../apps.html#apps.trainingapp.init_app">[docs]</a>
+<span class="k">def</span> <span class="nf">init_app</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize training and prediction app&quot;&quot;&quot;</span>
+    <span class="n">set_tracking_uri</span><span class="p">()</span>
+    <span class="n">instance_training</span> <span class="o">=</span> <span class="n">FraudDetectionTrainingApp</span><span class="p">()</span>
+    <span class="n">instance_training</span><span class="o">.</span><span class="n">initialize_pipeline</span><span class="p">()</span>
+    <span class="n">instance_training</span><span class="o">.</span><span class="n">main</span><span class="p">()</span></div>
+
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="c1"># streamlit_community_cloud()</span>
+    <span class="n">init_app</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Arun khare.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
