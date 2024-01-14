@@ -13,10 +13,11 @@
 import os
 import sys
 
-sys.path.insert(0, os.path.abspath("../src"))
 sys.path.insert(0, os.path.abspath(".."))
+sys.path.insert(1, os.path.abspath("../src"))
 
-# print("abs_path", os.path.abspath("../"))
+
+# print("abs_path", os.path.abspath("../")
 # -- Project information -----------------------------------------------------
 
 project = "FraudDetection"
@@ -24,7 +25,7 @@ copyright = "2024, Arun Khare"
 author = "Arun Khare"
 
 # The full version, including alpha/beta/rc tags
-release = "0.1"
+release = "beta:v1"
 
 
 # -- General configuration ---------------------------------------------------
@@ -37,22 +38,31 @@ extensions = [
     "sphinx.ext.autosectionlabel",
     "sphinx.ext.autosummary",
     "sphinx.ext.graphviz",
-    "sphinx.ext.ifconfig",
     "sphinx.ext.inheritance_diagram",
     "sphinx.ext.napoleon",
     "sphinx.ext.todo",
     "sphinx.ext.viewcode",
+    "autoapi.extension",
 ]
 
+source_suffix = {
+    ".rst": "restructuredtext",
+    ".txt": "restructuredtext",
+    ".md": "markdown",
+}
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
-
+autoapi_dirs = [".", "../src"]
+autoapi_file_patterns = ["*.py", "*.md", "*.yaml"]
+autoapi_generate_api_docs = True
+autoapi_keep_files = True
+suppress_warnings = ["autoapi"]
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = ["*flake.rst", "configs.rst", "setup.rst"]
 
-
+include_patterns = ["*.md"]
 # -- Options for HTML output -------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
