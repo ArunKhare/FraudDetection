@@ -1,17 +1,18 @@
-""" This module defines a training application for fraud detection, including 
+""" 
+This module defines a training application for fraud detection, including 
 the FraudDetectionTrainingApp class. It uses a Pipeline for training models, 
 **'MLflow'** for experiment tracking, and **'Streamlit'** for the user interface.
 set up Streamlit app for MLflow experiment tracking. Loads MLFLOW_TRACKING_URI from the environment
 With a user friendly UI you can 
-    - update the existing model configuration
-    - entirely new machine learning  model configuration 
-    - which is validated in UI using Json formatter 
-    - View the the and compare the experiments of training the models
-    - View Data, Logs
-    - With a click you can view  tracking UI of Mlfow and view, compare and download
-      the  model artifacts 'model.pickle, Signature, Processing object and Requirements'_
-    - A prediction service to predict with model, can upload a batch file or feed a single
-        record """
+- update the existing model configuration
+- entirely new machine learning  model configuration 
+- which is validated in UI using Json formatter 
+- View the the and compare the experiments of training the models
+- View Data, Logs
+- With a click you can view  tracking UI of Mlfow and view, compare and download
+  the  model artifacts 'model.pickle, Signature, Processing object and Requirements'_
+- A prediction service to predict with model, can upload a batch file or feed a singlerecord 
+"""
 
 import os
 import sys
@@ -34,7 +35,7 @@ from fraudDetection.constants import CONFIG_DIR, DATA_INGESTION_KAGGLE_CONFIG_FI
 from fraudDetection.components import FraudDetectionPredictorApp
 from fraudDetection.logger import get_log_dataframe, logging
 from fraudDetection.exception import FraudDetectionException
-from mlflowapp import exp_tracking
+from .mlflowapp import exp_tracking
 
 
 load_dotenv()
@@ -44,7 +45,7 @@ def set_tracking_uri():
     """Set Mlflow Tracking URI
     Raises:
         InvalidUrlException: when URI is not in proper format
-        """
+    """
     mlflow_tracking_uri = os.getenv(
         "MLFLOWTRACKINGURI", default="http://localhost:8080"
     )
@@ -55,7 +56,6 @@ def set_tracking_uri():
         raise FraudDetectionException(e, sys) from e
     finally:
         logging.info(f"Tracking URI set {mlflow_tracking_uri}")
-
 
 
 # # Deployment in Streamlit Community Cloud
@@ -476,7 +476,6 @@ class FraudDetectionTrainingApp:
             logging.info(e)
             raise FraudDetectionException(e, sys) from e
 
-
     @staticmethod
     def delete_empty_files(directory):
         """Delete empty files in a directory.
@@ -506,4 +505,4 @@ def init_app():
 
 if __name__ == "__main__":
     # streamlit_community_cloud()
-    init_app()  
+    init_app()

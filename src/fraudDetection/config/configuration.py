@@ -116,7 +116,7 @@ class ConfigurationManager:
             zip_data_dir = Path(
                 os.path.join(
                     data_ingestion_artifact_dir,
-                    data_ingestion_info[DATA_INGESTION_ZIP_DATA_DIR_KEY]
+                    data_ingestion_info[DATA_INGESTION_ZIP_DATA_DIR_KEY],
                 )
             )
             raw_data_dir = Path(

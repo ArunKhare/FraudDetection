@@ -1,9 +1,9 @@
-<!-- **FraudDetection**
 
-    Description: Detecting Fraud transaction in banking system using supervised machine learning 
-    Purpose: 
-Provide a concise and clear title for your project.
-Briefly describe what your project does and its main purpose.
+**FraudDetection**
+
+    Description
+**FraudDetection** (Fraud Detection)is Package built in Python for fraud transactions in a banking system using supervised machine learning. It pulls data from the `Kaggle databaset <https://www.kaggle.com/rupakroy/online-payments-fraud-detection-dataset>`_ and offers a *simple* and *intuitive* solution.
+
 Badges:
 
 [![GitHub](https://img.shields.io/badge/GitHub-ArunKhare/FraudDetection.git-blue.svg)](https://github.com/ArunKhare/FraudDetection.git)
@@ -115,113 +115,4 @@ Roadmap:
     - converting Python code to Pyspark
 
 
-Certainly! Here's a formatted version of your README for the **FraudDetection** project: -->
-
-```markdown
-# FraudDetection
-
-## Description
-Detecting Fraud transaction in banking system using supervised machine learning.
-
-## Purpose
-Provide a concise and clear title for your project.
-Briefly describe what your project does and its main purpose.
-
-## Badges
-[![GitHub](https://img.shields.io/badge/GitHub-ArunKhare/FraudDetection.git-blue.svg)](https://github.com/ArunKhare/FraudDetection.git)
-[![License](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
-
-## Table of Contents
-- [Installation](#installation)
-- [Usage](#usage)
-- [Contributing](#contributing)
-- [License](#license)
-
-## Installation
-Create a Conda environment in the root directory of the project:
-This will install python 3.10 and all dependencies from *'requirements_dev.txt'* for the project:
-```bash
-bash init_setup.sh
-```
-
-### Instruction to run the project:
-```bash
-conda activate ./FraudDetection
-```
-
-## Usage
-For running the project for training and predictions from the root directory of the project:
-
-### Usage Scenarios: 
-1. From console 
-    - **Training** 
-        ```bash
-        python apps\app.py
-        ```
-    - **Prediction**
-        ```bash
-        python src\fraudDetection\components\prediction\prediction_service.py
-        ```
-2. Streamlit app
-    ```bash
-    python apps/trainingapp.py
-    ```
-    - Run `streamlit run <path>/trainingapp.py` 
-    - This will run the Streamlit server in the background.
-        - You can now view your Streamlit app in your browser.
-        - Local URL: http://localhost:8501
-        - Network URL: http://192.168.99.138:8501             
-
-    A friendly UI will guide you through its various usage scenarios for training and prediction.
-![Alt text](/../main/docs/_static/screenshots/StreamlitApp-cli.png "streamlit cli")
-
-For screenshots and video, please refer to the relevant section.
-
-Alternatively, if you are editing the code:
-```bash
-python dvc init
-python dvc repro
-```
-
-MLflow UI
-```bash
-mlflow ui
-``` 
-    - This runs the MLflow UI server in the background.
-    - Click on link http://127.0.0.1:5000
-
-![Alt text](/../main/docs/_static/screenshots/MlfowApp-cli.png "Mlfow cli")
-
-## Contributing
-Please read [CONTRIBUTING.md](#) for details on our code of conduct, and the process for submitting pull requests to us.
-
-## License
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
-
-## Acknowledgements:
-    I would like to express my gratitude to the following individuals and resources that have contributed to the development and success of this project:
-
-    Libraries and Tools
-        - [Streamlit](https://docs.streamlit.io/): An Open-source Python library, which enables developers to build attractive user interfaces in no time.
-        - [Mlflow](https://mlflow.org/docs/latest/index.html): An open source platform for the end-to-end machine learning lifecycle. A tracking API and UI
-        - [Sphinx](https://www.sphinx-doc.org/en/master/index.html): An open source lib.  easy to create intelligent and beautiful documentation.
-        - [Scikit-learn](https://scikit-learn.org/0.21/documentation.html): An open source machine learning lib.
-        - [kaggle](https://www.kaggle.com/docs):Kaggle is the world's largest data science community with powerful tools and resources to help you achieve your data science goals
-
-## Inspiration
-- Blogs from Medium, geeksforgeeks, Analytics vidya, Stack overflow and many more
-
-## Contact Information:
-    https://github.com/ArunKhare 
-
-## Changelog:
-    [Unreleased]
-    - deployment in AWS  and Snowflake
-
-    [Version 1.0.0] - 07-01-20024
-    - [Version 1.0.0]: <Link to the release page or commit>
-
-## Roadmap:
-    - Multicluster depolyment along with scheduling-Airflow and streaming pipeline-Kafka
-    - converting Python code to Pyspark
-```
+Certainly! Here's a formatted version of your README for the **FraudDetection** project:

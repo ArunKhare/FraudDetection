@@ -95,8 +95,7 @@ class ModelTrainer:
             )
         except Exception as e:
             raise FraudDetectionException(e, sys) from e
-            
-  
+
     def initiate_model_trainer(self) -> ModelTrainerArtifact:
         """implements the training of models"""
         try:

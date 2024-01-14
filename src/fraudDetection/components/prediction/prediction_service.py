@@ -36,9 +36,7 @@ INPUT_SCHEMA_JSON_FILE_NAME = Path("input_schema.json")
 MODEL_EVALUATION_YAML = Path("model_evaluation.yaml")
 SAVED_MODELS_DIR = Path("artifacts/saved_models")
 MODEL_NAME = "model.pkl"
-PREPROCESSER_OBJ_PATH = Path(
-    "artifacts/transformed_data/preprocessed/preprocessed.pkl"
-)
+PREPROCESSER_OBJ_PATH = Path("artifacts/transformed_data/preprocessed/preprocessed.pkl")
 EVALUATED_MODELS_PATH = Path("artifacts/model_evaluation")
 
 
@@ -46,11 +44,11 @@ EVALUATED_MODELS_PATH = Path("artifacts/model_evaluation")
 class FraudDetectionModel:
     """This class provides methods for loading the trained model, getting input schema,
     transforming input data, and making predictions.
-     Methods:
-        - get_latest_model(): Load the latest trained model from evaluated models.
-        - get_frauddetection_input_schema(): Get the input schema for fraud detection.
-        - transform_input(df): Transform input DataFrame using preprocessed data object.
-        - predict(df): Make predictions using the loaded model.
+    Methods:
+    - get_latest_model(): Load the latest trained model from evaluated models.
+    - get_frauddetection_input_schema(): Get the input schema for fraud detection.
+    - transform_input(df): Transform input DataFrame using preprocessed data object.
+    - predict(df): Make predictions using the loaded model.
     """
 
     def __init__(self) -> None:
@@ -59,8 +57,8 @@ class FraudDetectionModel:
         self.evaluated_models_path = EVALUATED_MODELS_PATH
         self.preprocessd_obj_path = PREPROCESSER_OBJ_PATH
         self.evaluated_models_file_path = Path(
-                os.path.join(self.evaluated_models_path, MODEL_EVALUATION_YAML)
-            )
+            os.path.join(self.evaluated_models_path, MODEL_EVALUATION_YAML)
+        )
         self.input_schema_path = Path(
             os.path.join(self.evaluated_models_path, INPUT_SCHEMA_JSON_FILE_NAME)
         )
@@ -74,8 +72,10 @@ class FraudDetectionModel:
         """
         try:
             # Load best model from the saved models and the input schema
-            
-            with open(file=self.evaluated_models_file_path, mode="r", encoding="utf-8") as f:
+
+            with open(
+                file=self.evaluated_models_file_path, mode="r", encoding="utf-8"
+            ) as f:
                 model_registry_paths = yaml.load(f, Loader=yaml.Loader)
 
             # model_registry_paths = read_yaml(self.evaluated_models_file_path)

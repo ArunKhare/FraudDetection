@@ -54,12 +54,19 @@ import sys
 
 
 class FraudDetectionException(Exception):
+    """Custom exception class. Generates the detailed error message
+
+    Args:
+        Exception (_type_): _description_
+    """
+
     def __init__(self, error_message: Exception, error_details: sys):
         """
         Initializes a FraudDetectionException.
+
         Args:
-            error_message (Exception): The original exception object.
-            error_details (sys): The sys module object containing error details.
+            error_message (Exception): _description_
+            error_details (sys): _description_
         """
         super().__init__(error_message)
         self.error_message = FraudDetectionException.get_detailed_error_message(

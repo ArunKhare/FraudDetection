@@ -5,6 +5,7 @@ import sys
 from pathlib import Path
 import numpy as np
 import pandas as pd
+
 # from IPython.display import display
 from imblearn.over_sampling import SMOTENC
 from imblearn.under_sampling import RandomUnderSampler
@@ -15,7 +16,10 @@ from sklearn.feature_selection import SelectPercentile, chi2, SelectFromModel
 from sklearn.impute import SimpleImputer
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import RobustScaler, OneHotEncoder
-from fraudDetection.constants import (DATA_SCHEMA_COLUMNS_KEY, DATA_SCHEMA_TARGET_COLUMN_KEY)
+from fraudDetection.constants import (
+    DATA_SCHEMA_COLUMNS_KEY,
+    DATA_SCHEMA_TARGET_COLUMN_KEY,
+)
 from fraudDetection.entity import (
     DataIngestionArtifact,
     DataTransformationConfig,
@@ -190,10 +194,11 @@ class CustomImputer(BaseEstimator, TransformerMixin):
 
 def get_data_processing_objects() -> Pipeline:
     """
+    _summary_
     Module level function.
     Define the preprocessing data pipeline with SMOTENC and RandomUnderSampler
-    Returns: pipe_obj(obj:'Pipeline'): Pipeline with fitted steps
-             pipe_obj1(obj:'Pipeline'): Pipeline with fitted steps
+    Returns:
+        Pipeline: _description_
     """
     imputer = Pipeline([("CustomImputer", CustomImputer(thresh=0.3))])
 

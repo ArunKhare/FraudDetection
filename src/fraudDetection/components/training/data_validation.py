@@ -1,9 +1,13 @@
 """ This module validates the ingested data with the schema from config yaml"""
+
 import os
 import sys
 from pathlib import Path
 import pandas as pd
-from fraudDetection.constants import (DATA_SCHEMA_COLUMNS_KEY, DATA_SCHEMA_TARGET_COLUMN_KEY)
+from fraudDetection.constants import (
+    DATA_SCHEMA_COLUMNS_KEY,
+    DATA_SCHEMA_TARGET_COLUMN_KEY,
+)
 from fraudDetection.entity import (
     DataValidationConfig,
     DataValidationArtifact,
@@ -47,13 +51,13 @@ class DataValidation:
             is_testing_path_exist = os.path.exists(test_file_dir)
 
             if not is_training_path_exist and is_testing_path_exist:
-                raise Exception(
+                raise ValueError(
                     f"train_file_dir {train_file_dir} or test_file_dir {test_file_dir} does not exist",
                     sys,
                 )
 
             if not os.listdir(train_file_dir) and not os.listdir(test_file_dir):
-                raise Exception(
+                raise ValueError(
                     f"{train_file_dir} and {test_file_dir} no file found", sys
                 )
 
@@ -105,14 +109,24 @@ class DataValidation:
 
             return train_df, test_df
 
-        except Exception as e:
+        except (Exception, ValueError) as e:
             raise FraudDetectionException(e, sys) from e
 
     def validate_dataset_scheme(self, train_df, test_df):
         """Validating dataset schema with schema provided
-        Returns: 
-            bool: valid or not
-            target_col(obj:'pd.Series'): target feature of the dataset
+
+        Args:
+            train_df (_type_): _description_
+            test_df (_type_): _description_
+
+        Raises:
+            Exception: _description_
+            Exception: _description_
+            Exception: _description_
+            FraudDetectionException: _description_
+
+        Returns:
+            _type_: _description_
         """
         try:
             # Getting schema
@@ -126,7 +140,9 @@ class DataValidation:
 
             # Compare Df schemas
             if not train_df.dtypes.equals(test_df.dtypes):
-                raise Exception("Test and Train file schemas are not equal")
+                raise ValueError(
+                    "The schemas of the Test and Train DataFrames are not equal."
+                )
 
             missing_cols = [col for col in data_schema if col not in train_df.columns]
             mismatch_dtype_cols = [
@@ -136,12 +152,12 @@ class DataValidation:
             ]
 
             if missing_cols:
-                raise Exception(
-                    f"The following columns are missing from the DataFrame schema: {missing_cols}"
+                raise KeyError(
+                    f"The column '{missing_cols}' is missing from the DataFrame schema."
                 )
             elif mismatch_dtype_cols:
-                raise Exception(
-                    f"The following columns data types does not match with schema: {mismatch_dtype_cols}"
+                raise TypeError(
+                    f"Data type mismatch detected in {mismatch_dtype_cols}. Expected {dtype}."
                 )
             else:
                 logging.info(
@@ -150,16 +166,21 @@ class DataValidation:
 
             logging.info("Data validated")
             return True, target_col
-        except Exception as e:
+        except (ValueError, KeyError, TypeError) as e:
             raise FraudDetectionException(f"Error comparing schema: {e}", sys) from e
 
     def get_and_save_drift_report(self, train_df, test_df):
         """create a data drift report
+
         Args:
-            train_df(obj:'pd.DataFrame'): training dataset
-            test_df(obj:'pd.DataFrame'): testing dataset
+            train_df (_type_): _description_
+            test_df (_type_): _description_
+
+        Raises:
+            FraudDetectionException: _description_
+
         Returns:
-            message (str): string whether data is valid
+            _type_: _description_
         """
         try:
             logging.info("Creating a datadrift report")
