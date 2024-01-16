@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>fraudDetection.entity.config_entity &mdash; Fraud-Detection beta:v1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=92fd9be5" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=eafc0fe6" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=e630dfc1"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Fraud-Detection
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../fraudDetection.html">fraudDetection package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">FraudDetection</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../considerations.html">Considerations</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Fraud-Detection</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">fraudDetection.entity.config_entity</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for fraudDetection.entity.config_entity</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;This module defines data classes for various configuration settings used in the project, </span>
+<span class="sd">including paths and other configurations.</span>
+
+<span class="sd">Classes:</span>
+<span class="sd">    - DataIngestionConfig: Configuration for data ingestion process.</span>
+<span class="sd">    - DataValidationConfig: Configuration for data validation process.</span>
+<span class="sd">    - DataTransformationConfig: Configuration for data validation process.</span>
+<span class="sd">    - ModelTrainerConfig: Configuration for model trainer process.</span>
+<span class="sd">    - ModelEvaluationConfig: Configuration for model evaluation process.</span>
+<span class="sd">    - ModelPusherConfig: Configuration for model pusher process.</span>
+<span class="sd">    - TrainingPipelineConfig: Configuration for training pipeline process.</span>
+
+<span class="sd">Attributes:</span>
+<span class="sd">    - source_url (str): The source URL for data ingestion.</span>
+<span class="sd">    - kaggle_config_file (Path): Path to the Kaggle configuration file.</span>
+<span class="sd">    - zip_data_dir(Path): Path to the zip data directory</span>
+<span class="sd">    - raw_data_dir (Path): Path to the raw data directory.</span>
+<span class="sd">    - ingested_dir (Path): Path to the ingested data directory.</span>
+<span class="sd">    - ingested_train_dir (Path): Path to the ingested training data directory.</span>
+<span class="sd">    - ingested_test_dir (Path): Path to the ingested test data directory.</span>
+<span class="sd">    - stratify (str): Stratification parameter for data splitting (default: None).</span>
+<span class="sd">    - test_size (float): Test set size for data splitting (default: 0.2).</span>
+
+<span class="sd">    - schema_file_name (str): Name of the schema file for data validation.</span>
+<span class="sd">    - schema_file_path (Path): Path to the schema file.</span>
+<span class="sd">    - report_file_name (str): Name of the report file for data validation.</span>
+<span class="sd">    - report_file_path (Path): Path to the report file.</span>
+
+<span class="sd">    - transformed_dir (Path): Path to the transformed data directory.</span>
+<span class="sd">    - transformed_train_dir (Path): Path to the transformed training data directory.</span>
+<span class="sd">    - transformed_test_dir (Path): Path to the transformed test data directory.</span>
+<span class="sd">    - preprocessing_object_file_path (Path): Path to the preprocessing object file.</span>
+<span class="sd">    - imputer_sampler_object_file_path (Path): Path to the imputer sampler object file.</span>
+
+<span class="sd">    - trained_model_file_path (Path): Path to the trained model file.</span>
+<span class="sd">    - base_score (float): Base score for the model.</span>
+<span class="sd">    - model_config_file_path (str): Path to the model configuration file.</span>
+<span class="sd">    - threshold_diff_train_test_acc (float): Threshold difference between train and test accuracy.</span>
+
+<span class="sd">    - model_evaluation_file_path (Path): Path to the model evaluation file.</span>
+<span class="sd">    - time_stamp (str): Timestamp for model evaluation.</span>
+
+<span class="sd">    - model_export_dir (Path): Path to the model export directory.</span>
+<span class="sd">    - saved_models_directory (str): Directory for saved models.</span>
+
+<span class="sd">    - artifacts_root (Path): Root directory for artifacts.</span>
+<span class="sd">    - training_pipeline_name (str): Name of the training pipeline.</span>
+
+<span class="sd">Examples:</span>
+<span class="sd">    - training_config = TrainingPipelineConfig(</span>
+<span class="sd">        artifacts_root=Path(&quot;/path/to/artifacts&quot;),</span>
+<span class="sd">        training_pipeline_name=&quot;ExamplePipeline&quot;</span>
+<span class="sd">    )</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+
+
+<div class="viewcode-block" id="DataIngestionConfig">
+<a class="viewcode-back" href="../../../fraudDetection.entity.html#fraudDetection.entity.config_entity.DataIngestionConfig">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">DataIngestionConfig</span><span class="p">:</span>
+    <span class="n">source_url</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">zip_data_dir</span><span class="p">:</span> <span class="n">Path</span>
+    <span class="n">raw_data_dir</span><span class="p">:</span> <span class="n">Path</span>
+    <span class="n">ingested_dir</span><span class="p">:</span> <span class="n">Path</span>
+    <span class="n">ingested_train_dir</span><span class="p">:</span> <span class="n">Path</span>
+    <span class="n">ingested_test_dir</span><span class="p">:</span> <span class="n">Path</span>
+    <span class="n">stratify</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">test_size</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.2</span></div>
+
+
+
+<div class="viewcode-block" id="DataValidationConfig">
+<a class="viewcode-back" href="../../../fraudDetection.entity.html#fraudDetection.entity.config_entity.DataValidationConfig">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">DataValidationConfig</span><span class="p">:</span>
+    <span class="n">schema_file_name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">schema_file_path</span><span class="p">:</span> <span class="n">Path</span>
+    <span class="n">report_file_name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">report_file_path</span><span class="p">:</span> <span class="n">Path</span></div>
+
+
+
+<div class="viewcode-block" id="DataTransformationConfig">
+<a class="viewcode-back" href="../../../fraudDetection.entity.html#fraudDetection.entity.config_entity.DataTransformationConfig">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">DataTransformationConfig</span><span class="p">:</span>
+    <span class="n">transformed_dir</span><span class="p">:</span> <span class="n">Path</span>
+    <span class="n">transformed_train_dir</span><span class="p">:</span> <span class="n">Path</span>
+    <span class="n">transformed_test_dir</span><span class="p">:</span> <span class="n">Path</span>
+    <span class="n">preprocessing_object_file_path</span><span class="p">:</span> <span class="n">Path</span>
+    <span class="n">imputer_sampler_object_file_path</span><span class="p">:</span> <span class="n">Path</span></div>
+
+
+
+<div class="viewcode-block" id="ModelTrainerConfig">
+<a class="viewcode-back" href="../../../fraudDetection.entity.html#fraudDetection.entity.config_entity.ModelTrainerConfig">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">ModelTrainerConfig</span><span class="p">:</span>
+    <span class="n">trained_model_file_path</span><span class="p">:</span> <span class="n">Path</span>
+    <span class="n">base_score</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">model_config_file_path</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">threshold_diff_train_test_acc</span><span class="p">:</span> <span class="nb">float</span></div>
+
+
+
+<div class="viewcode-block" id="ModelEvaluationConfig">
+<a class="viewcode-back" href="../../../fraudDetection.entity.html#fraudDetection.entity.config_entity.ModelEvaluationConfig">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">ModelEvaluationConfig</span><span class="p">:</span>
+    <span class="n">model_evaluation_file_path</span><span class="p">:</span> <span class="n">Path</span>
+    <span class="n">time_stamp</span><span class="p">:</span> <span class="nb">str</span></div>
+
+
+
+<div class="viewcode-block" id="ModelPusherConfig">
+<a class="viewcode-back" href="../../../fraudDetection.entity.html#fraudDetection.entity.config_entity.ModelPusherConfig">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">ModelPusherConfig</span><span class="p">:</span>
+    <span class="n">model_export_dir</span><span class="p">:</span> <span class="n">Path</span>
+    <span class="n">saved_models_directory</span><span class="p">:</span> <span class="nb">str</span></div>
+
+
+
+<div class="viewcode-block" id="TrainingPipelineConfig">
+<a class="viewcode-back" href="../../../fraudDetection.entity.html#fraudDetection.entity.config_entity.TrainingPipelineConfig">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">TrainingPipelineConfig</span><span class="p">:</span>
+    <span class="n">artifacts_root</span><span class="p">:</span> <span class="n">Path</span>
+    <span class="n">training_pipeline_name</span><span class="p">:</span> <span class="nb">str</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Arun khare.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>fraudDetection.constants package &mdash; Fraud-Detection beta:v1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=92fd9be5" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=eafc0fe6" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=e630dfc1"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="fraudDetection.entity package" href="fraudDetection.entity.html" />
+    <link rel="prev" title="fraudDetection.config package" href="fraudDetection.config.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Fraud-Detection
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="fraudDetection.html">fraudDetection package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="fraudDetection.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="fraudDetection.components.html">fraudDetection.components package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fraudDetection.config.html">fraudDetection.config package</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">fraudDetection.constants package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#fraudDetection.constants.ROOT_DIR"><code class="docutils literal notranslate"><span class="pre">ROOT_DIR</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#fraudDetection.constants.CONFIG_DIR"><code class="docutils literal notranslate"><span class="pre">CONFIG_DIR</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#fraudDetection.constants.CONFIG_FILE_NAME"><code class="docutils literal notranslate"><span class="pre">CONFIG_FILE_NAME</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#fraudDetection.constants.CONFIG_FILE_PATH"><code class="docutils literal notranslate"><span class="pre">CONFIG_FILE_PATH</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#fraudDetection.constants.DATA_SCHEMA_FILE_NAME_KEY"><code class="docutils literal notranslate"><span class="pre">DATA_SCHEMA_FILE_NAME_KEY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#fraudDetection.constants.DATA_SCHEMA_DIR"><code class="docutils literal notranslate"><span class="pre">DATA_SCHEMA_DIR</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#fraudDetection.constants.DATA_SCHEMA_COLUMNS_KEY"><code class="docutils literal notranslate"><span class="pre">DATA_SCHEMA_COLUMNS_KEY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#fraudDetection.constants.DATA_SCHEMA_CATEGORICAL_COLUMN_KEY"><code class="docutils literal notranslate"><span class="pre">DATA_SCHEMA_CATEGORICAL_COLUMN_KEY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#fraudDetection.constants.DATA_SCHEMA_NUMERICAL_COLUMN_KEY"><code class="docutils literal notranslate"><span class="pre">DATA_SCHEMA_NUMERICAL_COLUMN_KEY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#fraudDetection.constants.DATA_SCHEMA_TARGET_COLUMN_KEY"><code class="docutils literal notranslate"><span class="pre">DATA_SCHEMA_TARGET_COLUMN_KEY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#fraudDetection.constants.LOGS_DIR"><code class="docutils literal notranslate"><span class="pre">LOGS_DIR</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#fraudDetection.constants.CURRENT_TIME_STAMP"><code class="docutils literal notranslate"><span class="pre">CURRENT_TIME_STAMP</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#fraudDetection.constants.TRAINING_PIPELINE_CONFIG_KEY"><code class="docutils literal notranslate"><span class="pre">TRAINING_PIPELINE_CONFIG_KEY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#fraudDetection.constants.TRAINING_PIPELINE_NAME_KEY"><code class="docutils literal notranslate"><span class="pre">TRAINING_PIPELINE_NAME_KEY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#fraudDetection.constants.TRAINING_PIPELINE_ARTIFACT_DIR_KEY"><code class="docutils literal notranslate"><span class="pre">TRAINING_PIPELINE_ARTIFACT_DIR_KEY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#fraudDetection.constants.DATA_INGESTION_CONFIG_KEY"><code class="docutils literal notranslate"><span class="pre">DATA_INGESTION_CONFIG_KEY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#fraudDetection.constants.DATA_INGESTION_ARTIFACT_DIR_KEY"><code class="docutils literal notranslate"><span class="pre">DATA_INGESTION_ARTIFACT_DIR_KEY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#fraudDetection.constants.DATA_INGESTION_URL_KEY"><code class="docutils literal notranslate"><span class="pre">DATA_INGESTION_URL_KEY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#fraudDetection.constants.DATA_INGESTION_ZIP_DATA_DIR_KEY"><code class="docutils literal notranslate"><span class="pre">DATA_INGESTION_ZIP_DATA_DIR_KEY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#fraudDetection.constants.DATA_INGESTION_RAW_DATA_DIR_KEY"><code class="docutils literal notranslate"><span class="pre">DATA_INGESTION_RAW_DATA_DIR_KEY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#fraudDetection.constants.DATA_INGESTION_INGESTED_DIR_KEY"><code class="docutils literal notranslate"><span class="pre">DATA_INGESTION_INGESTED_DIR_KEY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#fraudDetection.constants.DATA_INGESTION_TRAIN_DIR_KEY"><code class="docutils literal notranslate"><span class="pre">DATA_INGESTION_TRAIN_DIR_KEY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#fraudDetection.constants.DATA_INGESTION_TEST_DIR_KEY"><code class="docutils literal notranslate"><span class="pre">DATA_INGESTION_TEST_DIR_KEY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#fraudDetection.constants.DATA_INGESTION_TEST_SIZE_KEY"><code class="docutils literal notranslate"><span class="pre">DATA_INGESTION_TEST_SIZE_KEY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#fraudDetection.constants.DATA_INGESTION_STRATIFY_COL_KEY"><code class="docutils literal notranslate"><span class="pre">DATA_INGESTION_STRATIFY_COL_KEY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#fraudDetection.constants.DATA_INGESTION_KAGGLE_CONFIG_FILE_PATH"><code class="docutils literal notranslate"><span class="pre">DATA_INGESTION_KAGGLE_CONFIG_FILE_PATH</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#fraudDetection.constants.DATA_VALIDATION_CONFIG_KEY"><code class="docutils literal notranslate"><span class="pre">DATA_VALIDATION_CONFIG_KEY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#fraudDetection.constants.DATA_VALIDATION_ARTIFACT_DIR_KEY"><code class="docutils literal notranslate"><span class="pre">DATA_VALIDATION_ARTIFACT_DIR_KEY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#fraudDetection.constants.DATA_VALIDATION_REPORT_FILE_NAME_KEY"><code class="docutils literal notranslate"><span class="pre">DATA_VALIDATION_REPORT_FILE_NAME_KEY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#fraudDetection.constants.DATA_VALIDATION_REPORT_FILE_PATH"><code class="docutils literal notranslate"><span class="pre">DATA_VALIDATION_REPORT_FILE_PATH</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#fraudDetection.constants.DATA_TRANSFORMATION_CONFIG_KEY"><code class="docutils literal notranslate"><span class="pre">DATA_TRANSFORMATION_CONFIG_KEY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#fraudDetection.constants.DATA_TRANSFORMATION_ARTIFACTS_DIR_KEY"><code class="docutils literal notranslate"><span class="pre">DATA_TRANSFORMATION_ARTIFACTS_DIR_KEY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#fraudDetection.constants.DATA_TRANSFORMED_TRAIN_DIR_KEY"><code class="docutils literal notranslate"><span class="pre">DATA_TRANSFORMED_TRAIN_DIR_KEY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#fraudDetection.constants.DATA_TRANSFORMED_TEST_DIR_KEY"><code class="docutils literal notranslate"><span class="pre">DATA_TRANSFORMED_TEST_DIR_KEY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#fraudDetection.constants.DATA_TRANSFORMATION_PREPROCESSING_DIR_KEY"><code class="docutils literal notranslate"><span class="pre">DATA_TRANSFORMATION_PREPROCESSING_DIR_KEY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#fraudDetection.constants.DATA_TRANSFORMATION_PREPROCESSING_OBJECT_FILE_NAME_KEY"><code class="docutils literal notranslate"><span class="pre">DATA_TRANSFORMATION_PREPROCESSING_OBJECT_FILE_NAME_KEY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#fraudDetection.constants.DATA_TRANSFORMATION_IMPUTER_SAMPLER_OBJECT_FILE_NAME_KEY"><code class="docutils literal notranslate"><span class="pre">DATA_TRANSFORMATION_IMPUTER_SAMPLER_OBJECT_FILE_NAME_KEY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#fraudDetection.constants.MODEL_TRAINER_ARTIFACTS_DIR_KEY"><code class="docutils literal notranslate"><span class="pre">MODEL_TRAINER_ARTIFACTS_DIR_KEY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#fraudDetection.constants.MODEL_TRAINER_CONFIG_KEY"><code class="docutils literal notranslate"><span class="pre">MODEL_TRAINER_CONFIG_KEY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#fraudDetection.constants.MODEL_TRAINED_DIR_KEY"><code class="docutils literal notranslate"><span class="pre">MODEL_TRAINED_DIR_KEY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#fraudDetection.constants.MODEL_TRAINED_FILE_NAME_KEY"><code class="docutils literal notranslate"><span class="pre">MODEL_TRAINED_FILE_NAME_KEY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#fraudDetection.constants.MODEL_TRAINER_CONFIG_DIR"><code class="docutils literal notranslate"><span class="pre">MODEL_TRAINER_CONFIG_DIR</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#fraudDetection.constants.MODEL_TRAINER_MODEL_CONFIG_FILE_NAME_KEY"><code class="docutils literal notranslate"><span class="pre">MODEL_TRAINER_MODEL_CONFIG_FILE_NAME_KEY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#fraudDetection.constants.MODEL_TRAINER_BASE_SCORE_KEY"><code class="docutils literal notranslate"><span class="pre">MODEL_TRAINER_BASE_SCORE_KEY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#fraudDetection.constants.MODEL_TRAINED_DIFF_TRAIN_TEST_ACC_KEY"><code class="docutils literal notranslate"><span class="pre">MODEL_TRAINED_DIFF_TRAIN_TEST_ACC_KEY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#fraudDetection.constants.MODEL_EVALUATION_CONFIG_KEY"><code class="docutils literal notranslate"><span class="pre">MODEL_EVALUATION_CONFIG_KEY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#fraudDetection.constants.MODEL_EVALUATION_ARTIFACTS_DIR_KEY"><code class="docutils literal notranslate"><span class="pre">MODEL_EVALUATION_ARTIFACTS_DIR_KEY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#fraudDetection.constants.MODEL_EVALUATION_FILE_NAME_KEY"><code class="docutils literal notranslate"><span class="pre">MODEL_EVALUATION_FILE_NAME_KEY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#fraudDetection.constants.BEST_MODEL_KEY"><code class="docutils literal notranslate"><span class="pre">BEST_MODEL_KEY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#fraudDetection.constants.HISTORY_KEY"><code class="docutils literal notranslate"><span class="pre">HISTORY_KEY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#fraudDetection.constants.MODEL_PATH_KEY"><code class="docutils literal notranslate"><span class="pre">MODEL_PATH_KEY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#fraudDetection.constants.MODEL_PUSHER_CONFIG_KEY"><code class="docutils literal notranslate"><span class="pre">MODEL_PUSHER_CONFIG_KEY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#fraudDetection.constants.MODEL_PUSHER_EXPORT_DIR_KEY"><code class="docutils literal notranslate"><span class="pre">MODEL_PUSHER_EXPORT_DIR_KEY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#fraudDetection.constants.FACTORY_GRID_SEARCH_KEY"><code class="docutils literal notranslate"><span class="pre">FACTORY_GRID_SEARCH_KEY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#fraudDetection.constants.FACTORY_MODULE_KEY"><code class="docutils literal notranslate"><span class="pre">FACTORY_MODULE_KEY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#fraudDetection.constants.FACTORY_CLASS_KEY"><code class="docutils literal notranslate"><span class="pre">FACTORY_CLASS_KEY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#fraudDetection.constants.FACTORY_PARAMS_KEY"><code class="docutils literal notranslate"><span class="pre">FACTORY_PARAMS_KEY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#fraudDetection.constants.FACTORY_MODEL_SELECTION_KEY"><code class="docutils literal notranslate"><span class="pre">FACTORY_MODEL_SELECTION_KEY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#fraudDetection.constants.FACTORY_SEARCH_PARAM_GRID_KEY"><code class="docutils literal notranslate"><span class="pre">FACTORY_SEARCH_PARAM_GRID_KEY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#fraudDetection.constants.EXPERIMENT_DIR_NAME"><code class="docutils literal notranslate"><span class="pre">EXPERIMENT_DIR_NAME</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#fraudDetection.constants.EXPERIMENT_FILE_NAME"><code class="docutils literal notranslate"><span class="pre">EXPERIMENT_FILE_NAME</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#fraudDetection.constants.get_current_time_stamp"><code class="docutils literal notranslate"><span class="pre">get_current_time_stamp()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="fraudDetection.entity.html">fraudDetection.entity package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fraudDetection.exception.html">fraudDetection.exception package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fraudDetection.logger.html">fraudDetection.logger package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fraudDetection.pipeline.html">fraudDetection.pipeline package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fraudDetection.utils.html">fraudDetection.utils package</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">FraudDetection</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="considerations.html">Considerations</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Fraud-Detection</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="fraudDetection.html">fraudDetection package</a></li>
+      <li class="breadcrumb-item active">fraudDetection.constants package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/fraudDetection.constants.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-fraudDetection.constants">
+<span id="frauddetection-constants-package"></span><h1>fraudDetection.constants package<a class="headerlink" href="#module-fraudDetection.constants" title="Link to this heading"></a></h1>
+<p>Module: fraudDetection.constants</p>
+<p>This module defines constants used in the fraud detection system.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fraudDetection.constants.ROOT_DIR">
+<span class="sig-prename descclassname"><span class="pre">fraudDetection.constants.</span></span><span class="sig-name descname"><span class="pre">ROOT_DIR</span></span><a class="headerlink" href="#fraudDetection.constants.ROOT_DIR" title="Link to this definition"></a></dt>
+<dd><p>Root directory of the project.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Path</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fraudDetection.constants.CONFIG_DIR">
+<span class="sig-prename descclassname"><span class="pre">fraudDetection.constants.</span></span><span class="sig-name descname"><span class="pre">CONFIG_DIR</span></span><a class="headerlink" href="#fraudDetection.constants.CONFIG_DIR" title="Link to this definition"></a></dt>
+<dd><p>Directory containing configuration files.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fraudDetection.constants.CONFIG_FILE_NAME">
+<span class="sig-prename descclassname"><span class="pre">fraudDetection.constants.</span></span><span class="sig-name descname"><span class="pre">CONFIG_FILE_NAME</span></span><a class="headerlink" href="#fraudDetection.constants.CONFIG_FILE_NAME" title="Link to this definition"></a></dt>
+<dd><p>Name of the main configuration file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fraudDetection.constants.CONFIG_FILE_PATH">
+<span class="sig-prename descclassname"><span class="pre">fraudDetection.constants.</span></span><span class="sig-name descname"><span class="pre">CONFIG_FILE_PATH</span></span><a class="headerlink" href="#fraudDetection.constants.CONFIG_FILE_PATH" title="Link to this definition"></a></dt>
+<dd><p>Full path to the main configuration file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Path</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fraudDetection.constants.DATA_SCHEMA_FILE_NAME_KEY">
+<span class="sig-prename descclassname"><span class="pre">fraudDetection.constants.</span></span><span class="sig-name descname"><span class="pre">DATA_SCHEMA_FILE_NAME_KEY</span></span><a class="headerlink" href="#fraudDetection.constants.DATA_SCHEMA_FILE_NAME_KEY" title="Link to this definition"></a></dt>
+<dd><p>Key for the data schema file name in the configuration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fraudDetection.constants.DATA_SCHEMA_DIR">
+<span class="sig-prename descclassname"><span class="pre">fraudDetection.constants.</span></span><span class="sig-name descname"><span class="pre">DATA_SCHEMA_DIR</span></span><a class="headerlink" href="#fraudDetection.constants.DATA_SCHEMA_DIR" title="Link to this definition"></a></dt>
+<dd><p>Directory containing data schema files.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Path</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fraudDetection.constants.DATA_SCHEMA_COLUMNS_KEY">
+<span class="sig-prename descclassname"><span class="pre">fraudDetection.constants.</span></span><span class="sig-name descname"><span class="pre">DATA_SCHEMA_COLUMNS_KEY</span></span><a class="headerlink" href="#fraudDetection.constants.DATA_SCHEMA_COLUMNS_KEY" title="Link to this definition"></a></dt>
+<dd><p>Key for the data schema columns in the configuration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fraudDetection.constants.DATA_SCHEMA_CATEGORICAL_COLUMN_KEY">
+<span class="sig-prename descclassname"><span class="pre">fraudDetection.constants.</span></span><span class="sig-name descname"><span class="pre">DATA_SCHEMA_CATEGORICAL_COLUMN_KEY</span></span><a class="headerlink" href="#fraudDetection.constants.DATA_SCHEMA_CATEGORICAL_COLUMN_KEY" title="Link to this definition"></a></dt>
+<dd><p>Key for categorical columns in the data schema.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fraudDetection.constants.DATA_SCHEMA_NUMERICAL_COLUMN_KEY">
+<span class="sig-prename descclassname"><span class="pre">fraudDetection.constants.</span></span><span class="sig-name descname"><span class="pre">DATA_SCHEMA_NUMERICAL_COLUMN_KEY</span></span><a class="headerlink" href="#fraudDetection.constants.DATA_SCHEMA_NUMERICAL_COLUMN_KEY" title="Link to this definition"></a></dt>
+<dd><p>Key for numerical columns in the data schema.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fraudDetection.constants.DATA_SCHEMA_TARGET_COLUMN_KEY">
+<span class="sig-prename descclassname"><span class="pre">fraudDetection.constants.</span></span><span class="sig-name descname"><span class="pre">DATA_SCHEMA_TARGET_COLUMN_KEY</span></span><a class="headerlink" href="#fraudDetection.constants.DATA_SCHEMA_TARGET_COLUMN_KEY" title="Link to this definition"></a></dt>
+<dd><p>Key for the target column in the data schema.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fraudDetection.constants.LOGS_DIR">
+<span class="sig-prename descclassname"><span class="pre">fraudDetection.constants.</span></span><span class="sig-name descname"><span class="pre">LOGS_DIR</span></span><a class="headerlink" href="#fraudDetection.constants.LOGS_DIR" title="Link to this definition"></a></dt>
+<dd><p>Directory for log files.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fraudDetection.constants.CURRENT_TIME_STAMP">
+<span class="sig-prename descclassname"><span class="pre">fraudDetection.constants.</span></span><span class="sig-name descname"><span class="pre">CURRENT_TIME_STAMP</span></span><a class="headerlink" href="#fraudDetection.constants.CURRENT_TIME_STAMP" title="Link to this definition"></a></dt>
+<dd><p>Current timestamp.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fraudDetection.constants.TRAINING_PIPELINE_CONFIG_KEY">
+<span class="sig-prename descclassname"><span class="pre">fraudDetection.constants.</span></span><span class="sig-name descname"><span class="pre">TRAINING_PIPELINE_CONFIG_KEY</span></span><a class="headerlink" href="#fraudDetection.constants.TRAINING_PIPELINE_CONFIG_KEY" title="Link to this definition"></a></dt>
+<dd><p>Key for training pipeline configuration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fraudDetection.constants.TRAINING_PIPELINE_NAME_KEY">
+<span class="sig-prename descclassname"><span class="pre">fraudDetection.constants.</span></span><span class="sig-name descname"><span class="pre">TRAINING_PIPELINE_NAME_KEY</span></span><a class="headerlink" href="#fraudDetection.constants.TRAINING_PIPELINE_NAME_KEY" title="Link to this definition"></a></dt>
+<dd><p>Key for the name of the training pipeline.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fraudDetection.constants.TRAINING_PIPELINE_ARTIFACT_DIR_KEY">
+<span class="sig-prename descclassname"><span class="pre">fraudDetection.constants.</span></span><span class="sig-name descname"><span class="pre">TRAINING_PIPELINE_ARTIFACT_DIR_KEY</span></span><a class="headerlink" href="#fraudDetection.constants.TRAINING_PIPELINE_ARTIFACT_DIR_KEY" title="Link to this definition"></a></dt>
+<dd><p>Key for the artifacts root directory in the training pipeline.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fraudDetection.constants.DATA_INGESTION_CONFIG_KEY">
+<span class="sig-prename descclassname"><span class="pre">fraudDetection.constants.</span></span><span class="sig-name descname"><span class="pre">DATA_INGESTION_CONFIG_KEY</span></span><a class="headerlink" href="#fraudDetection.constants.DATA_INGESTION_CONFIG_KEY" title="Link to this definition"></a></dt>
+<dd><p>Key for data ingestion configuration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fraudDetection.constants.DATA_INGESTION_ARTIFACT_DIR_KEY">
+<span class="sig-prename descclassname"><span class="pre">fraudDetection.constants.</span></span><span class="sig-name descname"><span class="pre">DATA_INGESTION_ARTIFACT_DIR_KEY</span></span><a class="headerlink" href="#fraudDetection.constants.DATA_INGESTION_ARTIFACT_DIR_KEY" title="Link to this definition"></a></dt>
+<dd><p>Key for the data ingestion artifacts directory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fraudDetection.constants.DATA_INGESTION_URL_KEY">
+<span class="sig-prename descclassname"><span class="pre">fraudDetection.constants.</span></span><span class="sig-name descname"><span class="pre">DATA_INGESTION_URL_KEY</span></span><a class="headerlink" href="#fraudDetection.constants.DATA_INGESTION_URL_KEY" title="Link to this definition"></a></dt>
+<dd><p>Key for the source URL in data ingestion configuration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fraudDetection.constants.DATA_INGESTION_ZIP_DATA_DIR_KEY">
+<span class="sig-prename descclassname"><span class="pre">fraudDetection.constants.</span></span><span class="sig-name descname"><span class="pre">DATA_INGESTION_ZIP_DATA_DIR_KEY</span></span><a class="headerlink" href="#fraudDetection.constants.DATA_INGESTION_ZIP_DATA_DIR_KEY" title="Link to this definition"></a></dt>
+<dd><p>Key for the zip data directory in data ingestion configuration</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fraudDetection.constants.DATA_INGESTION_RAW_DATA_DIR_KEY">
+<span class="sig-prename descclassname"><span class="pre">fraudDetection.constants.</span></span><span class="sig-name descname"><span class="pre">DATA_INGESTION_RAW_DATA_DIR_KEY</span></span><a class="headerlink" href="#fraudDetection.constants.DATA_INGESTION_RAW_DATA_DIR_KEY" title="Link to this definition"></a></dt>
+<dd><p>Key for the raw data directory in data ingestion configuration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fraudDetection.constants.DATA_INGESTION_INGESTED_DIR_KEY">
+<span class="sig-prename descclassname"><span class="pre">fraudDetection.constants.</span></span><span class="sig-name descname"><span class="pre">DATA_INGESTION_INGESTED_DIR_KEY</span></span><a class="headerlink" href="#fraudDetection.constants.DATA_INGESTION_INGESTED_DIR_KEY" title="Link to this definition"></a></dt>
+<dd><p>Key for the ingested data directory in data ingestion configuration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fraudDetection.constants.DATA_INGESTION_TRAIN_DIR_KEY">
+<span class="sig-prename descclassname"><span class="pre">fraudDetection.constants.</span></span><span class="sig-name descname"><span class="pre">DATA_INGESTION_TRAIN_DIR_KEY</span></span><a class="headerlink" href="#fraudDetection.constants.DATA_INGESTION_TRAIN_DIR_KEY" title="Link to this definition"></a></dt>
+<dd><p>Key for the ingested train data directory in data ingestion configuration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fraudDetection.constants.DATA_INGESTION_TEST_DIR_KEY">
+<span class="sig-prename descclassname"><span class="pre">fraudDetection.constants.</span></span><span class="sig-name descname"><span class="pre">DATA_INGESTION_TEST_DIR_KEY</span></span><a class="headerlink" href="#fraudDetection.constants.DATA_INGESTION_TEST_DIR_KEY" title="Link to this definition"></a></dt>
+<dd><p>Key for the ingested test data directory in data ingestion configuration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fraudDetection.constants.DATA_INGESTION_TEST_SIZE_KEY">
+<span class="sig-prename descclassname"><span class="pre">fraudDetection.constants.</span></span><span class="sig-name descname"><span class="pre">DATA_INGESTION_TEST_SIZE_KEY</span></span><a class="headerlink" href="#fraudDetection.constants.DATA_INGESTION_TEST_SIZE_KEY" title="Link to this definition"></a></dt>
+<dd><p>Key for the test size in data ingestion configuration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fraudDetection.constants.DATA_INGESTION_STRATIFY_COL_KEY">
+<span class="sig-prename descclassname"><span class="pre">fraudDetection.constants.</span></span><span class="sig-name descname"><span class="pre">DATA_INGESTION_STRATIFY_COL_KEY</span></span><a class="headerlink" href="#fraudDetection.constants.DATA_INGESTION_STRATIFY_COL_KEY" title="Link to this definition"></a></dt>
+<dd><p>Key for the stratify column in data ingestion configuration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fraudDetection.constants.DATA_INGESTION_KAGGLE_CONFIG_FILE_PATH">
+<span class="sig-prename descclassname"><span class="pre">fraudDetection.constants.</span></span><span class="sig-name descname"><span class="pre">DATA_INGESTION_KAGGLE_CONFIG_FILE_PATH</span></span><a class="headerlink" href="#fraudDetection.constants.DATA_INGESTION_KAGGLE_CONFIG_FILE_PATH" title="Link to this definition"></a></dt>
+<dd><p>Key for the Kaggle configuration file path in data ingestion.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fraudDetection.constants.DATA_VALIDATION_CONFIG_KEY">
+<span class="sig-prename descclassname"><span class="pre">fraudDetection.constants.</span></span><span class="sig-name descname"><span class="pre">DATA_VALIDATION_CONFIG_KEY</span></span><a class="headerlink" href="#fraudDetection.constants.DATA_VALIDATION_CONFIG_KEY" title="Link to this definition"></a></dt>
+<dd><p>Key for data validation configuration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fraudDetection.constants.DATA_VALIDATION_ARTIFACT_DIR_KEY">
+<span class="sig-prename descclassname"><span class="pre">fraudDetection.constants.</span></span><span class="sig-name descname"><span class="pre">DATA_VALIDATION_ARTIFACT_DIR_KEY</span></span><a class="headerlink" href="#fraudDetection.constants.DATA_VALIDATION_ARTIFACT_DIR_KEY" title="Link to this definition"></a></dt>
+<dd><p>Key for data validation artifacts directory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fraudDetection.constants.DATA_VALIDATION_REPORT_FILE_NAME_KEY">
+<span class="sig-prename descclassname"><span class="pre">fraudDetection.constants.</span></span><span class="sig-name descname"><span class="pre">DATA_VALIDATION_REPORT_FILE_NAME_KEY</span></span><a class="headerlink" href="#fraudDetection.constants.DATA_VALIDATION_REPORT_FILE_NAME_KEY" title="Link to this definition"></a></dt>
+<dd><p>Key for the report file name in data validation configuration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fraudDetection.constants.DATA_VALIDATION_REPORT_FILE_PATH">
+<span class="sig-prename descclassname"><span class="pre">fraudDetection.constants.</span></span><span class="sig-name descname"><span class="pre">DATA_VALIDATION_REPORT_FILE_PATH</span></span><a class="headerlink" href="#fraudDetection.constants.DATA_VALIDATION_REPORT_FILE_PATH" title="Link to this definition"></a></dt>
+<dd><p>Key for the report file directory in data validation configuration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fraudDetection.constants.DATA_TRANSFORMATION_CONFIG_KEY">
+<span class="sig-prename descclassname"><span class="pre">fraudDetection.constants.</span></span><span class="sig-name descname"><span class="pre">DATA_TRANSFORMATION_CONFIG_KEY</span></span><a class="headerlink" href="#fraudDetection.constants.DATA_TRANSFORMATION_CONFIG_KEY" title="Link to this definition"></a></dt>
+<dd><p>Key for data transformation configuration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fraudDetection.constants.DATA_TRANSFORMATION_ARTIFACTS_DIR_KEY">
+<span class="sig-prename descclassname"><span class="pre">fraudDetection.constants.</span></span><span class="sig-name descname"><span class="pre">DATA_TRANSFORMATION_ARTIFACTS_DIR_KEY</span></span><a class="headerlink" href="#fraudDetection.constants.DATA_TRANSFORMATION_ARTIFACTS_DIR_KEY" title="Link to this definition"></a></dt>
+<dd><p>Key for the transformed data directory in data transformation configuration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fraudDetection.constants.DATA_TRANSFORMED_TRAIN_DIR_KEY">
+<span class="sig-prename descclassname"><span class="pre">fraudDetection.constants.</span></span><span class="sig-name descname"><span class="pre">DATA_TRANSFORMED_TRAIN_DIR_KEY</span></span><a class="headerlink" href="#fraudDetection.constants.DATA_TRANSFORMED_TRAIN_DIR_KEY" title="Link to this definition"></a></dt>
+<dd><p>Key for the transformed train data directory in data transformation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fraudDetection.constants.DATA_TRANSFORMED_TEST_DIR_KEY">
+<span class="sig-prename descclassname"><span class="pre">fraudDetection.constants.</span></span><span class="sig-name descname"><span class="pre">DATA_TRANSFORMED_TEST_DIR_KEY</span></span><a class="headerlink" href="#fraudDetection.constants.DATA_TRANSFORMED_TEST_DIR_KEY" title="Link to this definition"></a></dt>
+<dd><p>Key for the transformed test data directory in data transformation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fraudDetection.constants.DATA_TRANSFORMATION_PREPROCESSING_DIR_KEY">
+<span class="sig-prename descclassname"><span class="pre">fraudDetection.constants.</span></span><span class="sig-name descname"><span class="pre">DATA_TRANSFORMATION_PREPROCESSING_DIR_KEY</span></span><a class="headerlink" href="#fraudDetection.constants.DATA_TRANSFORMATION_PREPROCESSING_DIR_KEY" title="Link to this definition"></a></dt>
+<dd><p>Key for the preprocessing directory in data transformation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fraudDetection.constants.DATA_TRANSFORMATION_PREPROCESSING_OBJECT_FILE_NAME_KEY">
+<span class="sig-prename descclassname"><span class="pre">fraudDetection.constants.</span></span><span class="sig-name descname"><span class="pre">DATA_TRANSFORMATION_PREPROCESSING_OBJECT_FILE_NAME_KEY</span></span><a class="headerlink" href="#fraudDetection.constants.DATA_TRANSFORMATION_PREPROCESSING_OBJECT_FILE_NAME_KEY" title="Link to this definition"></a></dt>
+<dd><p>Key for the preprocessing object file name.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fraudDetection.constants.DATA_TRANSFORMATION_IMPUTER_SAMPLER_OBJECT_FILE_NAME_KEY">
+<span class="sig-prename descclassname"><span class="pre">fraudDetection.constants.</span></span><span class="sig-name descname"><span class="pre">DATA_TRANSFORMATION_IMPUTER_SAMPLER_OBJECT_FILE_NAME_KEY</span></span><a class="headerlink" href="#fraudDetection.constants.DATA_TRANSFORMATION_IMPUTER_SAMPLER_OBJECT_FILE_NAME_KEY" title="Link to this definition"></a></dt>
+<dd><p>Key for the imputer sampler object file name.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fraudDetection.constants.MODEL_TRAINER_ARTIFACTS_DIR_KEY">
+<span class="sig-prename descclassname"><span class="pre">fraudDetection.constants.</span></span><span class="sig-name descname"><span class="pre">MODEL_TRAINER_ARTIFACTS_DIR_KEY</span></span><a class="headerlink" href="#fraudDetection.constants.MODEL_TRAINER_ARTIFACTS_DIR_KEY" title="Link to this definition"></a></dt>
+<dd><p>Key for model trainer artifacts directory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fraudDetection.constants.MODEL_TRAINER_CONFIG_KEY">
+<span class="sig-prename descclassname"><span class="pre">fraudDetection.constants.</span></span><span class="sig-name descname"><span class="pre">MODEL_TRAINER_CONFIG_KEY</span></span><a class="headerlink" href="#fraudDetection.constants.MODEL_TRAINER_CONFIG_KEY" title="Link to this definition"></a></dt>
+<dd><p>Key for model trainer configuration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fraudDetection.constants.MODEL_TRAINED_DIR_KEY">
+<span class="sig-prename descclassname"><span class="pre">fraudDetection.constants.</span></span><span class="sig-name descname"><span class="pre">MODEL_TRAINED_DIR_KEY</span></span><a class="headerlink" href="#fraudDetection.constants.MODEL_TRAINED_DIR_KEY" title="Link to this definition"></a></dt>
+<dd><p>Key for the trained model directory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fraudDetection.constants.MODEL_TRAINED_FILE_NAME_KEY">
+<span class="sig-prename descclassname"><span class="pre">fraudDetection.constants.</span></span><span class="sig-name descname"><span class="pre">MODEL_TRAINED_FILE_NAME_KEY</span></span><a class="headerlink" href="#fraudDetection.constants.MODEL_TRAINED_FILE_NAME_KEY" title="Link to this definition"></a></dt>
+<dd><p>Key for the model file name in model trainer configuration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fraudDetection.constants.MODEL_TRAINER_CONFIG_DIR">
+<span class="sig-prename descclassname"><span class="pre">fraudDetection.constants.</span></span><span class="sig-name descname"><span class="pre">MODEL_TRAINER_CONFIG_DIR</span></span><a class="headerlink" href="#fraudDetection.constants.MODEL_TRAINER_CONFIG_DIR" title="Link to this definition"></a></dt>
+<dd><p>Directory containing model trainer configuration files.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Path</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fraudDetection.constants.MODEL_TRAINER_MODEL_CONFIG_FILE_NAME_KEY">
+<span class="sig-prename descclassname"><span class="pre">fraudDetection.constants.</span></span><span class="sig-name descname"><span class="pre">MODEL_TRAINER_MODEL_CONFIG_FILE_NAME_KEY</span></span><a class="headerlink" href="#fraudDetection.constants.MODEL_TRAINER_MODEL_CONFIG_FILE_NAME_KEY" title="Link to this definition"></a></dt>
+<dd><p>Key for the model config file name in model trainer configuration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fraudDetection.constants.MODEL_TRAINER_BASE_SCORE_KEY">
+<span class="sig-prename descclassname"><span class="pre">fraudDetection.constants.</span></span><span class="sig-name descname"><span class="pre">MODEL_TRAINER_BASE_SCORE_KEY</span></span><a class="headerlink" href="#fraudDetection.constants.MODEL_TRAINER_BASE_SCORE_KEY" title="Link to this definition"></a></dt>
+<dd><p>Key for the base score in model trainer configuration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fraudDetection.constants.MODEL_TRAINED_DIFF_TRAIN_TEST_ACC_KEY">
+<span class="sig-prename descclassname"><span class="pre">fraudDetection.constants.</span></span><span class="sig-name descname"><span class="pre">MODEL_TRAINED_DIFF_TRAIN_TEST_ACC_KEY</span></span><a class="headerlink" href="#fraudDetection.constants.MODEL_TRAINED_DIFF_TRAIN_TEST_ACC_KEY" title="Link to this definition"></a></dt>
+<dd><p>Key for the threshold difference between train and test accuracy.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fraudDetection.constants.MODEL_EVALUATION_CONFIG_KEY">
+<span class="sig-prename descclassname"><span class="pre">fraudDetection.constants.</span></span><span class="sig-name descname"><span class="pre">MODEL_EVALUATION_CONFIG_KEY</span></span><a class="headerlink" href="#fraudDetection.constants.MODEL_EVALUATION_CONFIG_KEY" title="Link to this definition"></a></dt>
+<dd><p>Key for model evaluation configuration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fraudDetection.constants.MODEL_EVALUATION_ARTIFACTS_DIR_KEY">
+<span class="sig-prename descclassname"><span class="pre">fraudDetection.constants.</span></span><span class="sig-name descname"><span class="pre">MODEL_EVALUATION_ARTIFACTS_DIR_KEY</span></span><a class="headerlink" href="#fraudDetection.constants.MODEL_EVALUATION_ARTIFACTS_DIR_KEY" title="Link to this definition"></a></dt>
+<dd><p>Key for model evaluation artifacts directory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fraudDetection.constants.MODEL_EVALUATION_FILE_NAME_KEY">
+<span class="sig-prename descclassname"><span class="pre">fraudDetection.constants.</span></span><span class="sig-name descname"><span class="pre">MODEL_EVALUATION_FILE_NAME_KEY</span></span><a class="headerlink" href="#fraudDetection.constants.MODEL_EVALUATION_FILE_NAME_KEY" title="Link to this definition"></a></dt>
+<dd><p>Key for the model evaluation file name.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fraudDetection.constants.BEST_MODEL_KEY">
+<span class="sig-prename descclassname"><span class="pre">fraudDetection.constants.</span></span><span class="sig-name descname"><span class="pre">BEST_MODEL_KEY</span></span><a class="headerlink" href="#fraudDetection.constants.BEST_MODEL_KEY" title="Link to this definition"></a></dt>
+<dd><p>Key for the best model in model evaluation .</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fraudDetection.constants.HISTORY_KEY">
+<span class="sig-prename descclassname"><span class="pre">fraudDetection.constants.</span></span><span class="sig-name descname"><span class="pre">HISTORY_KEY</span></span><a class="headerlink" href="#fraudDetection.constants.HISTORY_KEY" title="Link to this definition"></a></dt>
+<dd><p>Key for best model archive in model evaluation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fraudDetection.constants.MODEL_PATH_KEY">
+<span class="sig-prename descclassname"><span class="pre">fraudDetection.constants.</span></span><span class="sig-name descname"><span class="pre">MODEL_PATH_KEY</span></span><a class="headerlink" href="#fraudDetection.constants.MODEL_PATH_KEY" title="Link to this definition"></a></dt>
+<dd><p>Key for the model path in model evaluation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fraudDetection.constants.MODEL_PUSHER_CONFIG_KEY">
+<span class="sig-prename descclassname"><span class="pre">fraudDetection.constants.</span></span><span class="sig-name descname"><span class="pre">MODEL_PUSHER_CONFIG_KEY</span></span><a class="headerlink" href="#fraudDetection.constants.MODEL_PUSHER_CONFIG_KEY" title="Link to this definition"></a></dt>
+<dd><p>Key for model pusher configuration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fraudDetection.constants.MODEL_PUSHER_EXPORT_DIR_KEY">
+<span class="sig-prename descclassname"><span class="pre">fraudDetection.constants.</span></span><span class="sig-name descname"><span class="pre">MODEL_PUSHER_EXPORT_DIR_KEY</span></span><a class="headerlink" href="#fraudDetection.constants.MODEL_PUSHER_EXPORT_DIR_KEY" title="Link to this definition"></a></dt>
+<dd><p>Key for the model export directory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fraudDetection.constants.FACTORY_GRID_SEARCH_KEY">
+<span class="sig-prename descclassname"><span class="pre">fraudDetection.constants.</span></span><span class="sig-name descname"><span class="pre">FACTORY_GRID_SEARCH_KEY</span></span><a class="headerlink" href="#fraudDetection.constants.FACTORY_GRID_SEARCH_KEY" title="Link to this definition"></a></dt>
+<dd><p>Key for grid search in model factory configuration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fraudDetection.constants.FACTORY_MODULE_KEY">
+<span class="sig-prename descclassname"><span class="pre">fraudDetection.constants.</span></span><span class="sig-name descname"><span class="pre">FACTORY_MODULE_KEY</span></span><a class="headerlink" href="#fraudDetection.constants.FACTORY_MODULE_KEY" title="Link to this definition"></a></dt>
+<dd><p>Key for module in model factory configuration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fraudDetection.constants.FACTORY_CLASS_KEY">
+<span class="sig-prename descclassname"><span class="pre">fraudDetection.constants.</span></span><span class="sig-name descname"><span class="pre">FACTORY_CLASS_KEY</span></span><a class="headerlink" href="#fraudDetection.constants.FACTORY_CLASS_KEY" title="Link to this definition"></a></dt>
+<dd><p>Key for class in model factory configuration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fraudDetection.constants.FACTORY_PARAMS_KEY">
+<span class="sig-prename descclassname"><span class="pre">fraudDetection.constants.</span></span><span class="sig-name descname"><span class="pre">FACTORY_PARAMS_KEY</span></span><a class="headerlink" href="#fraudDetection.constants.FACTORY_PARAMS_KEY" title="Link to this definition"></a></dt>
+<dd><p>Key for params in model factory configuration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fraudDetection.constants.FACTORY_MODEL_SELECTION_KEY">
+<span class="sig-prename descclassname"><span class="pre">fraudDetection.constants.</span></span><span class="sig-name descname"><span class="pre">FACTORY_MODEL_SELECTION_KEY</span></span><a class="headerlink" href="#fraudDetection.constants.FACTORY_MODEL_SELECTION_KEY" title="Link to this definition"></a></dt>
+<dd><p>Key for model selection in model factory configuration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fraudDetection.constants.FACTORY_SEARCH_PARAM_GRID_KEY">
+<span class="sig-prename descclassname"><span class="pre">fraudDetection.constants.</span></span><span class="sig-name descname"><span class="pre">FACTORY_SEARCH_PARAM_GRID_KEY</span></span><a class="headerlink" href="#fraudDetection.constants.FACTORY_SEARCH_PARAM_GRID_KEY" title="Link to this definition"></a></dt>
+<dd><p>Key for search parameter grid in model factory configuration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fraudDetection.constants.EXPERIMENT_DIR_NAME">
+<span class="sig-prename descclassname"><span class="pre">fraudDetection.constants.</span></span><span class="sig-name descname"><span class="pre">EXPERIMENT_DIR_NAME</span></span><a class="headerlink" href="#fraudDetection.constants.EXPERIMENT_DIR_NAME" title="Link to this definition"></a></dt>
+<dd><p>Directory name for experiments.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fraudDetection.constants.EXPERIMENT_FILE_NAME">
+<span class="sig-prename descclassname"><span class="pre">fraudDetection.constants.</span></span><span class="sig-name descname"><span class="pre">EXPERIMENT_FILE_NAME</span></span><a class="headerlink" href="#fraudDetection.constants.EXPERIMENT_FILE_NAME" title="Link to this definition"></a></dt>
+<dd><p>File name for experiment details.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fraudDetection.constants.get_current_time_stamp">
+<span class="sig-prename descclassname"><span class="pre">fraudDetection.constants.</span></span><span class="sig-name descname"><span class="pre">get_current_time_stamp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/fraudDetection/constants.html#get_current_time_stamp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fraudDetection.constants.get_current_time_stamp" title="Link to this definition"></a></dt>
+<dd><p>Get the current timestamp.
+:returns: Current timestamp in a string format.
+:rtype: str</p>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="fraudDetection.config.html" class="btn btn-neutral float-left" title="fraudDetection.config package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="fraudDetection.entity.html" class="btn btn-neutral float-right" title="fraudDetection.entity package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Arun khare.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>apps package &mdash; Fraud-Detection beta:v1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=92fd9be5" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=eafc0fe6" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=e630dfc1"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="template module" href="template.html" />
+    <link rel="prev" title="FraudDetection" href="modules.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Fraud-Detection
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="fraudDetection.html">fraudDetection package</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">FraudDetection</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">apps package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-apps.app">apps.app module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-apps.mlflowapp">apps.mlflowapp module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#apps.mlflowapp.exp_tracking"><code class="docutils literal notranslate"><span class="pre">exp_tracking()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#apps.mlflowapp.launch_mlflow_ui"><code class="docutils literal notranslate"><span class="pre">launch_mlflow_ui()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-apps.trainingapp">apps.trainingapp module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#apps.trainingapp.Constants"><code class="docutils literal notranslate"><span class="pre">Constants</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#apps.trainingapp.FraudDetectionTrainingApp"><code class="docutils literal notranslate"><span class="pre">FraudDetectionTrainingApp</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#apps.trainingapp.init_app"><code class="docutils literal notranslate"><span class="pre">init_app()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#apps.trainingapp.set_tracking_uri"><code class="docutils literal notranslate"><span class="pre">set_tracking_uri()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="template.html">template module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tests.html">tests package</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="considerations.html">Considerations</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Fraud-Detection</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">FraudDetection</a></li>
+      <li class="breadcrumb-item active">apps package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/apps.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-apps">
+<span id="apps-package"></span><h1>apps package<a class="headerlink" href="#module-apps" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-apps.app">
+<span id="apps-app-module"></span><h2>apps.app module<a class="headerlink" href="#module-apps.app" title="Link to this heading"></a></h2>
+<p>”
+This module sets up and runs the training pipeline for the Fraud Detection System. It initializes the necessary configurations, directories, and components required for training models. The main functionality is executed by creating an instance of the Pipeline class and calling its run method.</p>
+<dl class="simple">
+<dt>Module Components:</dt><dd><ul class="simple">
+<li><p>Pipeline: Class responsible for orchestrating the training pipeline.</p></li>
+<li><p>ConfigurationManager: Class for managing configuration settings.</p></li>
+<li><p>ROOT_DIR: Root directory of the Fraud Detection System.</p></li>
+<li><p>CONFIG_FILE_PATH: Path to the configuration file.</p></li>
+<li><p>get_current_time_stamp: Function to get the current timestamp.</p></li>
+</ul>
+</dd>
+<dt>Configuration and Directory Setup:</dt><dd><ul class="simple">
+<li><p>Initializes the ConfigurationManager with the specified configuration file path.</p></li>
+<li><p>Retrieves training pipeline, model pusher, and model trainer configurations.</p></li>
+<li><p>Defines constants for artifact directory, project folder name, logs directory, model configuration file path, model directory, saved models directory, and pipeline directory.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Note: for running on local machine only</p>
+</section>
+<section id="module-apps.mlflowapp">
+<span id="apps-mlflowapp-module"></span><h2>apps.mlflowapp module<a class="headerlink" href="#module-apps.mlflowapp" title="Link to this heading"></a></h2>
+<p>This module defines functions related to launching <em>MLflow UI</em>.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="apps.mlflowapp.exp_tracking">
+<span class="sig-prename descclassname"><span class="pre">apps.mlflowapp.</span></span><span class="sig-name descname"><span class="pre">exp_tracking</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/apps/mlflowapp.html#exp_tracking"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apps.mlflowapp.exp_tracking" title="Link to this definition"></a></dt>
+<dd><p>Displays a Streamlit app with a
+button to launch the MLflow UI.
+:return: None</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="apps.mlflowapp.launch_mlflow_ui">
+<span class="sig-prename descclassname"><span class="pre">apps.mlflowapp.</span></span><span class="sig-name descname"><span class="pre">launch_mlflow_ui</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/apps/mlflowapp.html#launch_mlflow_ui"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apps.mlflowapp.launch_mlflow_ui" title="Link to this definition"></a></dt>
+<dd><p>Function to launch the MLflow UI using subprocess.
+This function attempts to launch the MLflow UI using subprocess. It specifies the
+port and backend-store-uri parameters for configuring the UI.
+:param None:</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-apps.trainingapp">
+<span id="apps-trainingapp-module"></span><h2>apps.trainingapp module<a class="headerlink" href="#module-apps.trainingapp" title="Link to this heading"></a></h2>
+<p>This module defines the <cite>FraudDetectionTrainingApp</cite> class, which facilitates the training of machine learning models for fraud detection. It utilizes a pipeline structure for model training, MLflow for experiment tracking, and Streamlit for creating a user-friendly interface.</p>
+<p>The application allows users to:
+- Update existing model configurations.
+- Create entirely new machine learning model configurations.
+- Validate configurations using a JSON formatter within the UI.
+- View and compare experiments related to model training.
+- Access data and logs for in-depth analysis.
+- Utilize a single-click feature to navigate to the MLflow tracking UI, enabling users to view, compare, and download model artifacts such as ‘model.pickle’, ‘Signature’, ‘Processing object’, and ‘Requirements’.
+- Employ a prediction service that supports model predictions, with the capability to upload a batch file or input a single record for processing.</p>
+<p>Environment Variables:
+- MLFLOW_TRACKING_URI: The URI used by MLflow for experiment tracking, loaded from the environment.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="apps.trainingapp.Constants">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">apps.trainingapp.</span></span><span class="sig-name descname"><span class="pre">Constants</span></span><a class="reference internal" href="_modules/apps/trainingapp.html#Constants"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apps.trainingapp.Constants" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This class holds constant values for the module.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="apps.trainingapp.Constants.ARCHIVE_FOLDER">
+<span class="sig-name descname"><span class="pre">ARCHIVE_FOLDER</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">WindowsPath('C:/Users/arunk/FraudDetection/configs/archive')</span></em><a class="headerlink" href="#apps.trainingapp.Constants.ARCHIVE_FOLDER" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="apps.trainingapp.Constants.LOG_DIR">
+<span class="sig-name descname"><span class="pre">LOG_DIR</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">WindowsPath('C:/Users/arunk/FraudDetection/logs')</span></em><a class="headerlink" href="#apps.trainingapp.Constants.LOG_DIR" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="apps.trainingapp.Constants.LOG_FOLDER_NAME">
+<span class="sig-name descname"><span class="pre">LOG_FOLDER_NAME</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'logs'</span></em><a class="headerlink" href="#apps.trainingapp.Constants.LOG_FOLDER_NAME" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="apps.trainingapp.Constants.MODEL_CONFIG_FILE_PATH">
+<span class="sig-name descname"><span class="pre">MODEL_CONFIG_FILE_PATH</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">WindowsPath('C:/Users/arunk/FraudDetection/configs/model.yaml')</span></em><a class="headerlink" href="#apps.trainingapp.Constants.MODEL_CONFIG_FILE_PATH" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="apps.trainingapp.Constants.MODEL_DIR">
+<span class="sig-name descname"><span class="pre">MODEL_DIR</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">WindowsPath('C:/Users/arunk/FraudDetection/saved_models')</span></em><a class="headerlink" href="#apps.trainingapp.Constants.MODEL_DIR" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="apps.trainingapp.Constants.PIPELINE_DIR">
+<span class="sig-name descname"><span class="pre">PIPELINE_DIR</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">WindowsPath('C:/Users/arunk/FraudDetection/FraudDetection')</span></em><a class="headerlink" href="#apps.trainingapp.Constants.PIPELINE_DIR" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="apps.trainingapp.Constants.PIPELINE_FOLDER_NAME">
+<span class="sig-name descname"><span class="pre">PIPELINE_FOLDER_NAME</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'FraudDetection'</span></em><a class="headerlink" href="#apps.trainingapp.Constants.PIPELINE_FOLDER_NAME" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="apps.trainingapp.Constants.SAVED_MODELS_DIR_NAME">
+<span class="sig-name descname"><span class="pre">SAVED_MODELS_DIR_NAME</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'saved_models'</span></em><a class="headerlink" href="#apps.trainingapp.Constants.SAVED_MODELS_DIR_NAME" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="apps.trainingapp.FraudDetectionTrainingApp">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">apps.trainingapp.</span></span><span class="sig-name descname"><span class="pre">FraudDetectionTrainingApp</span></span><a class="reference internal" href="_modules/apps/trainingapp.html#FraudDetectionTrainingApp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apps.trainingapp.FraudDetectionTrainingApp" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This class defines the main training application for fraud detection.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="apps.trainingapp.FraudDetectionTrainingApp.delete_empty_files">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">delete_empty_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">directory</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/apps/trainingapp.html#FraudDetectionTrainingApp.delete_empty_files"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apps.trainingapp.FraudDetectionTrainingApp.delete_empty_files" title="Link to this definition"></a></dt>
+<dd><p>Delete empty files in a directory.
+:param directory: Directory path.
+:type directory: str</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apps.trainingapp.FraudDetectionTrainingApp.display_configuration">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">display_configuration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/apps/trainingapp.html#FraudDetectionTrainingApp.display_configuration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apps.trainingapp.FraudDetectionTrainingApp.display_configuration" title="Link to this definition"></a></dt>
+<dd><p>Display the current model configuration.
+:param config: Model configuration.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apps.trainingapp.FraudDetectionTrainingApp.display_file_content">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">display_file_content</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/apps/trainingapp.html#FraudDetectionTrainingApp.display_file_content"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apps.trainingapp.FraudDetectionTrainingApp.display_file_content" title="Link to this definition"></a></dt>
+<dd><p>Display the file content .
+:param file_path:
+:type file_path: str</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apps.trainingapp.FraudDetectionTrainingApp.display_hierarchy">
+<span class="sig-name descname"><span class="pre">display_hierarchy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hierarchy_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/apps/trainingapp.html#FraudDetectionTrainingApp.display_hierarchy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apps.trainingapp.FraudDetectionTrainingApp.display_hierarchy" title="Link to this definition"></a></dt>
+<dd><p>Display the hierarchy of artifacts and content of files in tabs.
+:param hierarchy_dict: Hierarchy dictionary.
+:type hierarchy_dict: dict
+:param current_path: Current path for artifacts.
+:type current_path: str</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apps.trainingapp.FraudDetectionTrainingApp.display_home">
+<span class="sig-name descname"><span class="pre">display_home</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/apps/trainingapp.html#FraudDetectionTrainingApp.display_home"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apps.trainingapp.FraudDetectionTrainingApp.display_home" title="Link to this definition"></a></dt>
+<dd><p>Display the home page.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apps.trainingapp.FraudDetectionTrainingApp.display_logs">
+<span class="sig-name descname"><span class="pre">display_logs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/apps/trainingapp.html#FraudDetectionTrainingApp.display_logs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apps.trainingapp.FraudDetectionTrainingApp.display_logs" title="Link to this definition"></a></dt>
+<dd><p>Display logs in the logs directory.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apps.trainingapp.FraudDetectionTrainingApp.edit">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">edit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/apps/trainingapp.html#FraudDetectionTrainingApp.edit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apps.trainingapp.FraudDetectionTrainingApp.edit" title="Link to this definition"></a></dt>
+<dd><p>Edit the model configuration.
+:param config: Model configuration.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apps.trainingapp.FraudDetectionTrainingApp.generate_hierarchy_dict">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">generate_hierarchy_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/apps/trainingapp.html#FraudDetectionTrainingApp.generate_hierarchy_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apps.trainingapp.FraudDetectionTrainingApp.generate_hierarchy_dict" title="Link to this definition"></a></dt>
+<dd><p>Generate a hierarchy dictionary for file structure.
+:param root_path: Root path for file structure.
+:type root_path: str</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Hierarchy dictionary.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apps.trainingapp.FraudDetectionTrainingApp.get_pipeline_artifact">
+<span class="sig-name descname"><span class="pre">get_pipeline_artifact</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/apps/trainingapp.html#FraudDetectionTrainingApp.get_pipeline_artifact"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apps.trainingapp.FraudDetectionTrainingApp.get_pipeline_artifact" title="Link to this definition"></a></dt>
+<dd><p>Get the artifact directory for the training pipeline.
+:returns: Path to the artifact directory.
+:rtype: str</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apps.trainingapp.FraudDetectionTrainingApp.initialize_pipeline">
+<span class="sig-name descname"><span class="pre">initialize_pipeline</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/apps/trainingapp.html#FraudDetectionTrainingApp.initialize_pipeline"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apps.trainingapp.FraudDetectionTrainingApp.initialize_pipeline" title="Link to this definition"></a></dt>
+<dd><p>Initialize the pipeline for training.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apps.trainingapp.FraudDetectionTrainingApp.main">
+<span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/apps/trainingapp.html#FraudDetectionTrainingApp.main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apps.trainingapp.FraudDetectionTrainingApp.main" title="Link to this definition"></a></dt>
+<dd><p>Main method to run the training application.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apps.trainingapp.FraudDetectionTrainingApp.predict">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/apps/trainingapp.html#FraudDetectionTrainingApp.predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apps.trainingapp.FraudDetectionTrainingApp.predict" title="Link to this definition"></a></dt>
+<dd><p>Run the FraudDetectionPredictorApp for predictions.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apps.trainingapp.FraudDetectionTrainingApp.train">
+<span class="sig-name descname"><span class="pre">train</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/apps/trainingapp.html#FraudDetectionTrainingApp.train"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apps.trainingapp.FraudDetectionTrainingApp.train" title="Link to this definition"></a></dt>
+<dd><p>Train models using the pipeline</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apps.trainingapp.FraudDetectionTrainingApp.update_model_config">
+<span class="sig-name descname"><span class="pre">update_model_config</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/apps/trainingapp.html#FraudDetectionTrainingApp.update_model_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apps.trainingapp.FraudDetectionTrainingApp.update_model_config" title="Link to this definition"></a></dt>
+<dd><p>Update the model configuration.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apps.trainingapp.FraudDetectionTrainingApp.view_experiment_history">
+<span class="sig-name descname"><span class="pre">view_experiment_history</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/apps/trainingapp.html#FraudDetectionTrainingApp.view_experiment_history"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apps.trainingapp.FraudDetectionTrainingApp.view_experiment_history" title="Link to this definition"></a></dt>
+<dd><p>View the experiment history.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="apps.trainingapp.init_app">
+<span class="sig-prename descclassname"><span class="pre">apps.trainingapp.</span></span><span class="sig-name descname"><span class="pre">init_app</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/apps/trainingapp.html#init_app"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apps.trainingapp.init_app" title="Link to this definition"></a></dt>
+<dd><p>Initialize training and prediction app</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="apps.trainingapp.set_tracking_uri">
+<span class="sig-prename descclassname"><span class="pre">apps.trainingapp.</span></span><span class="sig-name descname"><span class="pre">set_tracking_uri</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/apps/trainingapp.html#set_tracking_uri"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apps.trainingapp.set_tracking_uri" title="Link to this definition"></a></dt>
+<dd><p>Set Mlflow Tracking URI
+:raises InvalidUrlException: when URI is not in proper format</p>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="modules.html" class="btn btn-neutral float-left" title="FraudDetection" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="template.html" class="btn btn-neutral float-right" title="template module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Arun khare.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

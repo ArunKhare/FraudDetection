@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>apps.mlflowapp &mdash; Fraud-Detection beta:v1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=92fd9be5" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=eafc0fe6" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=e630dfc1"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Fraud-Detection
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../fraudDetection.html">fraudDetection package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">FraudDetection</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../considerations.html">Considerations</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Fraud-Detection</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">apps.mlflowapp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for apps.mlflowapp</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module defines functions related to launching *MLflow UI*.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">import</span> <span class="nn">streamlit</span> <span class="k">as</span> <span class="nn">st</span>
+<span class="kn">from</span> <span class="nn">fraudDetection.exception</span> <span class="kn">import</span> <span class="n">FraudDetectionException</span>
+
+
+<div class="viewcode-block" id="exp_tracking">
+<a class="viewcode-back" href="../../apps.html#apps.mlflowapp.exp_tracking">[docs]</a>
+<span class="k">def</span> <span class="nf">exp_tracking</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Displays a Streamlit app with a</span>
+<span class="sd">    button to launch the MLflow UI.</span>
+<span class="sd">    :return: None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">st</span><span class="o">.</span><span class="n">sidebar</span><span class="o">.</span><span class="n">markdown</span><span class="p">(</span>
+        <span class="s2">&quot;This is a Streamlit app that integrates with MLflow to manage experiments and models.&quot;</span>
+    <span class="p">)</span>
+
+    <span class="n">st</span><span class="o">.</span><span class="n">sidebar</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+        <span class="s2">&quot;Note: Make sure your MLflow Tracking Server is running or replace the URI in the code.&quot;</span><span class="p">,</span>
+        <span class="n">icon</span><span class="o">=</span><span class="s2">&quot;ℹ️&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">st</span><span class="o">.</span><span class="n">button</span><span class="p">(</span><span class="s2">&quot;MLflow UI&quot;</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="s2">&quot;MLFLOW UI&quot;</span><span class="p">,</span> <span class="n">on_click</span><span class="o">=</span><span class="n">launch_mlflow_ui</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;primary&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="launch_mlflow_ui">
+<a class="viewcode-back" href="../../apps.html#apps.mlflowapp.launch_mlflow_ui">[docs]</a>
+<span class="k">def</span> <span class="nf">launch_mlflow_ui</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Function to launch the MLflow UI using subprocess.</span>
+<span class="sd">    This function attempts to launch the MLflow UI using subprocess. It specifies the</span>
+<span class="sd">    port and backend-store-uri parameters for configuring the UI.</span>
+<span class="sd">    Args:</span>
+<span class="sd">        None</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># Launch MLflow UI using subprocess</span>
+        <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="s2">&quot;mlflow&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;ui&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;--port&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;8080&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;--backend-store-uri&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;sqlite:///mlruns.db&quot;</span><span class="p">,</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+    <span class="k">except</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">CalledProcessError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">st</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error launching MLflow UI: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">FraudDetectionException</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">sys</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+
+    <span class="k">with</span> <span class="n">st</span><span class="o">.</span><span class="n">container</span><span class="p">(</span><span class="n">border</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="n">st</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="s2">&quot;Click the HERE :red[*&#39;http://127.0.0.1:8080&#39;*] to open Mlfow UI in browser&quot;</span><span class="p">,</span>
+            <span class="n">icon</span><span class="o">=</span><span class="s2">&quot;ℹ️&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">st</span><span class="o">.</span><span class="n">link_button</span><span class="p">(</span><span class="s2">&quot;Go to Mlflow UI&quot;</span><span class="p">,</span> <span class="s2">&quot;http://127.0.0.1:8080&quot;</span><span class="p">)</span>
+
+        <span class="n">st</span><span class="o">.</span><span class="n">toast</span><span class="p">(</span><span class="s2">&quot;MLflow UI is now running in back ground&quot;</span><span class="p">,</span> <span class="n">icon</span><span class="o">=</span><span class="s2">&quot;🎉&quot;</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Arun khare.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,5 +1,5 @@
 # Byte-compiled / optimized / DLL files
-__pycache__ 
+__pycache__
 *.py[cod]
 *$py.class
 *.pyc
@@ -148,5 +148,3 @@ documentation
 notebook/online-payments-fraud-detection-dataset.zip
 logs
 .vscode
-docs
-docs/

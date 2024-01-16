@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FraudDetection &mdash; Fraud-Detection beta:v1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=92fd9be5" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=eafc0fe6" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=e630dfc1"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="apps package" href="apps.html" />
+    <link rel="prev" title="fraudDetection.utils package" href="fraudDetection.utils.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Fraud-Detection
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="fraudDetection.html">fraudDetection package</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">FraudDetection</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="apps.html">apps package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="template.html">template module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tests.html">tests package</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="considerations.html">Considerations</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Fraud-Detection</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">FraudDetection</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/modules.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="frauddetection">
+<h1>FraudDetection<a class="headerlink" href="#frauddetection" title="Link to this heading"></a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="apps.html">apps package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="apps.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="apps.html#module-apps.app">apps.app module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="apps.html#module-apps.mlflowapp">apps.mlflowapp module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="apps.html#apps.mlflowapp.exp_tracking"><code class="docutils literal notranslate"><span class="pre">exp_tracking()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="apps.html#apps.mlflowapp.launch_mlflow_ui"><code class="docutils literal notranslate"><span class="pre">launch_mlflow_ui()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="apps.html#module-apps.trainingapp">apps.trainingapp module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="apps.html#apps.trainingapp.Constants"><code class="docutils literal notranslate"><span class="pre">Constants</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="apps.html#apps.trainingapp.Constants.ARCHIVE_FOLDER"><code class="docutils literal notranslate"><span class="pre">Constants.ARCHIVE_FOLDER</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="apps.html#apps.trainingapp.Constants.LOG_DIR"><code class="docutils literal notranslate"><span class="pre">Constants.LOG_DIR</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="apps.html#apps.trainingapp.Constants.LOG_FOLDER_NAME"><code class="docutils literal notranslate"><span class="pre">Constants.LOG_FOLDER_NAME</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="apps.html#apps.trainingapp.Constants.MODEL_CONFIG_FILE_PATH"><code class="docutils literal notranslate"><span class="pre">Constants.MODEL_CONFIG_FILE_PATH</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="apps.html#apps.trainingapp.Constants.MODEL_DIR"><code class="docutils literal notranslate"><span class="pre">Constants.MODEL_DIR</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="apps.html#apps.trainingapp.Constants.PIPELINE_DIR"><code class="docutils literal notranslate"><span class="pre">Constants.PIPELINE_DIR</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="apps.html#apps.trainingapp.Constants.PIPELINE_FOLDER_NAME"><code class="docutils literal notranslate"><span class="pre">Constants.PIPELINE_FOLDER_NAME</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="apps.html#apps.trainingapp.Constants.SAVED_MODELS_DIR_NAME"><code class="docutils literal notranslate"><span class="pre">Constants.SAVED_MODELS_DIR_NAME</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="apps.html#apps.trainingapp.FraudDetectionTrainingApp"><code class="docutils literal notranslate"><span class="pre">FraudDetectionTrainingApp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="apps.html#apps.trainingapp.FraudDetectionTrainingApp.delete_empty_files"><code class="docutils literal notranslate"><span class="pre">FraudDetectionTrainingApp.delete_empty_files()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="apps.html#apps.trainingapp.FraudDetectionTrainingApp.display_configuration"><code class="docutils literal notranslate"><span class="pre">FraudDetectionTrainingApp.display_configuration()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="apps.html#apps.trainingapp.FraudDetectionTrainingApp.display_file_content"><code class="docutils literal notranslate"><span class="pre">FraudDetectionTrainingApp.display_file_content()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="apps.html#apps.trainingapp.FraudDetectionTrainingApp.display_hierarchy"><code class="docutils literal notranslate"><span class="pre">FraudDetectionTrainingApp.display_hierarchy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="apps.html#apps.trainingapp.FraudDetectionTrainingApp.display_home"><code class="docutils literal notranslate"><span class="pre">FraudDetectionTrainingApp.display_home()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="apps.html#apps.trainingapp.FraudDetectionTrainingApp.display_logs"><code class="docutils literal notranslate"><span class="pre">FraudDetectionTrainingApp.display_logs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="apps.html#apps.trainingapp.FraudDetectionTrainingApp.edit"><code class="docutils literal notranslate"><span class="pre">FraudDetectionTrainingApp.edit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="apps.html#apps.trainingapp.FraudDetectionTrainingApp.generate_hierarchy_dict"><code class="docutils literal notranslate"><span class="pre">FraudDetectionTrainingApp.generate_hierarchy_dict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="apps.html#apps.trainingapp.FraudDetectionTrainingApp.get_pipeline_artifact"><code class="docutils literal notranslate"><span class="pre">FraudDetectionTrainingApp.get_pipeline_artifact()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="apps.html#apps.trainingapp.FraudDetectionTrainingApp.initialize_pipeline"><code class="docutils literal notranslate"><span class="pre">FraudDetectionTrainingApp.initialize_pipeline()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="apps.html#apps.trainingapp.FraudDetectionTrainingApp.main"><code class="docutils literal notranslate"><span class="pre">FraudDetectionTrainingApp.main()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="apps.html#apps.trainingapp.FraudDetectionTrainingApp.predict"><code class="docutils literal notranslate"><span class="pre">FraudDetectionTrainingApp.predict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="apps.html#apps.trainingapp.FraudDetectionTrainingApp.train"><code class="docutils literal notranslate"><span class="pre">FraudDetectionTrainingApp.train()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="apps.html#apps.trainingapp.FraudDetectionTrainingApp.update_model_config"><code class="docutils literal notranslate"><span class="pre">FraudDetectionTrainingApp.update_model_config()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="apps.html#apps.trainingapp.FraudDetectionTrainingApp.view_experiment_history"><code class="docutils literal notranslate"><span class="pre">FraudDetectionTrainingApp.view_experiment_history()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="apps.html#apps.trainingapp.init_app"><code class="docutils literal notranslate"><span class="pre">init_app()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="apps.html#apps.trainingapp.set_tracking_uri"><code class="docutils literal notranslate"><span class="pre">set_tracking_uri()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="template.html">template module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="template.html#template.create_directories_and_files"><code class="docutils literal notranslate"><span class="pre">create_directories_and_files()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="template.html#template.setup_logging"><code class="docutils literal notranslate"><span class="pre">setup_logging()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tests.html">tests package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tests.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="tests.integration.html">tests.integration package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.unit.html">tests.unit package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="tests.unit.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tests.unit.html#module-tests.unit.test_configuration_manager">tests.unit.test_configuration_manager module</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="tests.unit.html#tests.unit.test_configuration_manager.mock_read_yaml"><code class="docutils literal notranslate"><span class="pre">mock_read_yaml()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="tests.unit.html#tests.unit.test_configuration_manager.test_get_model_pusher_config"><code class="docutils literal notranslate"><span class="pre">test_get_model_pusher_config()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="tests.unit.html#tests.unit.test_configuration_manager.test_get_model_pusher_config_exception"><code class="docutils literal notranslate"><span class="pre">test_get_model_pusher_config_exception()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="fraudDetection.utils.html" class="btn btn-neutral float-left" title="fraudDetection.utils package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="apps.html" class="btn btn-neutral float-right" title="apps package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Arun khare.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

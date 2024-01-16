@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>fraudDetection.components.training.data_ingestion &mdash; Fraud-Detection beta:v1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=92fd9be5" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=eafc0fe6" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../_static/documentation_options.js?v=e630dfc1"></script>
+        <script src="../../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            Fraud-Detection
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../fraudDetection.html">fraudDetection package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">FraudDetection</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../considerations.html">Considerations</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">Fraud-Detection</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">fraudDetection.components.training.data_ingestion</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for fraudDetection.components.training.data_ingestion</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">This module downloads the data and chunk, split the data in to train test</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">threading</span>
+<span class="kn">from</span> <span class="nn">zipfile</span> <span class="kn">import</span> <span class="n">ZipFile</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+<span class="kn">from</span> <span class="nn">kaggle.api.kaggle_api_extended</span> <span class="kn">import</span> <span class="n">KaggleApi</span>
+<span class="kn">from</span> <span class="nn">fraudDetection.entity</span> <span class="kn">import</span> <span class="n">DataIngestionConfig</span><span class="p">,</span> <span class="n">DataIngestionArtifact</span>
+<span class="kn">from</span> <span class="nn">fraudDetection.exception</span> <span class="kn">import</span> <span class="n">FraudDetectionException</span>
+<span class="kn">from</span> <span class="nn">fraudDetection.logger</span> <span class="kn">import</span> <span class="n">logging</span>
+<span class="kn">from</span> <span class="nn">fraudDetection.utils</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">create_directories</span><span class="p">,</span>
+    <span class="n">save_dfs_to_csv</span><span class="p">,</span>
+    <span class="n">is_dir_empty</span><span class="p">,</span>
+    <span class="n">get_directory_size</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<div class="viewcode-block" id="DataIngestion">
+<a class="viewcode-back" href="../../../../fraudDetection.components.training.html#fraudDetection.components.training.data_ingestion.DataIngestion">[docs]</a>
+<span class="k">class</span> <span class="nc">DataIngestion</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Downloaded datawith API. Process, split data,</span>
+<span class="sd">    storing them to specified location</span>
+<span class="sd">    Attributes:</span>
+<span class="sd">        DataIngestionconfig: specfiying the artifacts paths</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_ingestion_config</span><span class="p">:</span> <span class="n">DataIngestionConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="si">{</span><span class="s1">&#39;=&#39;</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">20</span><span class="si">}</span><span class="s2"> Data ingestion start </span><span class="si">{</span><span class="s1">&#39;=&#39;</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">20</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_ingestion_config</span><span class="p">:</span> <span class="n">DataIngestionConfig</span> <span class="o">=</span> <span class="n">data_ingestion_config</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">zip_data_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_ingestion_config</span><span class="o">.</span><span class="n">zip_data_dir</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">raw_data_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_ingestion_config</span><span class="o">.</span><span class="n">raw_data_dir</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">FraudDetectionException</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">sys</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+
+    <span class="k">def</span> <span class="nf">_authenticate_kaggle_api</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Authenticate Kaggle API using Kaggle.json</span>
+<span class="sd">        return (str): api instance</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">api</span> <span class="o">=</span> <span class="n">KaggleApi</span><span class="p">()</span>
+        <span class="n">api</span><span class="o">.</span><span class="n">authenticate</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">api</span>
+
+<div class="viewcode-block" id="DataIngestion.unzip_data">
+<a class="viewcode-back" href="../../../../fraudDetection.components.training.html#fraudDetection.components.training.data_ingestion.DataIngestion.unzip_data">[docs]</a>
+    <span class="k">def</span> <span class="nf">unzip_data</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Unzip the downloaded zip file&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># extract file from zip_data_dir</span>
+            <span class="n">create_directories</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">raw_data_dir</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">is_dir_empty</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">zip_data_dir</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Zip file is not in </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">zip_data_dir</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">zipped_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">zip_data_dir</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">zip_file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">zip_data_dir</span><span class="p">,</span> <span class="n">zipped_file</span><span class="p">)</span>
+            <span class="k">with</span> <span class="n">ZipFile</span><span class="p">(</span><span class="n">zip_file_path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">zip_file</span><span class="p">:</span>
+                <span class="n">zip_file</span><span class="o">.</span><span class="n">extractall</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">raw_data_dir</span><span class="p">)</span>
+
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Extracted file from :[</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">zip_data_dir</span><span class="p">,</span><span class="w"> </span><span class="n">zipped_file</span><span class="si">}</span><span class="s2">] into :[</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">raw_data_dir</span><span class="si">}</span><span class="s2">]&quot;</span>
+            <span class="p">)</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">Exception</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">FraudDetectionException</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">error_details</span><span class="o">=</span><span class="n">sys</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span></div>
+
+
+<div class="viewcode-block" id="DataIngestion.download_transaction_data">
+<a class="viewcode-back" href="../../../../fraudDetection.components.training.html#fraudDetection.components.training.data_ingestion.DataIngestion.download_transaction_data">[docs]</a>
+    <span class="k">def</span> <span class="nf">download_transaction_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Downloading data from kaggle using API in directory&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">download_dataset_link</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_ingestion_config</span><span class="o">.</span><span class="n">source_url</span>
+            <span class="n">create_directories</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">zip_data_dir</span><span class="p">])</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Downloading file from :[</span><span class="si">{</span><span class="n">download_dataset_link</span><span class="si">}</span><span class="s2">] into :[</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">zip_data_dir</span><span class="si">}</span><span class="s2">]&quot;</span>
+            <span class="p">)</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">download_dataset_link</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span>
+            <span class="n">api</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_authenticate_kaggle_api</span><span class="p">()</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Kaggle API Authenticated&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Kaggle Api authenticated&quot;</span><span class="p">)</span>
+            <span class="c1"># Download the dataset using the Kaggle API</span>
+            <span class="n">tqdm</span><span class="p">(</span>
+                <span class="n">api</span><span class="o">.</span><span class="n">dataset_download_files</span><span class="p">(</span>
+                    <span class="n">download_dataset_link</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">zip_data_dir</span><span class="p">,</span> <span class="n">unzip</span><span class="o">=</span><span class="kc">False</span>
+                <span class="p">),</span>
+                <span class="n">mininterval</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+                <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;downloading kaggle dataset in zip format&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;File :[</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">zip_data_dir</span><span class="si">}</span><span class="s2">] has been downloaded successfully.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">FraudDetectionException</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">sys</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span></div>
+
+
+<div class="viewcode-block" id="DataIngestion.split_data_as_train_test">
+<a class="viewcode-back" href="../../../../fraudDetection.components.training.html#fraudDetection.components.training.data_ingestion.DataIngestion.split_data_as_train_test">[docs]</a>
+    <span class="k">def</span> <span class="nf">split_data_as_train_test</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataIngestionArtifact</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Split the datase into train and test</span>
+<span class="sd">        Returns:</span>
+<span class="sd">                data_ingestion_artifacts(:obj:&#39;DataIngestionArtifact&#39;): Split datasets with message as DataIngestionartifact</span>
+<span class="sd">        Example:</span>
+<span class="sd">            data_ingestion_artifacts = create_data_ingestion_artifacts(</span>
+<span class="sd">                                                train_file_path=&quot;/path/to/train.csv&quot;,</span>
+<span class="sd">                                                test_file_path=&quot;/path/to/test.csv&quot;,</span>
+<span class="sd">                                                is_ingested=True,</span>
+<span class="sd">                                                message=&quot;Data successfully ingested.&quot;</span>
+<span class="sd">                                                )</span>
+<span class="sd">        logging.info(f&quot;Data ingestion artifacts: {data_ingestion_artifacts}&quot;)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">is_ingested</span> <span class="o">=</span> <span class="kc">False</span>
+
+            <span class="k">if</span> <span class="n">is_dir_empty</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">raw_data_dir</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;raw_data_dir must contain data file&quot;</span><span class="p">)</span>
+
+            <span class="n">directory_size</span> <span class="o">=</span> <span class="n">get_directory_size</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">raw_data_dir</span><span class="p">)</span>
+
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Total size of files in directory &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">raw_data_dir</span><span class="si">}</span><span class="s2">&#39;: </span><span class="si">{</span><span class="n">directory_size</span><span class="si">:</span><span class="s2">0.2f</span><span class="si">}</span><span class="s2"> MB&quot;</span>
+            <span class="p">)</span>
+
+            <span class="n">train_file_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_ingestion_config</span><span class="o">.</span><span class="n">ingested_train_dir</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">test_file_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_ingestion_config</span><span class="o">.</span><span class="n">ingested_test_dir</span><span class="p">)</span>
+            <span class="p">)</span>
+
+            <span class="n">split_dataset_path</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">train_file_path</span><span class="p">,</span> <span class="n">test_file_path</span><span class="p">]</span>
+            <span class="n">create_directories</span><span class="p">(</span><span class="n">split_dataset_path</span><span class="p">)</span>
+            <span class="c1"># check_data_dir(raw_data_dir)</span>
+
+            <span class="k">if</span> <span class="n">is_dir_empty</span><span class="p">(</span><span class="n">train_file_path</span><span class="p">)</span> <span class="ow">or</span> <span class="n">is_dir_empty</span><span class="p">(</span><span class="n">test_file_path</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;Both train and test directories must contain data before splitting.&quot;</span>
+                <span class="p">)</span>
+
+            <span class="n">file_name</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">raw_data_dir</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">file_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">raw_data_dir</span><span class="p">,</span> <span class="n">file_name</span><span class="p">))</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Reading CSV file: </span><span class="si">{</span><span class="n">file_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+            <span class="c1"># Check if test_size is within valid range</span>
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">data_ingestion_config</span><span class="o">.</span><span class="n">test_size</span> <span class="o">&gt;</span> <span class="mf">0.5</span>
+                <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_ingestion_config</span><span class="o">.</span><span class="n">test_size</span> <span class="o">&lt;=</span> <span class="mi">0</span>
+            <span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Invalid test_size: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data_ingestion_config</span><span class="o">.</span><span class="n">test_size</span><span class="si">}</span><span class="s2">. Test size must be between 0 and 0.5&quot;</span><span class="p">,</span>
+                    <span class="n">sys</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="c1"># Check if stratify parameter refers to a valid column</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_ingestion_config</span><span class="o">.</span><span class="n">stratify</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Invalid stratify column: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data_ingestion_config</span><span class="o">.</span><span class="n">stratify</span><span class="si">}</span><span class="s2">. Column not found inDataFrame&quot;</span><span class="p">,</span>
+                    <span class="n">sys</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="c1"># Split the dataset into training and testing sets using stratified sampling</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="s2">&quot;Split the dataset into training and testing sets using stratified sampling&quot;</span>
+            <span class="p">)</span>
+            <span class="n">strat_train_set</span><span class="p">,</span> <span class="n">strat_test_set</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span>
+                <span class="n">df</span><span class="p">,</span>
+                <span class="n">test_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data_ingestion_config</span><span class="o">.</span><span class="n">test_size</span><span class="p">,</span>
+                <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">,</span>
+                <span class="n">stratify</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">data_ingestion_config</span><span class="o">.</span><span class="n">stratify</span><span class="p">],</span>
+            <span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Exporting training and testing dataset to files: [</span><span class="si">{</span><span class="n">train_file_path</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">test_file_path</span><span class="si">}</span><span class="s2">] &quot;</span>
+            <span class="p">)</span>
+            <span class="c1"># Save each file as multiple chunks</span>
+            <span class="n">chunk_size</span> <span class="o">=</span> <span class="mi">100000</span>
+            <span class="n">save_dfs_to_csv</span><span class="p">(</span><span class="n">strat_test_set</span><span class="p">,</span> <span class="n">test_file_path</span><span class="p">,</span> <span class="n">chunk_size</span><span class="p">)</span>
+            <span class="n">save_dfs_to_csv</span><span class="p">(</span><span class="n">strat_train_set</span><span class="p">,</span> <span class="n">train_file_path</span><span class="p">,</span> <span class="n">chunk_size</span><span class="p">)</span>
+            <span class="c1"># check_data_dir(test_file_path)</span>
+            <span class="c1"># check_data_dir(train_file_path)</span>
+            <span class="n">message</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Data ingestion completed successfully train and test data saved at </span><span class="si">{</span><span class="n">train_file_path</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">test_file_path</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="n">is_ingested</span> <span class="o">=</span> <span class="kc">True</span>
+
+            <span class="n">message</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Train_test_split already exist at path </span><span class="si">{</span><span class="n">train_file_path</span><span class="si">}</span><span class="s2"> and </span><span class="si">{</span><span class="n">test_file_path</span><span class="si">}</span><span class="s2">&quot;</span>
+
+            <span class="c1"># create the data ingestion artifacts</span>
+            <span class="n">data_ingestion_artifacts</span> <span class="o">=</span> <span class="n">DataIngestionArtifact</span><span class="p">(</span>
+                <span class="n">train_file_path</span><span class="o">=</span><span class="n">train_file_path</span><span class="p">,</span>
+                <span class="n">test_file_path</span><span class="o">=</span><span class="n">test_file_path</span><span class="p">,</span>
+                <span class="n">is_ingested</span><span class="o">=</span><span class="n">is_ingested</span><span class="p">,</span>
+                <span class="n">message</span><span class="o">=</span><span class="n">message</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Data ingestion artifacts : </span><span class="si">{</span><span class="n">data_ingestion_artifacts</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">data_ingestion_artifacts</span>
+
+        <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="n">FraudDetectionException</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">FraudDetectionException</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">sys</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span></div>
+
+
+<div class="viewcode-block" id="DataIngestion.user_input_to_downloaddata">
+<a class="viewcode-back" href="../../../../fraudDetection.components.training.html#fraudDetection.components.training.data_ingestion.DataIngestion.user_input_to_downloaddata">[docs]</a>
+    <span class="k">def</span> <span class="nf">user_input_to_downloaddata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout_seconds</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Choice to download the data. If &#39;y&#39;, download the data.&quot;&quot;&quot;</span>
+        <span class="c1"># Prompt the user for input with a timeout</span>
+        <span class="nb">print</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;*&#39;</span><span class="si">:</span><span class="s2">.^10</span><span class="si">}</span><span class="s2"> Do you want to download transaction data? Press y or n and enter&quot;</span>
+        <span class="p">)</span>
+
+        <span class="n">user_input</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">def</span> <span class="nf">get_input</span><span class="p">():</span>
+            <span class="k">nonlocal</span> <span class="n">user_input</span>
+            <span class="n">user_input</span> <span class="o">=</span> <span class="nb">input</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Create a thread to get user input</span>
+            <span class="n">input_thread</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">get_input</span><span class="p">)</span>
+            <span class="n">input_thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+            <span class="n">input_thread</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="n">timeout_seconds</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">user_input</span> <span class="o">==</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;! Proceeding with Download ...&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">download_transaction_data</span><span class="p">()</span>
+            <span class="k">elif</span> <span class="n">user_input</span> <span class="o">==</span> <span class="s2">&quot;n&quot;</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="si">{</span><span class="s1">&#39;_&#39;</span><span class="si">:</span><span class="s2">_&gt;10</span><span class="si">}</span><span class="s2"> You pressed &#39;n&#39;. The data must be already downloaded </span><span class="si">{</span><span class="s1">&#39;_&#39;</span><span class="si">:</span><span class="s2">_&gt;10</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;User pressed &#39;n&#39;, data is not downloaded&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="si">{</span><span class="s1">&#39;_&#39;</span><span class="si">:</span><span class="s2">_&gt;10</span><span class="si">}</span><span class="s2"> Timeout reached. Proceeding with Download ... </span><span class="si">{</span><span class="s1">&#39;_&#39;</span><span class="si">:</span><span class="s2">_&gt;10</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">download_transaction_data</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">EOFError</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;downloading data&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">download_transaction_data</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">FraudDetectionException</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">sys</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;zip file is in diretory </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">zip_data_dir</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">unzip_data</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="DataIngestion.initiate_data_ingestion">
+<a class="viewcode-back" href="../../../../fraudDetection.components.training.html#fraudDetection.components.training.data_ingestion.DataIngestion.initiate_data_ingestion">[docs]</a>
+    <span class="k">def</span> <span class="nf">initiate_data_ingestion</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataIngestionArtifact</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initiate data ingestion and Return the artifacts</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            data_ingestion_artifacts(:obj:&#39;DataIngestionArtifact&#39;)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># self.user_input_to_downloaddata()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">download_transaction_data</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">unzip_data</span><span class="p">()</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">split_data_as_train_test</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">FraudDetectionException</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">sys</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span></div>
+
+
+    <span class="k">def</span> <span class="fm">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="si">{</span><span class="s1">&#39;=&#39;</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">20</span><span class="si">}</span><span class="s2"> Data Ingestion Log Completed.</span><span class="si">{</span><span class="s1">&#39;=&#39;</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">20</span><span class="si">}</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Arun khare.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>fraudDetection.components.prediction.prediction_service &mdash; Fraud-Detection beta:v1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=92fd9be5" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=eafc0fe6" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../_static/documentation_options.js?v=e630dfc1"></script>
+        <script src="../../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            Fraud-Detection
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../fraudDetection.html">fraudDetection package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">FraudDetection</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../considerations.html">Considerations</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">Fraud-Detection</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">fraudDetection.components.prediction.prediction_service</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for fraudDetection.components.prediction.prediction_service</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module provides classes and functions for fraud detection in banking transactions. It includes</span>
+<span class="sd">a FraudDetectionModel class for loading and using the trained model, and a FraudDetectionPredictorApp</span>
+<span class="sd">class for creating a Streamlit web application for making predictions.</span>
+
+<span class="sd">Module Constants:</span>
+<span class="sd">    - tags (dict): Dictionary containing version information.</span>
+<span class="sd">    - INPUT_SCHEMA_JSON_FILE_NAME (str): Name of the input schema JSON file.</span>
+<span class="sd">    - MODEL_EVALUATION_YAML (str): Name of the model evaluation YAML file.</span>
+<span class="sd">    - SAVED_MODELS_DIR (Path): Directory path for saving models.</span>
+<span class="sd">    - MODEL_NAME (str): Name of the model file.</span>
+<span class="sd">    - PREPROCESSER_OBJ_PATH (Path): Path to the preprocessed data object.</span>
+<span class="sd">    - EVALUATED_MODELS_PATH (Path): Path to the evaluated models.</span>
+
+<span class="sd">Classes:</span>
+<span class="sd">    - FraudDetectionModel: Class for loading and using the trained model.</span>
+<span class="sd">    - FraudDetectionPredictorApp: Class for creating a Streamlit web application for predictions.</span>
+
+<span class="sd">Usage:</span>
+
+<span class="sd">if __name__ == &quot;__main__&quot;:</span>
+<span class="sd">    FraudDetectionPredictorApp.run()</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">yaml</span>
+<span class="kn">import</span> <span class="nn">joblib</span>
+<span class="kn">import</span> <span class="nn">streamlit</span> <span class="k">as</span> <span class="nn">st</span>
+
+<span class="n">tags</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Version&quot;</span><span class="p">:</span> <span class="s2">&quot;v1&quot;</span><span class="p">}</span>
+<span class="n">INPUT_SCHEMA_JSON_FILE_NAME</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;input_schema.json&quot;</span><span class="p">)</span>
+<span class="n">MODEL_EVALUATION_YAML</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;model_evaluation.yaml&quot;</span><span class="p">)</span>
+<span class="n">SAVED_MODELS_DIR</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;artifacts/saved_models&quot;</span><span class="p">)</span>
+<span class="n">MODEL_NAME</span> <span class="o">=</span> <span class="s2">&quot;model.pkl&quot;</span>
+<span class="n">PREPROCESSER_OBJ_PATH</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;artifacts/transformed_data/preprocessed/preprocessed.pkl&quot;</span><span class="p">)</span>
+<span class="n">EVALUATED_MODELS_PATH</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;artifacts/model_evaluation&quot;</span><span class="p">)</span>
+
+
+<span class="c1"># schema_file_path = Path(r&quot;C:\Users\arunk\FraudDetection\configs\schema.yaml&quot;)</span>
+<div class="viewcode-block" id="FraudDetectionModel">
+<a class="viewcode-back" href="../../../../fraudDetection.components.prediction.html#fraudDetection.components.prediction.prediction_service.FraudDetectionModel">[docs]</a>
+<span class="k">class</span> <span class="nc">FraudDetectionModel</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;This class provides methods for loading the trained model, getting input schema,</span>
+<span class="sd">    transforming input data, and making predictions.</span>
+<span class="sd">    Methods:</span>
+<span class="sd">    - get_latest_model(): Load the latest trained model from evaluated models.</span>
+<span class="sd">    - get_frauddetection_input_schema(): Get the input schema for fraud detection.</span>
+<span class="sd">    - transform_input(df): Transform input DataFrame using preprocessed data object.</span>
+<span class="sd">    - predict(df): Make predictions using the loaded model.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initializes attributes for model name, evaluated models path, and preprocessed data path.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_name</span> <span class="o">=</span> <span class="n">MODEL_NAME</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">evaluated_models_path</span> <span class="o">=</span> <span class="n">EVALUATED_MODELS_PATH</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">preprocessd_obj_path</span> <span class="o">=</span> <span class="n">PREPROCESSER_OBJ_PATH</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">evaluated_models_file_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">evaluated_models_path</span><span class="p">,</span> <span class="n">MODEL_EVALUATION_YAML</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">input_schema_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">evaluated_models_path</span><span class="p">,</span> <span class="n">INPUT_SCHEMA_JSON_FILE_NAME</span><span class="p">)</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="FraudDetectionModel.get_latest_model">
+<a class="viewcode-back" href="../../../../fraudDetection.components.prediction.html#fraudDetection.components.prediction.prediction_service.FraudDetectionModel.get_latest_model">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_latest_model</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the latest trained model from evaluated models.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            Trained model object.</span>
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If there is an issue during the process.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Load best model from the saved models and the input schema</span>
+
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span>
+                <span class="n">file</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">evaluated_models_file_path</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span>
+            <span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">model_registry_paths</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">Loader</span><span class="o">=</span><span class="n">yaml</span><span class="o">.</span><span class="n">Loader</span><span class="p">)</span>
+
+            <span class="c1"># model_registry_paths = read_yaml(self.evaluated_models_file_path)</span>
+            <span class="n">path_object</span> <span class="o">=</span> <span class="n">model_registry_paths</span><span class="p">[</span><span class="s2">&quot;best_model&quot;</span><span class="p">][</span><span class="s2">&quot;model_path&quot;</span><span class="p">]</span>
+
+            <span class="c1"># Convert the WindowsPath object to a string</span>
+            <span class="n">path_string</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">path_object</span><span class="p">)</span>
+            <span class="c1"># Define a regex pattern for matching the date</span>
+            <span class="n">date_pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\d</span><span class="si">{4}</span><span class="s2">-\d</span><span class="si">{2}</span><span class="s2">-\d</span><span class="si">{2}</span><span class="s2">-\d</span><span class="si">{2}</span><span class="s2">-\d</span><span class="si">{2}</span><span class="s2">-\d</span><span class="si">{2}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="c1"># Search for the date pattern in the string</span>
+            <span class="n">match</span> <span class="o">=</span> <span class="n">date_pattern</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">path_string</span><span class="p">)</span>
+            <span class="c1"># Extract the matched date</span>
+            <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+                <span class="n">best_model_name_dir</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">()</span>
+
+            <span class="n">matching_dirs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">SAVED_MODELS_DIR</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">best_model_name_dir</span><span class="p">))</span>
+            <span class="c1"># Check if any matching directories were found</span>
+            <span class="k">if</span> <span class="n">matching_dirs</span><span class="p">:</span>
+                <span class="c1"># matching directory</span>
+                <span class="n">saved_model_path</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">matching_dirs</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                <span class="n">model_file</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">saved_model_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_name</span><span class="p">))</span>
+                <span class="n">model</span> <span class="o">=</span> <span class="n">joblib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">model_file</span><span class="p">)</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">model</span></div>
+
+
+<div class="viewcode-block" id="FraudDetectionModel.get_frauddetection_input_schema">
+<a class="viewcode-back" href="../../../../fraudDetection.components.prediction.html#fraudDetection.components.prediction.prediction_service.FraudDetectionModel.get_frauddetection_input_schema">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_frauddetection_input_schema</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the input schema for fraud detection.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            schema (dict): Input schema</span>
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If there is an issue during the process.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">input_schema_path</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">json_file</span><span class="p">:</span>
+            <span class="n">schema</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">json_file</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">schema</span></div>
+
+
+<div class="viewcode-block" id="FraudDetectionModel.transform_input">
+<a class="viewcode-back" href="../../../../fraudDetection.components.prediction.html#fraudDetection.components.prediction.prediction_service.FraudDetectionModel.transform_input">[docs]</a>
+    <span class="k">def</span> <span class="nf">transform_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Transform input DataFrame using preprocessed data object.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            df (pd.DataFrame): Input DataFrame.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            transformed_test_arr (Numpy.array): Transformed input</span>
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If there is an issue during the process.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Load the pipeline object</span>
+            <span class="n">preprocessing_pipe_obj</span> <span class="o">=</span> <span class="n">joblib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">preprocessd_obj_path</span><span class="p">)</span>
+            <span class="n">schema</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_frauddetection_input_schema</span><span class="p">()</span>
+            <span class="n">df_input</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">schema</span><span class="p">[</span><span class="s2">&quot;columns&quot;</span><span class="p">]]</span>
+            <span class="n">transformed_test_arr</span> <span class="o">=</span> <span class="n">preprocessing_pipe_obj</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">df_input</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">transformed_test_arr</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="FraudDetectionModel.predict">
+<a class="viewcode-back" href="../../../../fraudDetection.components.prediction.html#fraudDetection.components.prediction.prediction_service.FraudDetectionModel.predict">[docs]</a>
+    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Make predictions using the loaded model.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            df (pd.DataFrame): Input DataFrame.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            df (pd.DataFrame): DataFrame with predictions.</span>
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If there is an issue during the process.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_latest_model</span><span class="p">()</span>
+            <span class="n">transformed_input</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform_input</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+            <span class="n">prediction</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">transformed_input</span><span class="p">)</span>
+            <span class="n">drop_features</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;isFlaggedFraud&quot;</span><span class="p">,</span> <span class="s2">&quot;isFraud&quot;</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">drop_features</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+                    <span class="n">df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="n">col</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">prediction_column_name</span> <span class="o">=</span> <span class="s2">&quot;Prediction isFraud&quot;</span>
+            <span class="n">df</span><span class="p">[</span><span class="n">prediction_column_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">prediction</span>
+
+            <span class="k">return</span> <span class="n">df</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="FraudDetectionPredictorApp">
+<a class="viewcode-back" href="../../../../fraudDetection.components.prediction.html#fraudDetection.components.prediction.prediction_service.FraudDetectionPredictorApp">[docs]</a>
+<span class="k">class</span> <span class="nc">FraudDetectionPredictorApp</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;This class provides a Streamlit web application for making predictions using the FraudDetectionModel.</span>
+<span class="sd">    Methods:</span>
+<span class="sd">        - run(): Run the Streamlit application.</span>
+<span class="sd">    Usage:</span>
+<span class="sd">        if __name__ == &quot;__main__&quot;:</span>
+<span class="sd">            FraudDetectionPredictorApp.run()</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="FraudDetectionPredictorApp.run">
+<a class="viewcode-back" href="../../../../fraudDetection.components.prediction.html#fraudDetection.components.prediction.prediction_service.FraudDetectionPredictorApp.run">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">run</span><span class="p">():</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Creates a Streamlit web application with sections for entering a single record or uploading a file</span>
+<span class="sd">        to predict fraudulent transactions.&quot;&quot;&quot;</span>
+        <span class="c1"># st.set_page_config(</span>
+        <span class="c1">#     page_title=&quot;Fraud Detection System&quot;,</span>
+        <span class="c1">#     page_icon=&quot;🧊&quot;,</span>
+        <span class="c1">#     layout=&quot;wide&quot;,</span>
+        <span class="c1">#     initial_sidebar_state=&quot;expanded&quot;,</span>
+        <span class="c1">#     menu_items={&#39;About&#39;: &quot;# This is a Fraud Detection System! by Arun khare&quot;}</span>
+        <span class="c1">#     )</span>
+
+        <span class="n">model</span> <span class="o">=</span> <span class="n">FraudDetectionModel</span><span class="p">()</span>
+
+        <span class="n">page</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">sidebar</span><span class="o">.</span><span class="n">radio</span><span class="p">(</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot; Hello there! I’ll guide you! Prediction Service&quot;&quot;&quot;</span><span class="p">,</span>
+            <span class="p">[</span>
+                <span class="s2">&quot;Main Page&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;Prediction&quot;</span><span class="p">,</span>
+            <span class="p">],</span>
+            <span class="n">key</span><span class="o">=</span><span class="s2">&quot;current_page&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">page</span> <span class="o">==</span> <span class="s2">&quot;Main Page&quot;</span><span class="p">:</span>
+            <span class="n">st</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;🏦 :rainbow[Hello, welcome to Fraud Detector]&quot;</span><span class="p">)</span>
+            <span class="n">st</span><span class="o">.</span><span class="n">caption</span><span class="p">(</span>
+                <span class="s2">&quot;This detects :blue[_Fraud Transaction_] :sunglasses: in banking transaction&quot;</span>
+            <span class="p">)</span>
+            <span class="n">st</span><span class="o">.</span><span class="n">markdown</span><span class="p">(</span>
+<span class="w">                </span><span class="sd">&quot;&quot;&quot;### Transactions drivers used in prediction:</span>
+<span class="sd">                    - step: represents a unit of time where 1 step equals 1 hour</span>
+<span class="sd">                    - type: type of online transaction</span>
+<span class="sd">                    - amount: the amount of the transaction</span>
+<span class="sd">                    - nameOrig: customer starting the transaction</span>
+<span class="sd">                    - oldbalanceOrg: balance before the transaction</span>
+<span class="sd">                    - newbalanceOrig: balance after the transaction</span>
+<span class="sd">                    - nameDest: recipient of the transaction</span>
+<span class="sd">                    - oldbalanceDest: initial balance of recipient before the transaction</span>
+<span class="sd">                    - newbalanceDest: the new balance of recipient after the transaction&quot;&quot;&quot;</span>
+            <span class="p">)</span>
+
+            <span class="c1"># next = st.button(&quot;__Prediction__ ➡️&quot;)</span>
+            <span class="c1"># if next:</span>
+            <span class="c1">#     if st.session_state[&quot;current_page&quot;] == &quot;Main Page&quot;:</span>
+            <span class="c1">#         st.session_state[&quot;current_page&quot;] =&quot;Prediction&quot;</span>
+
+        <span class="k">elif</span> <span class="n">page</span> <span class="o">==</span> <span class="s2">&quot;Prediction&quot;</span><span class="p">:</span>
+            <span class="n">st</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;:sunflower: :orange[Prediction]&quot;</span><span class="p">,</span> <span class="n">anchor</span><span class="o">=</span><span class="s2">&quot;Prediction&quot;</span><span class="p">)</span>
+            <span class="n">input_option</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">radio</span><span class="p">(</span>
+                <span class="s2">&quot;:blue[Pick data option]:lightning:&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;Single Record&quot;</span><span class="p">,</span> <span class="s2">&quot;Upload File&quot;</span><span class="p">]</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">input_option</span> <span class="o">==</span> <span class="s2">&quot;Single Record&quot;</span><span class="p">:</span>
+                <span class="c1"># Section for entering a single record</span>
+                <span class="n">st</span><span class="o">.</span><span class="n">subheader</span><span class="p">(</span><span class="s2">&quot;:blue[Enter a record to predict]&quot;</span><span class="p">)</span>
+                <span class="n">column_list</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">get_frauddetection_input_schema</span><span class="p">()[</span><span class="s2">&quot;columns&quot;</span><span class="p">]</span>
+                <span class="n">single_record</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="n">column_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span> <span class="n">st</span><span class="o">.</span><span class="n">selectbox</span><span class="p">(</span>
+                        <span class="s2">&quot;Transacted type&quot;</span><span class="p">,</span>
+                        <span class="p">(</span><span class="s2">&quot;CASH_OUT&quot;</span><span class="p">,</span> <span class="s2">&quot;PAYMENT&quot;</span><span class="p">,</span> <span class="s2">&quot;CASH_IN&quot;</span><span class="p">,</span> <span class="s2">&quot;TRANSFER&quot;</span><span class="p">,</span> <span class="s2">&quot;DEBIT&quot;</span><span class="p">),</span>
+                    <span class="p">),</span>
+                    <span class="n">column_list</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="n">st</span><span class="o">.</span><span class="n">number_input</span><span class="p">(</span><span class="s2">&quot;Step number&quot;</span><span class="p">),</span>
+                    <span class="n">column_list</span><span class="p">[</span><span class="mi">2</span><span class="p">]:</span> <span class="n">st</span><span class="o">.</span><span class="n">number_input</span><span class="p">(</span><span class="s2">&quot;Amount&quot;</span><span class="p">),</span>
+                    <span class="n">column_list</span><span class="p">[</span><span class="mi">3</span><span class="p">]:</span> <span class="n">st</span><span class="o">.</span><span class="n">number_input</span><span class="p">(</span><span class="s2">&quot;OldBalance Origin&quot;</span><span class="p">),</span>
+                    <span class="n">column_list</span><span class="p">[</span><span class="mi">4</span><span class="p">]:</span> <span class="n">st</span><span class="o">.</span><span class="n">number_input</span><span class="p">(</span><span class="s2">&quot;NewBalance Origin&quot;</span><span class="p">),</span>
+                    <span class="n">column_list</span><span class="p">[</span><span class="mi">5</span><span class="p">]:</span> <span class="n">st</span><span class="o">.</span><span class="n">number_input</span><span class="p">(</span><span class="s2">&quot;Oldbalance Destination&quot;</span><span class="p">),</span>
+                    <span class="n">column_list</span><span class="p">[</span><span class="mi">6</span><span class="p">]:</span> <span class="n">st</span><span class="o">.</span><span class="n">number_input</span><span class="p">(</span><span class="s2">&quot;NewBalance Destination&quot;</span><span class="p">),</span>
+                <span class="p">}</span>
+
+                <span class="n">single_record_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([</span><span class="n">single_record</span><span class="p">])</span>
+                <span class="n">st</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;:blue[User Input (Single Record)]:&quot;</span><span class="p">)</span>
+                <span class="n">st</span><span class="o">.</span><span class="n">dataframe</span><span class="p">(</span><span class="n">single_record_df</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">st</span><span class="o">.</span><span class="n">button</span><span class="p">(</span>
+                    <span class="s2">&quot;Predict :eyes:&quot;</span><span class="p">,</span>
+                    <span class="n">key</span><span class="o">=</span><span class="s2">&quot;predict-button1&quot;</span><span class="p">,</span>
+                    <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;primary&quot;</span><span class="p">,</span>
+                    <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Click to make predictions&quot;</span><span class="p">,</span>
+                <span class="p">):</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">single_record_df</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+                        <span class="k">with</span> <span class="n">st</span><span class="o">.</span><span class="n">spinner</span><span class="p">(</span><span class="s2">&quot;Wait for it...&quot;</span><span class="p">):</span>
+                            <span class="n">prediction_single</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">single_record_df</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="n">prediction_single</span><span class="o">.</span><span class="n">empty</span> <span class="ow">or</span> <span class="n">prediction_single</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                            <span class="n">st</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="s2">&quot;This is a success&quot;</span><span class="p">,</span> <span class="n">icon</span><span class="o">=</span><span class="s2">&quot;✅&quot;</span><span class="p">)</span>
+                            <span class="n">st</span><span class="o">.</span><span class="n">snow</span><span class="p">()</span>
+                            <span class="n">st</span><span class="o">.</span><span class="n">write</span><span class="p">(</span>
+                                <span class="s2">&quot; 🉑 :red[Prediction for _Single Record_]: isFraud :blue[1=yes 0=Not fraud transaction]&quot;</span>
+                            <span class="p">)</span>
+                            <span class="n">st</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">prediction_single</span><span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">st</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;This is a warning&quot;</span><span class="p">,</span> <span class="n">icon</span><span class="o">=</span><span class="s2">&quot;⚠️&quot;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">input_option</span> <span class="o">==</span> <span class="s2">&quot;Upload File&quot;</span><span class="p">:</span>
+                <span class="c1"># Section for uploading a file</span>
+                <span class="k">with</span> <span class="n">st</span><span class="o">.</span><span class="n">container</span><span class="p">():</span>
+                    <span class="n">st</span><span class="o">.</span><span class="n">subheader</span><span class="p">(</span>
+                        <span class="s2">&quot;:blue[Upload the data file to predict fraudulent transactions]&quot;</span>
+                    <span class="p">)</span>
+                    <span class="n">uploaded_file</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">file_uploader</span><span class="p">(</span>
+                        <span class="s2">&quot;Choose a file&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;csv&quot;</span><span class="p">,</span> <span class="s2">&quot;xlsx&quot;</span><span class="p">]</span>
+                    <span class="p">)</span>
+                    <span class="k">if</span> <span class="n">uploaded_file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">multiple_record_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">uploaded_file</span><span class="p">)</span>
+                        <span class="n">st</span><span class="o">.</span><span class="n">subheader</span><span class="p">(</span><span class="s2">&quot;:blue[User Input DataFrame (Uploaded File)]:&quot;</span><span class="p">)</span>
+                        <span class="n">st</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">multiple_record_df</span><span class="p">)</span>
+
+                    <span class="c1"># Perform prediction using the model</span>
+                    <span class="k">if</span> <span class="n">st</span><span class="o">.</span><span class="n">button</span><span class="p">(</span>
+                        <span class="s2">&quot;Predict :eyes:&quot;</span><span class="p">,</span>
+                        <span class="n">key</span><span class="o">=</span><span class="s2">&quot;predict-button&quot;</span><span class="p">,</span>
+                        <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;primary&quot;</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Click to make predictions&quot;</span><span class="p">,</span>
+                    <span class="p">):</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="n">multiple_record_df</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+                            <span class="k">with</span> <span class="n">st</span><span class="o">.</span><span class="n">spinner</span><span class="p">(</span><span class="s2">&quot;Wait for it...&quot;</span><span class="p">):</span>
+                                <span class="n">prediction_multiple</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">multiple_record_df</span><span class="p">)</span>
+                            <span class="k">if</span> <span class="p">(</span>
+                                <span class="ow">not</span> <span class="n">prediction_multiple</span><span class="o">.</span><span class="n">empty</span>
+                                <span class="ow">or</span> <span class="n">prediction_multiple</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+                            <span class="p">):</span>
+                                <span class="n">st</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="s2">&quot;This is a success&quot;</span><span class="p">,</span> <span class="n">icon</span><span class="o">=</span><span class="s2">&quot;✅&quot;</span><span class="p">)</span>
+                                <span class="n">st</span><span class="o">.</span><span class="n">balloons</span><span class="p">()</span>
+                                <span class="n">st</span><span class="o">.</span><span class="n">write</span><span class="p">(</span>
+                                    <span class="s2">&quot;🉑 :red[Prediction for _Multiple Records_]: isFraud :blue[1 = yes 0 = Not fraud transaction]&quot;</span>
+                                <span class="p">)</span>
+                                <span class="n">st</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">prediction_multiple</span><span class="p">)</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="n">st</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;This is a warning&quot;</span><span class="p">,</span> <span class="n">icon</span><span class="o">=</span><span class="s2">&quot;⚠️&quot;</span><span class="p">)</span>
+
+        <span class="n">st</span><span class="o">.</span><span class="n">markdown</span><span class="p">(</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;&lt;footer&gt;  &lt;p&gt;Version: v1.0.0&lt;/p&gt;&lt;/footer&gt;&quot;&quot;&quot;</span><span class="p">,</span> <span class="n">unsafe_allow_html</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span></div>
+</div>
+
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">FraudDetectionPredictorApp</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Arun khare.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
