@@ -1,7 +1,8 @@
 name: "Sphinx: Render docs"
 
 on: push
-
+env:
+    INPUT_DOCS-FOLDER: docs/
 jobs:
   build:
     runs-on: ubuntu-latest
