@@ -2,7 +2,7 @@ name: documentation
 
 on:
   push:
-    branches: ["main"]
+    branches: ["docs-master"]
   pull_request:
   workflow_dispatch:
 
