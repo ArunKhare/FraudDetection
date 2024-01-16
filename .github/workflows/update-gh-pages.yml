@@ -17,6 +17,10 @@ jobs:
       - name: Install dependencies
         run: |
           pip install sphinx sphinx_rtd_theme
+      - name: Sphinx apidoc
+        run: | 
+          sphinx-apidoc -o  docs/source . 
+          sphinx-apidoc -o  docs/source src snowflake
       - name: Sphinx build
         run: |
           sphinx-build -b html docs/source docs/build
