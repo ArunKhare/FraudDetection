@@ -1,7 +1,18 @@
+dill==0.3.6
+imblearn==0.0
+kaggle==1.6.0
 mlflow==2.9.2
-numpy==1.26.3
-pandas==2.1.4
+python-decouple==3.8
+python-dotenv==0.21.0
 python-box==7.1.1
 streamlit==1.29.0
-Sphinx==7.1.2
+scikit-learn==1.2.2
+ensure==1.0.3
+# dev only
+Sphinx==7.2.6
 sphinx-rtd-theme==2.0.0
+myst-parser==2.0.0
+ipykernel==6.23.1
+dvc==2.56.0
+black==23.12.1
+pytest
