@@ -8,6 +8,7 @@ Badges:
 
 [![GitHub](https://img.shields.io/badge/GitHub-ArunKhare/FraudDetection.git-blue.svg)](https://github.com/ArunKhare/FraudDetection.git)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
+[![documentation](https://github.com/ArunKhare/FraudDetection/actions/workflows/update-gh-pages.yml/badge.svg?branch=docs-master)](https://github.com/ArunKhare/FraudDetection/actions/workflows/update-gh-pages.yml)
 
 Table of Contents:
 
