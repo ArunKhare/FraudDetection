@@ -62,11 +62,11 @@ class FraudDetectionException(Exception):
 
     def __init__(self, error_message: Exception, error_details: sys):
         """
-        Initializes a FraudDetectionException.
+        Initializes a FraudDetectionException with a specific error message and details.
 
         Args:
-            error_message (Exception): _description_
-            error_details (sys): _description_
+            error_message (Exception): The exception message associated with the fraud detection error.
+            error_details (sys): The system-specific details associated with the error.
         """
         super().__init__(error_message)
         self.error_message = FraudDetectionException.get_detailed_error_message(

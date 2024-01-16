@@ -1,20 +1,19 @@
-""" 
-This module defines a training application for fraud detection, including 
-the FraudDetectionTrainingApp class. It uses a Pipeline for training models, 
-**'MLflow'** for experiment tracking, and **'Streamlit'** for the user interface.
-set up Streamlit app for MLflow experiment tracking. Loads MLFLOW_TRACKING_URI from the environment
-With a user friendly UI you can 
-- update the existing model configuration
-- entirely new machine learning  model configuration 
-- which is validated in UI using Json formatter 
-- View the the and compare the experiments of training the models
-- View Data, Logs
-- With a click you can view  tracking UI of Mlfow and view, compare and download
-  the  model artifacts 'model.pickle, Signature, Processing object and Requirements'_
-- A prediction service to predict with model, can upload a batch file or feed a singlerecord
+"""
+This module defines the `FraudDetectionTrainingApp` class, which facilitates the training of machine learning models for fraud detection. It utilizes a pipeline structure for model training, MLflow for experiment tracking, and Streamlit for creating a user-friendly interface.
+
+The application allows users to:
+- Update existing model configurations.
+- Create entirely new machine learning model configurations.
+- Validate configurations using a JSON formatter within the UI.
+- View and compare experiments related to model training.
+- Access data and logs for in-depth analysis.
+- Utilize a single-click feature to navigate to the MLflow tracking UI, enabling users to view, compare, and download model artifacts such as 'model.pickle', 'Signature', 'Processing object', and 'Requirements'.
+- Employ a prediction service that supports model predictions, with the capability to upload a batch file or input a single record for processing.
+
+Environment Variables:
+- MLFLOW_TRACKING_URI: The URI used by MLflow for experiment tracking, loaded from the environment.
 
 """
-
 
 import os
 import sys
