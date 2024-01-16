@@ -127,11 +127,6 @@ class DataIngestion:
             create_directories(split_dataset_path)
             # check_data_dir(raw_data_dir)
 
-            if is_dir_empty(train_file_path) or is_dir_empty(test_file_path):
-                raise ValueError(
-                    "Both train and test directories must contain data before splitting."
-                )
-
             file_name = Path(os.listdir(self.raw_data_dir)[0])
             file_path = Path(os.path.join(self.raw_data_dir, file_name))
             logging.info(f"Reading CSV file: {file_path}")
@@ -175,6 +170,10 @@ class DataIngestion:
 
             message = f"Train_test_split already exist at path {train_file_path} and {test_file_path}"
 
+            if is_dir_empty(train_file_path) or is_dir_empty(test_file_path):
+                raise ValueError(
+                    "Both train and test directories must contain data before splitting."
+                )
             # create the data ingestion artifacts
             data_ingestion_artifacts = DataIngestionArtifact(
                 train_file_path=train_file_path,
@@ -237,8 +236,8 @@ class DataIngestion:
         """
         try:
             # self.user_input_to_downloaddata()
-            self.download_transaction_data()
-            self.unzip_data()
+            # self.download_transaction_data()
+            # self.unzip_data()
             return self.split_data_as_train_test()
         except Exception as e:
             raise FraudDetectionException(e, sys) from e
