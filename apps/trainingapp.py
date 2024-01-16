@@ -11,8 +11,10 @@ With a user friendly UI you can
 - View Data, Logs
 - With a click you can view  tracking UI of Mlfow and view, compare and download
   the  model artifacts 'model.pickle, Signature, Processing object and Requirements'_
-- A prediction service to predict with model, can upload a batch file or feed a singlerecord 
+- A prediction service to predict with model, can upload a batch file or feed a singlerecord
+
 """
+
 
 import os
 import sys
