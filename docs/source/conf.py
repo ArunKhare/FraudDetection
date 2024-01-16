@@ -15,8 +15,7 @@ from pathlib import Path
 # Get the absolute path to the root directory (assuming conf.py is in Root/docs/source)
 # join_path = lambda *paths: os.path.join(os.path.dirname(__file__),*paths)
 
-_static_dir = os.path.abspath(os.path.dirname(__file__)) or "."
-_source_dir = os.path.join(_static_dir, "..")
+_source_dir = os.path.abspath(os.path.dirname(__file__)) or "."
 docs_dir = os.path.join(_source_dir, "..")
 root_dir = os.path.join(docs_dir, "..")
 
@@ -27,7 +26,7 @@ src_dir = os.path.join(root_dir, "src")
 sys.path.insert(0, root_dir)
 sys.path.insert(1, src_dir)
 sys.path.insert(2, docs_dir)
-sys.path.insert(3, _static_dir)
+sys.path.insert(3, _source_dir)
 
 # I hope this in correct in conf.py settings
 # _static contains conf.py in index.rst
@@ -83,4 +82,4 @@ exclude_patterns = [
 ]
 
 html_theme = "sphinx_rtd_theme"
-html_static_path = [_static_dir]
+html_static_path = ['_static']
