@@ -18,6 +18,9 @@ Badges
 .. image:: https://img.shields.io/badge/License-MIT-green.svg
     :target: https://opensource.org/licenses/MIT
     :alt: MIT License
+.. image:: https://github.com/ArunKhare/FraudDetection/actions/workflows/update-gh-pages.yml/badge.svg?branch=docs-master
+    :target: https://github.com/ArunKhare/FraudDetection/actions/workflows/update-gh-pages.yml
+    :alt: documentation
 
 Table of Contents
 -----------------
