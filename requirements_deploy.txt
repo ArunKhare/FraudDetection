@@ -9,3 +9,5 @@ python-box==7.1.1
 streamlit==1.29.0
 scikit-learn==1.2.2
 ensure==1.0.3
+pymysql
+boto3

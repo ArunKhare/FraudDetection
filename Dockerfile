@@ -12,7 +12,7 @@ ENV MLFLOWTRACKINGURI=sqlite:///mlruns.db
 
 COPY . /app
 WORKDIR /app
-RUN pip install -r requirements.txt
+RUN pip install --no-cache-dir -r requirements_deploy.txt
 
 RUN mkdir -p /root/.kaggle/
 COPY .kaggle/kaggle.json /root/.kaggle/
