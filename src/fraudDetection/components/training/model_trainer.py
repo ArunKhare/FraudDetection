@@ -98,16 +98,20 @@ class ModelTrainer:
 
     def initiate_model_trainer(self) -> ModelTrainerArtifact:
         """implements the training of models"""
+         # Check if the tracking URI for MySQL is set
         try:
-            tracking_uri = os.getenv("MLFLOWTRACKINGURI")
 
-            if tracking_uri is not None:
-                mlflow.set_tracking_uri(tracking_uri)
+            if os.getenv("MLFLOW_TRACKING_URI_MYSQL") is not None and os.getenv("MLFLOW_TRACKING_URI_MYSQL") != "":
+                tracking_uri = os.getenv("MLFLOW_TRACKING_URI_MYSQL")
             else:
-                logging.info("Tracking_URI not set")
-                return
+                    # If not set, use the SQLite tracking URI as a default
+                tracking_uri = os.getenv("MLFLOW_TRACKING_URI_SQLITE", "sqlite:///mlruns.db")
 
-            mlflow.set_experiment("Experiment_1")
+            # Set the tracking URI
+            mlflow.set_tracking_uri(tracking_uri)
+
+            exp_name = os.getenv("MLFLOW_EXPERIMENT_NAME", "exp-frauddetect")
+            mlflow.set_experiment(exp_name)
             mlflow.start_run(run_name="Training", nested=True)
 
             mlflow.set_tags({"version": "v1", "stage": "training"})

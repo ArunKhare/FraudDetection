@@ -1,0 +1,13 @@
+dill==0.3.6
+-e .
+imblearn==0.0
+kaggle==1.6.0
+mlflow==2.9.2
+python-decouple==3.8
+python-dotenv==0.21.0
+python-box==7.1.1
+streamlit==1.29.0
+scikit-learn==1.2.2
+ensure==1.0.3
+pymysql
+boto3

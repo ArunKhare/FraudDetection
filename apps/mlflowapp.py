@@ -1,6 +1,7 @@
 """
 This module defines functions related to launching *MLflow UI*.
 """
+import os
 import sys
 import subprocess
 import streamlit as st
@@ -9,8 +10,7 @@ from fraudDetection.exception import FraudDetectionException
 
 def exp_tracking():
     """
-    Displays a Streamlit app with a
-    button to launch the MLflow UI.
+    Displays a Streamlit app with a button to launch the MLflow UI.
     :return: None
     """
 
@@ -23,20 +23,33 @@ def exp_tracking():
         icon="ℹ️",
     )
 
-    st.button("MLflow UI", key="MLFLOW UI", on_click=launch_mlflow_ui, type="primary")
+    # Add a radio button to select the tracking URI type
+    uri_type = st.radio("Select Tracking URI Type", ["MySQL", "SQLite"])
+
+    if uri_type == "MySQL":
+        tracking_uri = os.getenv("MLFLOW_TRACKING_URI_MYSQL")
+    else:
+        tracking_uri = os.getenv("MLFLOW_TRACKING_URI_SQLITE", "sqlite:///mlruns.db")
+
+    st.button(
+        "MLflow UI",
+        key="MLFLOW UI",
+        on_click=lambda: launch_mlflow_ui(tracking_uri),
+        type="primary",
+    )
 
 
-def launch_mlflow_ui():
+def launch_mlflow_ui(tracking_uri):
     """Function to launch the MLflow UI using subprocess.
     This function attempts to launch the MLflow UI using subprocess. It specifies the
     port and backend-store-uri parameters for configuring the UI.
     Args:
-        None
+        tracking_uri (str): The MLflow tracking URI to use.
     Returns:
         None
     """
     try:
-        # Launch MLflow UI using subprocess
+        # Launch MLflow UI using subprocess with the specified tracking URI
         subprocess.Popen(
             [
                 "mlflow",
@@ -44,7 +57,7 @@ def launch_mlflow_ui():
                 "--port",
                 "8080",
                 "--backend-store-uri",
-                "sqlite:///mlruns.db",
+                tracking_uri,
             ]
         )
     except subprocess.CalledProcessError as e:
@@ -53,9 +66,9 @@ def launch_mlflow_ui():
 
     with st.container(border=True):
         st.info(
-            "Click the HERE :red[*'http://127.0.0.1:8080'*] to open Mlfow UI in browser",
+            "Click the HERE :red[*'http://127.0.0.1:8080'*] to open Mlfow UI in browser Or incase of windows :red[*'http://localhost:8080'*] ",
             icon="ℹ️",
         )
         st.link_button("Go to Mlflow UI", "http://127.0.0.1:8080")
 
-        st.toast("MLflow UI is now running in back ground", icon="🎉")
+        st.toast("MLflow UI is now running in the background", icon="🎉")
