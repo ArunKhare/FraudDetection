@@ -23,16 +23,16 @@ import yaml
 import pandas as pd
 import streamlit as st
 import mlflow
-from mlflow.exceptions import InvalidUrlException
 from dotenv import load_dotenv
+from mlflow.exceptions import InvalidUrlException
 from fraudDetection.pipeline.pipeline import Pipeline
 from fraudDetection.config.configuration import (
     ConfigurationManager,
     ROOT_DIR,
     CONFIG_FILE_PATH,
 )
-from fraudDetection.utils import read_yaml, write_yaml, load_json
-from fraudDetection.constants import CONFIG_DIR, DATA_INGESTION_KAGGLE_CONFIG_FILE_PATH
+from fraudDetection.utils import read_yaml, write_yaml
+from fraudDetection.constants import CONFIG_DIR
 from fraudDetection.components import FraudDetectionPredictorApp
 from fraudDetection.logger import get_log_dataframe, logging
 from fraudDetection.exception import FraudDetectionException
