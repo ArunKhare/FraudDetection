@@ -91,7 +91,7 @@ class ModelEvaluation:
                 return
             else:
                 model_eval_file_content = read_yaml(
-                    file_path=model_evaluation_file_path
+                    file_path=Path(model_evaluation_file_path)
                 )
 
             logging.info(f"yaml file:{model_evaluation_file_path} loaded successfully")
@@ -117,7 +117,7 @@ class ModelEvaluation:
             model_evaluation_artifact (obj:'ModelEvaluationArtifact'): artifacts of best model;
         """
         try:
-            eval_file_path = self.model_evaluation_config.model_evaluation_file_path
+            eval_file_path:Path = self.model_evaluation_config.model_evaluation_file_path
 
             model_eval_content = read_yaml(file_path=eval_file_path)
             model_eval_content = (

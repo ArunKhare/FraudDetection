@@ -36,7 +36,7 @@ from fraudDetection.constants import CONFIG_DIR, DATA_INGESTION_KAGGLE_CONFIG_FI
 from fraudDetection.components import FraudDetectionPredictorApp
 from fraudDetection.logger import get_log_dataframe, logging
 from fraudDetection.exception import FraudDetectionException
-from .mlflowapp import exp_tracking
+from mlflowapp import exp_tracking
 
 
 load_dotenv()
