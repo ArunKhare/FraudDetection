@@ -31,6 +31,5 @@ docs/
 remove_file_pycache.sh
 .vscode
 /aws-deployment
-cond?.yaml
 pyproject_poetry.toml
 **/snowflake
