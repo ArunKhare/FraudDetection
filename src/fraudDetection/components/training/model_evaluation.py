@@ -86,7 +86,7 @@ class ModelEvaluation:
                 or os.stat(model_evaluation_file_path).st_size == 0
             ):
                 write_yaml(
-                    data=model_evaluation_dict, file_path=model_evaluation_file_path
+                    data=model_evaluation_dict, file_path=Path(model_evaluation_file_path)
                 )
                 return
             else:
@@ -117,7 +117,7 @@ class ModelEvaluation:
             model_evaluation_artifact (obj:'ModelEvaluationArtifact'): artifacts of best model;
         """
         try:
-            eval_file_path = self.model_evaluation_config.model_evaluation_file_path
+            eval_file_path:Path = self.model_evaluation_config.model_evaluation_file_path
 
             model_eval_content = read_yaml(file_path=eval_file_path)
             model_eval_content = (
