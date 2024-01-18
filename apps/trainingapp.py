@@ -36,7 +36,7 @@ from fraudDetection.constants import CONFIG_DIR, DATA_INGESTION_KAGGLE_CONFIG_FI
 from fraudDetection.components import FraudDetectionPredictorApp
 from fraudDetection.logger import get_log_dataframe, logging
 from fraudDetection.exception import FraudDetectionException
-from .mlflowapp import exp_tracking
+from mlflowapp import exp_tracking
 
 
 load_dotenv()
@@ -48,7 +48,7 @@ def set_tracking_uri():
         InvalidUrlException: when URI is not in proper format
     """
     mlflow_tracking_uri = os.getenv(
-        "MLFLOWTRACKINGURI", default="http://localhost:8080"
+        "MLFLOW_TRACKING_URI_SQLITE", default="http://localhost:8080"
     )
     try:
         mlflow.set_tracking_uri(mlflow_tracking_uri)

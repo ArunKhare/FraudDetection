@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   frauddetection:
-    image: frauddetection:v1
+    image: frauddetection:v0
     ports:
       - "8501:8501"
     volumes:

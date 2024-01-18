@@ -8,7 +8,7 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Set Default Mlflow URI
-ENV MLFLOWTRACKINGURI=sqlite:///mlruns.db
+ENV MLFLOW_TRACKING_URI_SQLITE=sqlite:///mlruns.db
 
 COPY . /app
 WORKDIR /app

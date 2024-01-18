@@ -99,7 +99,7 @@ class ModelTrainer:
     def initiate_model_trainer(self) -> ModelTrainerArtifact:
         """implements the training of models"""
         try:
-            tracking_uri = os.getenv("MLFLOWTRACKINGURI")
+            tracking_uri = os.getenv("MLFLOW_TRACKING_URI_SQLITE")
 
             if tracking_uri is not None:
                 mlflow.set_tracking_uri(tracking_uri)
