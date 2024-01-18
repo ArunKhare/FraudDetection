@@ -23,7 +23,9 @@ Installation:
     
     Instruction to run the project:
         conda activate ./FraudDetection
-
+    Save the environment:
+        conda env export --file conda.yaml
+    
 Usage:
     for running the project for training and predictions from root directory for the project:
         usage senarios: 
