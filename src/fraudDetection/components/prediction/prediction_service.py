@@ -23,7 +23,6 @@ if __name__ == "__main__":
 """
 import os
 from pathlib import Path
-import json
 import re
 import numpy as np
 import pandas as pd
@@ -109,7 +108,9 @@ class FraudDetectionModel:
 
             if saved_model_path is _exhausted:
                 st.write(f"empty file path{path_string} in {SAVED_MODELS_DIR}")
-                raise ValueError(f"No Saved best model {path_string} in {SAVED_MODELS_DIR}")
+                raise ValueError(
+                    f"No Saved best model {path_string} in {SAVED_MODELS_DIR}"
+                )
             model_file = Path(os.path.join(saved_model_path, self.model_name))
             model = joblib.load(model_file)
         except (ValueError, TypeError) as e:
@@ -251,7 +252,10 @@ class FraudDetectionPredictorApp:
                     if not single_record_df.empty:
                         with st.spinner("Wait for it..."):
                             prediction_single = model.predict(single_record_df)
-                        if not prediction_single is not None or not prediction_single.empty:
+                        if (
+                            not prediction_single is not None
+                            or not prediction_single.empty
+                        ):
                             st.success("This is a success", icon="✅")
                             st.snow()
                             st.write(
