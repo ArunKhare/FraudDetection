@@ -57,27 +57,6 @@ def set_tracking_uri():
         raise FraudDetectionException(e, sys) from e
     finally:
         logging.info(f"Tracking URI set {mlflow_tracking_uri}")
-
-
-# # Deployment in Streamlit Community Cloud
-# def streamlit_community_cloud():
-#     """Deploy in Stremlit Community Cloud """
-#     # Get Kaggle API credentials from environment variables
-#     kaggle_username = st.secrets["KAGGLE_USERNAME"]
-#     kaggle_key = st.secrets["KAGGLE_KEY"]
-#     # Define the directory path and file path
-#     KAGGLE_DIR = "/home/appuser/.kaggle"
-#     kaggle_file_path = os.path.join(KAGGLE_DIR, "kaggle.json")
-#     # Create the directory if it doesn't exist
-#     os.makedirs(KAGGLE_DIR, exist_ok=True)
-#     # Create the Kaggle JSON file
-#     kaggle_credentials = {"username": kaggle_username, "key": kaggle_key}
-#     with open(kaggle_file_path, "w") as kaggle_file:
-#         json.dump(kaggle_credentials, kaggle_file)
-#     # Set appropriate permissions
-#     os.chmod(kaggle_file_path, 0o600)
-#     print("Performing actions for Streamlit Community deployment...")
-
 # # LOCAL RUN
 # conn_location = Path(DATA_INGESTION_KAGGLE_CONFIG_FILE_PATH)
 # connect = load_json(conn_location)
