@@ -32,12 +32,25 @@ import joblib
 import streamlit as st
 
 tags = {"Version": "v1"}
-INPUT_SCHEMA_JSON_FILE_NAME = Path("input_schema.json")
-MODEL_EVALUATION_YAML = Path("model_evaluation.yaml")
-SAVED_MODELS_DIR = Path("artifacts/saved_models")
+# INPUT_SCHEMA_JSON_FILE_NAME = Path("input_schema.json")
+MODEL_EVALUATION_YAML = Path(os.path.join("model_evaluation.yaml"))
+SAVED_MODELS_DIR = Path(os.path.join("artifacts", "saved_models"))
 MODEL_NAME = "model.pkl"
-PREPROCESSER_OBJ_PATH = Path("artifacts/transformed_data/preprocessed/preprocessed.pkl")
-EVALUATED_MODELS_PATH = Path("artifacts/model_evaluation")
+PREPROCESSER_OBJ_PATH = Path(
+    os.path.join("artifacts", "transformed_data", "preprocessed", "preprocessed.pkl")
+)
+EVALUATED_MODELS_PATH = Path(os.path.join("artifacts", "model_evaluation"))
+SCHEMA = {
+    "columns": [
+        "type",
+        "step",
+        "amount",
+        "oldbalanceOrg",
+        "newbalanceOrig",
+        "oldbalanceDest",
+        "newbalanceDest",
+    ]
+}
 
 
 # schema_file_path = Path(r"C:\Users\arunk\FraudDetection\configs\schema.yaml")
@@ -46,7 +59,6 @@ class FraudDetectionModel:
     transforming input data, and making predictions.
     Methods:
     - get_latest_model(): Load the latest trained model from evaluated models.
-    - get_frauddetection_input_schema(): Get the input schema for fraud detection.
     - transform_input(df): Transform input DataFrame using preprocessed data object.
     - predict(df): Make predictions using the loaded model.
     """
@@ -59,9 +71,9 @@ class FraudDetectionModel:
         self.evaluated_models_file_path = Path(
             os.path.join(self.evaluated_models_path, MODEL_EVALUATION_YAML)
         )
-        self.input_schema_path = Path(
-            os.path.join(self.evaluated_models_path, INPUT_SCHEMA_JSON_FILE_NAME)
-        )
+        # self.input_schema_path = Path(
+        #     os.path.join(self.evaluated_models_path, INPUT_SCHEMA_JSON_FILE_NAME)
+        # )
 
     def get_latest_model(self):
         """Get the latest trained model from evaluated models.
@@ -72,7 +84,7 @@ class FraudDetectionModel:
         """
         try:
             # Load best model from the saved models and the input schema
-
+            _exhausted = object()
             with open(
                 file=self.evaluated_models_file_path, mode="r", encoding="utf-8"
             ) as f:
@@ -91,30 +103,21 @@ class FraudDetectionModel:
             if match:
                 best_model_name_dir = match.group()
 
-            matching_dirs = list(SAVED_MODELS_DIR.glob(best_model_name_dir))
+            matching_dirs = SAVED_MODELS_DIR.glob(best_model_name_dir)
             # Check if any matching directories were found
-            if matching_dirs:
-                # matching directory
-                saved_model_path = next(matching_dirs, None)
-                model_file = Path(os.path.join(saved_model_path, self.model_name))
-                model = joblib.load(model_file)
+            saved_model_path = next(matching_dirs, None)
+
+            if saved_model_path is _exhausted:
+                st.write(f"empty file path{path_string} in {SAVED_MODELS_DIR}")
+                raise ValueError(f"No Saved best model {path_string} in {SAVED_MODELS_DIR}")
+            model_file = Path(os.path.join(saved_model_path, self.model_name))
+            model = joblib.load(model_file)
         except (ValueError, TypeError) as e:
             print(f"Error: {e}")
         except Exception as e:
             print(e)
 
         return model
-
-    def get_frauddetection_input_schema(self):
-        """Get the input schema for fraud detection.
-        Returns:
-            schema (dict): Input schema
-        Raises:
-            ValueError: If there is an issue during the process.
-        """
-        with open(file=self.input_schema_path, mode="r", encoding="utf-8") as json_file:
-            schema = json.load(json_file)
-        return schema
 
     def transform_input(self, df) -> np.array:
         """Transform input DataFrame using preprocessed data object.
@@ -128,8 +131,7 @@ class FraudDetectionModel:
         try:
             # Load the pipeline object
             preprocessing_pipe_obj = joblib.load(self.preprocessd_obj_path)
-            schema = self.get_frauddetection_input_schema()
-            df_input = df[schema["columns"]]
+            df_input = df[SCHEMA["columns"]]
             transformed_test_arr = preprocessing_pipe_obj.transform(df_input)
             return transformed_test_arr
         except (ValueError, TypeError) as e:
@@ -214,11 +216,6 @@ class FraudDetectionPredictorApp:
                     - newbalanceDest: the new balance of recipient after the transaction"""
             )
 
-            # next = st.button("__Prediction__ ➡️")
-            # if next:
-            #     if st.session_state["current_page"] == "Main Page":
-            #         st.session_state["current_page"] ="Prediction"
-
         elif page == "Prediction":
             st.title(":sunflower: :orange[Prediction]", anchor="Prediction")
             input_option = st.radio(
@@ -227,7 +224,7 @@ class FraudDetectionPredictorApp:
             if input_option == "Single Record":
                 # Section for entering a single record
                 st.subheader(":blue[Enter a record to predict]")
-                column_list = model.get_frauddetection_input_schema()["columns"]
+                column_list = SCHEMA["columns"]
                 single_record = {
                     column_list[0]: st.selectbox(
                         "Transacted type",
@@ -254,7 +251,7 @@ class FraudDetectionPredictorApp:
                     if not single_record_df.empty:
                         with st.spinner("Wait for it..."):
                             prediction_single = model.predict(single_record_df)
-                        if not prediction_single.empty or prediction_single is not None:
+                        if not prediction_single is not None or not prediction_single.empty:
                             st.success("This is a success", icon="✅")
                             st.snow()
                             st.write(
