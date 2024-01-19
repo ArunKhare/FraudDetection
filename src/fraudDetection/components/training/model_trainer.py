@@ -224,13 +224,6 @@ class ModelTrainer:
 
             logging.info(f"Model Trainer Artifact: {model_trainer_artifact}")
 
-            # mlflow_artifact_path = "trained_model"
-            # if  mlflow_artifact_path == mlflow.get_artifact_uri():
-            #     mlflow.sklearn.save_model(sk_model=fraud_detection_model,
-            #                         path=mlflow_artifact_path,
-            #                         conda_env='conda.yaml',
-            #                         pyfunc_predict_fn="predict")
-
             mlflow.sklearn.log_model(
                 sk_model=metric_info.model_object,
                 artifact_path="trained_model",

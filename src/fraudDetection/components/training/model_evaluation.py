@@ -330,7 +330,6 @@ class ModelEvaluation:
                         ),
                         signature=signature,
                         input_example=train_x[:1, :],
-                        conda_env="conda.yaml",
                         pyfunc_predict_fn="predict",
                         metadata=dict(
                             stage="staging",
