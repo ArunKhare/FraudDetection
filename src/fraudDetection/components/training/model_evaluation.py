@@ -4,11 +4,9 @@ import sys
 from pathlib import Path
 import pickle
 import shutil
-import mlflow
-
-# from IPython.display import display
-from mlflow.models.signature import infer_signature
 from dotenv import load_dotenv
+import mlflow
+from mlflow.models.signature import infer_signature
 from fraudDetection.logger import logging
 from fraudDetection.exception import FraudDetectionException
 from fraudDetection.entity import (
@@ -34,6 +32,7 @@ from fraudDetection.constants import (
     MODEL_PATH_KEY,
     DATA_SCHEMA_TARGET_COLUMN_KEY,
     DATA_SCHEMA_COLUMNS_KEY,
+    ROOT_DIR,
 )
 from fraudDetection.components import processing_data
 
@@ -69,12 +68,13 @@ class ModelEvaluation:
            model(obj:'pathlib.Path'): returns path to model in production
         """
         try:
+            trained_model_abs_path = self.model_trainer_artifact.trained_model_file_path
+            trained_model_relative_path = Path(
+                trained_model_abs_path.relative_to(ROOT_DIR)
+            )
+
             model_evaluation_dict = {
-                BEST_MODEL_KEY: {
-                    MODEL_PATH_KEY: str(
-                        self.model_trainer_artifact.trained_model_file_path
-                    )
-                },
+                BEST_MODEL_KEY: {MODEL_PATH_KEY: str(trained_model_relative_path)},
             }
 
             model_evaluation_file_path = Path(
@@ -91,7 +91,7 @@ class ModelEvaluation:
                 return
             else:
                 model_eval_file_content = read_yaml(
-                    file_path=Path(model_evaluation_file_path)
+                    file_path=model_evaluation_file_path
                 )
 
             logging.info(f"yaml file:{model_evaluation_file_path} loaded successfully")
@@ -103,9 +103,10 @@ class ModelEvaluation:
             if BEST_MODEL_KEY not in model_eval_file_content:
                 return
 
-            model = load_object(
-                file_path=Path(model_eval_file_content[BEST_MODEL_KEY][MODEL_PATH_KEY])
+            best_model_path = ROOT_DIR.joinpath(
+                model_eval_file_content[BEST_MODEL_KEY][MODEL_PATH_KEY]
             )
+            model = load_object(file_path=Path(best_model_path))
 
             return model
         except Exception as e:
@@ -117,7 +118,9 @@ class ModelEvaluation:
             model_evaluation_artifact (obj:'ModelEvaluationArtifact'): artifacts of best model;
         """
         try:
-            eval_file_path:Path = self.model_evaluation_config.model_evaluation_file_path
+            eval_file_path: Path = (
+                self.model_evaluation_config.model_evaluation_file_path
+            )
 
             model_eval_content = read_yaml(file_path=eval_file_path)
             model_eval_content = (
@@ -130,10 +133,11 @@ class ModelEvaluation:
 
             logging.info(f"Previous eval result: {model_eval_content}")
 
+            evaluated_model_relative_path = (
+                model_evaluation_artifact.evaluated_model_path.relative_to(ROOT_DIR)
+            )
             eval_result = {
-                BEST_MODEL_KEY: {
-                    MODEL_PATH_KEY: model_evaluation_artifact.evaluated_model_path
-                }
+                BEST_MODEL_KEY: {MODEL_PATH_KEY: evaluated_model_relative_path}
             }
 
             if previous_best_model is not None:
@@ -179,8 +183,6 @@ class ModelEvaluation:
             mlflow.start_run(run_name="Evaluation")
             logging.info("Mlflow run model Evaluation tracking on ")
 
-            # mlflow.set_registry_uri(self.model_evaluation_config.mlflow_uri)
-
             mlflow.set_tags({"version": "v1", "stage": "evaluation"})
             mlflow.log_param("Phase", "eval")
 
@@ -211,7 +213,6 @@ class ModelEvaluation:
                     f"Model accepted. Model eval artifact {model_evaluation_artifact}"
                 )
 
-                # return model_evaluation_artifact
             else:
                 trained_model_object = load_object(trained_model_file_path)
                 train_file_path = self.data_ingestion_artifact.train_file_path

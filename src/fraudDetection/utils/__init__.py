@@ -30,10 +30,10 @@ import sys
 from glob import glob
 from pathlib import Path
 import json
+import pickle
 import dill
 import numpy as np
 import pandas as pd
-import pickle
 from box import ConfigBox
 from ensure import ensure_annotations
 from tqdm import tqdm
@@ -81,14 +81,12 @@ def read_yaml(file_path: Path) -> dict:
             raise ValueError(f"{file_path} is empty.")
         file_path = str(file_path)
 
-        with open(file_path, "r") as f:
+        with open(file=file_path, mode="r", encoding="utf-8") as f:
             content = yaml.load(f, Loader=yaml.Loader)
             logging.info(f"yaml file:{file_path} loaded successfully")
             return content
-
-    except ValueError as e:
+    except (ValueError, FileNotFoundError) as e:
         logging.info(e)
-    except FileNotFoundError as e:
         raise FraudDetectionException(e, sys) from e
 
 
@@ -103,8 +101,12 @@ def write_yaml(file_path: Path, data: dict) -> yaml:
     try:
         dir_path = os.path.dirname(file_path)
         os.makedirs(dir_path, exist_ok=True)
-        with open(file=file_path, mode="w") as yaml_file:
+        with open(file=file_path, mode="w", encoding="utf-8") as yaml_file:
             yaml.dump(data=data, stream=yaml_file)
+    except FileNotFoundError as e:
+        raise FraudDetectionException(f"File not found: {file_path}", sys) from e
+    except PermissionError as e:
+        raise FraudDetectionException(f"Permission denied: {file_path}", sys) from e
     except Exception as e:
         raise FraudDetectionException(e, sys) from e
 
@@ -386,7 +388,7 @@ def concat_csv_files(files: list, file_dir: Path) -> pd.DataFrame:
     """
     try:
         dfs = []
-        for i, file in enumerate(iterable=files):
+        for _, file in enumerate(iterable=files):
             if file.endswith(".csv"):
                 path = Path(os.path.join(file_dir, file))
                 df: pd.DataFrame = pd.read_csv(filepath_or_buffer=path)

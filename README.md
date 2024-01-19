@@ -22,6 +22,7 @@ Installation:
     
     Instruction to run the project:
         conda activate ./FraudDetection
+        
     Save the environment:
         conda env export --file conda.yaml
 Usage:

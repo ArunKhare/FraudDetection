@@ -11,7 +11,8 @@ The application allows users to:
 - Employ a prediction service that supports model predictions, with the capability to upload a batch file or input a single record for processing.
 
 Environment Variables:
-- MLFLOW_TRACKING_URI: The URI used by MLflow for experiment tracking, loaded from the environment.
+- MLFLOW_TRACKING_URI_SQLITE: The URI used by MLflow for experiment tracking, loaded from the environment.
+- MLFLOW_TRACKING_URI_MYSQL: The URI used by MLflow for experiment tracking in cloud server, loaded from the environment.
 
 """
 
@@ -57,6 +58,8 @@ def set_tracking_uri():
         raise FraudDetectionException(e, sys) from e
     finally:
         logging.info(f"Tracking URI set {mlflow_tracking_uri}")
+
+
 # # LOCAL RUN
 # conn_location = Path(DATA_INGESTION_KAGGLE_CONFIG_FILE_PATH)
 # connect = load_json(conn_location)
