@@ -236,8 +236,8 @@ class DataIngestion:
         """
         try:
             # self.user_input_to_downloaddata()
-            # self.download_transaction_data()
-            # self.unzip_data()
+            self.download_transaction_data()
+            self.unzip_data()
             return self.split_data_as_train_test()
         except Exception as e:
             raise FraudDetectionException(e, sys) from e

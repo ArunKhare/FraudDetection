@@ -5,22 +5,19 @@ RUN apt-get update && apt-get install -y \
     curl \
     software-properties-common \
     git \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean
 
-# Set Default Mlflow URI
-ENV MLFLOWTRACKINGURI=sqlite:///mlruns.db
+COPY . ./app
 
-COPY . /app
 WORKDIR /app
 RUN pip install --no-cache-dir -r requirements_deploy.txt
 
-RUN mkdir -p /root/.kaggle/
-COPY .kaggle/kaggle.json /root/.kaggle/
-RUN chmod 600 /root/.kaggle/kaggle.json
+COPY .kaggle/kaggle.json /home/myuser/.kaggle/kaggle.json
+RUN chmod 600 /home/myuser/.kaggle/kaggle.json
 
 EXPOSE 8501
 
 HEALTHCHECK CMD curl --fail http://localhost:8501/_stcore/health
 
-ENTRYPOINT ["streamlit", "run"]
-CMD ["apps/trainingapp.py"]
+ENTRYPOINT ["streamlit", "run", "apps/trainingapp.py", "--server.port=8501"]

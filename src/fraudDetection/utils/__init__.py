@@ -82,7 +82,7 @@ def read_yaml(file_path: Path) -> dict:
         file_path = str(file_path)
 
         with open(file=file_path, mode="r", encoding="utf-8") as f:
-            content = yaml.load(f, Loader=yaml.Loader)
+            content = yaml.safe_load(f)
             logging.info(f"yaml file:{file_path} loaded successfully")
             return content
     except (ValueError, FileNotFoundError) as e:
@@ -102,7 +102,7 @@ def write_yaml(file_path: Path, data: dict) -> yaml:
         dir_path = os.path.dirname(file_path)
         os.makedirs(dir_path, exist_ok=True)
         with open(file=file_path, mode="w", encoding="utf-8") as yaml_file:
-            yaml.dump(data=data, stream=yaml_file)
+            yaml.safe_dump(data=data, stream=yaml_file)
     except FileNotFoundError as e:
         raise FraudDetectionException(f"File not found: {file_path}", sys) from e
     except PermissionError as e:

@@ -42,11 +42,8 @@ class ModelPusher:
             model_pusher_artifacts(obj:'ModelPusherArtifacts'): paths to saved model
         """
         try:
-            evaluated_model_relative_file_path = (
+            evaluated_model_file_path = os.path.abspath(
                 self.model_evaluation_artifact.evaluated_model_path
-            )
-            evaluated_model_file_path = ROOT_DIR.joinpath(
-                evaluated_model_relative_file_path
             )
 
             is_model_accepted = self.model_evaluation_artifact.is_model_accepted

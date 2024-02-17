@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+        
+  frauddetectionapp:
+    image: app-ecr:v1
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./artifacts:/app/artifacts
+      - ./logs:/app/logs
+      - ./db:mlruns.db
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8501/_stcore/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  mlflow:
+    restart: always
+    build: ./mlflow
+    image: mlflow_server:latest
+    container_name: mlflow_server
+    ports:
+      - "8080:5000"
+    environment:
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION}
+      - MLFOW_TRACKING_URI_MYSQL=mysql+pymysql://${MYSQL_USER}:${MYSQL_PASSWORD}@locahost:3306/${MYSQL_DATABASE}
+    volumes:
+      - ./mlruns.db:/app/mlruns.db
+      - ./db:/var/lib/mysql
+    command: mlflow server --backend-store-uri ${MLFOW_TRACKING_URI_MYSQL} --default-artifact-root s3://frauddbucket/mlflow/ --host 0.0.0.0
+
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:5000"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  artifacts:
+  logs:
+  db:
+  mlruns:

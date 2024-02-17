@@ -69,17 +69,13 @@ class ModelEvaluation:
         """
         try:
             trained_model_abs_path = self.model_trainer_artifact.trained_model_file_path
-            trained_model_relative_path = Path(
-                trained_model_abs_path.relative_to(ROOT_DIR)
-            )
-
+            trained_model_relative_path = os.path.normpath(trained_model_abs_path.relative_to(ROOT_DIR))
+            
             model_evaluation_dict = {
                 BEST_MODEL_KEY: {MODEL_PATH_KEY: str(trained_model_relative_path)},
             }
 
-            model_evaluation_file_path = Path(
-                self.model_evaluation_config.model_evaluation_file_path
-            )
+            model_evaluation_file_path = self.model_evaluation_config.model_evaluation_file_path
 
             if (
                 not os.path.exists(model_evaluation_file_path)
@@ -104,7 +100,7 @@ class ModelEvaluation:
                 return
 
             best_model_path = ROOT_DIR.joinpath(
-                model_eval_file_content[BEST_MODEL_KEY][MODEL_PATH_KEY]
+                Path(model_eval_file_content[BEST_MODEL_KEY][MODEL_PATH_KEY])
             )
             model = load_object(file_path=Path(best_model_path))
 
@@ -134,10 +130,10 @@ class ModelEvaluation:
             logging.info(f"Previous eval result: {model_eval_content}")
 
             evaluated_model_relative_path = (
-                model_evaluation_artifact.evaluated_model_path.relative_to(ROOT_DIR)
+               os.path.normpath(model_evaluation_artifact.evaluated_model_path.relative_to(ROOT_DIR))
             )
             eval_result = {
-                BEST_MODEL_KEY: {MODEL_PATH_KEY: evaluated_model_relative_path}
+                BEST_MODEL_KEY: {MODEL_PATH_KEY: str(evaluated_model_relative_path)}
             }
 
             if previous_best_model is not None:

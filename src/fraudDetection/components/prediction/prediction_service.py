@@ -21,9 +21,9 @@ Usage:
 if __name__ == "__main__":
     FraudDetectionPredictorApp.run()
 """
+
 import os
 from pathlib import Path
-import json
 import re
 import numpy as np
 import pandas as pd
@@ -32,14 +32,17 @@ import joblib
 import streamlit as st
 
 tags = {"Version": "v1"}
-# INPUT_SCHEMA_JSON_FILE_NAME = Path("input_schema.json")
+
+ROOT_DIR = os.getcwd()
 MODEL_EVALUATION_YAML = Path(os.path.join("model_evaluation.yaml"))
-SAVED_MODELS_DIR = Path(os.path.join("artifacts", "saved_models"))
+SAVED_MODELS_DIR = Path(os.path.join(ROOT_DIR, "artifacts", "saved_models"))
 MODEL_NAME = "model.pkl"
 PREPROCESSER_OBJ_PATH = Path(
-    os.path.join("artifacts", "transformed_data", "preprocessed", "preprocessed.pkl")
+    os.path.join(
+        ROOT_DIR, "artifacts", "transformed_data", "preprocessed", "preprocessed.pkl"
+    )
 )
-EVALUATED_MODELS_PATH = Path(os.path.join("artifacts", "model_evaluation"))
+EVALUATED_MODELS_PATH = Path(os.path.join(ROOT_DIR, "artifacts", "model_evaluation"))
 SCHEMA = {
     "columns": [
         "type",
@@ -114,10 +117,12 @@ class FraudDetectionModel:
                 )
             model_file = Path(os.path.join(saved_model_path, self.model_name))
             model = joblib.load(model_file)
+            size_in_bytes = os.path.getsize("model.pkl")
+            st.write(f"Size of model in bytes : {size_in_bytes}")
         except (ValueError, TypeError) as e:
             print(f"Error: {e}")
         except Exception as e:
-            print(e)
+            print(f"get latest model {e}")
 
         return model
 
@@ -135,11 +140,13 @@ class FraudDetectionModel:
             preprocessing_pipe_obj = joblib.load(self.preprocessd_obj_path)
             df_input = df[SCHEMA["columns"]]
             transformed_test_arr = preprocessing_pipe_obj.transform(df_input)
+            array_size = transformed_test_arr.size
+            st.write(f"Size of transformed data array : {array_size}")
             return transformed_test_arr
         except (ValueError, TypeError) as e:
             print(f"Error: {e}")
         except Exception as e:
-            print(e)
+            print(f"transform input {e}")
 
     def predict(self, df) -> pd.DataFrame:
         """Make predictions using the loaded model.
@@ -165,7 +172,7 @@ class FraudDetectionModel:
         except (ValueError, TypeError) as e:
             print(f"Error: {e}")
         except Exception as e:
-            print(e)
+            print(f"predict{e}")
 
 
 class FraudDetectionPredictorApp:
@@ -291,8 +298,8 @@ class FraudDetectionPredictorApp:
                             with st.spinner("Wait for it..."):
                                 prediction_multiple = model.predict(multiple_record_df)
                             if (
-                                not prediction_multiple.empty
-                                or prediction_multiple is not None
+                                not prediction_multiple is not None
+                                or not prediction_multiple.empty
                             ):
                                 st.success("This is a success", icon="✅")
                                 st.balloons()

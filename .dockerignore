@@ -33,3 +33,4 @@ remove_file_pycache.sh
 /aws-deployment
 pyproject_poetry.toml
 **/snowflake
+.aws

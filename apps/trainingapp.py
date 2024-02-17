@@ -32,8 +32,8 @@ from fraudDetection.config.configuration import (
     ROOT_DIR,
     CONFIG_FILE_PATH,
 )
-from fraudDetection.utils import read_yaml, write_yaml
-from fraudDetection.constants import CONFIG_DIR
+from fraudDetection.utils import read_yaml, write_yaml, load_json
+from fraudDetection.constants import CONFIG_DIR, DATA_INGESTION_KAGGLE_CONFIG_FILE_PATH
 from fraudDetection.components import FraudDetectionPredictorApp
 from fraudDetection.logger import get_log_dataframe, logging
 from fraudDetection.exception import FraudDetectionException
@@ -42,6 +42,12 @@ from mlflowapp import exp_tracking
 
 load_dotenv()
 
+conn_location = Path(DATA_INGESTION_KAGGLE_CONFIG_FILE_PATH)
+connect = load_json(conn_location)
+os.environ["KAGGLE_CONFIG_DIR"] = str(conn_location.parent)
+os.environ["KAGGLE_USERNAME"] = connect["username"]
+os.environ["KAGGLE_KEY"] = connect["key"]
+print("No specific deployment check provided. Performing default actions...")
 
 def set_tracking_uri():
     """Set Mlflow Tracking URI
@@ -49,7 +55,7 @@ def set_tracking_uri():
         InvalidUrlException: when URI is not in proper format
     """
     mlflow_tracking_uri = os.getenv(
-        "MLFLOWTRACKINGURI", default="http://localhost:8080"
+        "MLFLOW_TRACKING_URI_MYSQL", default="http://localhost:8080"
     )
     try:
         mlflow.set_tracking_uri(mlflow_tracking_uri)
@@ -58,15 +64,6 @@ def set_tracking_uri():
         raise FraudDetectionException(e, sys) from e
     finally:
         logging.info(f"Tracking URI set {mlflow_tracking_uri}")
-
-
-# # LOCAL RUN
-# conn_location = Path(DATA_INGESTION_KAGGLE_CONFIG_FILE_PATH)
-# connect = load_json(conn_location)
-# os.environ["KAGGLE_CONFIG_DIR"] = str(conn_location.parent)
-# os.environ["KAGGLE_USERNAME"] = connect["username"]
-# os.environ["KAGGLE_KEY"] = connect["key"]
-# print("No specific deployment check provided. Performing default actions...")
 
 
 class Constants:
